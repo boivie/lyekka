@@ -42,10 +42,19 @@ int PathCmdHandler::execute(int argc, char* argv[])
     sd::sqlite db = get_db();
     sd::sql insert_query(db);
     insert_query << "INSERT INTO paths (path) VALUES (?)";
-    insert_query << p.string();
-    insert_query.step();
+    try 
+    {
+      insert_query << p.string();
+      insert_query.step();
+    }
+    catch(sd::db_error& err)
+    {
+      cerr << p << " is already present." << endl;
+      return -2;
+    }    
+    
     int id = db.last_rowid();
-    cout << "Path " << p << " inserted as ID " << id << "." << endl;
+    cout << "Path '" << p << "' added." << endl;
   }
   else if (cmd == "list") 
   {
@@ -58,7 +67,7 @@ int PathCmdHandler::execute(int argc, char* argv[])
     while (query.step()) 
     { 
       query >> id >> path;
-      cout << id << ": " << path << endl;
+      cout << "[" << id << "] " << path << endl;
     }
   }
   else

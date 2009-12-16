@@ -32,7 +32,7 @@ int CreateCmdHandler::execute(int argc, char* argv[])
   }
 
   char* errmsg;
-  if (sqlite3_exec(db, "CREATE TABLE paths (id INTEGER PRIMARY KEY, path TEXT)", NULL, NULL, &errmsg) != SQLITE_OK)
+  if (sqlite3_exec(db, "CREATE TABLE paths (id INTEGER PRIMARY KEY, path TEXT UNIQUE)", NULL, NULL, &errmsg) != SQLITE_OK)
   {
     cerr << "DB Error: " << errmsg << endl;
     sqlite3_free(errmsg);
