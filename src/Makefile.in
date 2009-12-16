@@ -43,7 +43,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT) \
-	create_cmd.$(OBJEXT)
+	create_cmd.$(OBJEXT) cmd_handler.$(OBJEXT) path_cmd.$(OBJEXT) \
+	sdsqlite.$(OBJEXT)
 lyekka_OBJECTS = $(am_lyekka_OBJECTS)
 lyekka_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -155,14 +156,14 @@ top_srcdir = @top_srcdir@
 # what flags you want to pass to the C compiler & linker
 AM_CFLAGS = --pedantic -Wall -O2
 AM_LDFLAGS = 
-INCLUDES = 
+INCLUDES = -I../extern/sdsqlite/
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h ../extern/sdsqlite/sdsqlite.cpp
 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cc .o .obj
+.SUFFIXES: .cc .cpp .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -225,9 +226,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/create_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/index_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path_cmd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdsqlite.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -237,6 +241,34 @@ distclean-compile:
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
 
 .cc.obj:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+sdsqlite.o: ../extern/sdsqlite/sdsqlite.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT sdsqlite.o -MD -MP -MF $(DEPDIR)/sdsqlite.Tpo -c -o sdsqlite.o `test -f '../extern/sdsqlite/sdsqlite.cpp' || echo '$(srcdir)/'`../extern/sdsqlite/sdsqlite.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/sdsqlite.Tpo $(DEPDIR)/sdsqlite.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../extern/sdsqlite/sdsqlite.cpp' object='sdsqlite.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o sdsqlite.o `test -f '../extern/sdsqlite/sdsqlite.cpp' || echo '$(srcdir)/'`../extern/sdsqlite/sdsqlite.cpp
+
+sdsqlite.obj: ../extern/sdsqlite/sdsqlite.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT sdsqlite.obj -MD -MP -MF $(DEPDIR)/sdsqlite.Tpo -c -o sdsqlite.obj `if test -f '../extern/sdsqlite/sdsqlite.cpp'; then $(CYGPATH_W) '../extern/sdsqlite/sdsqlite.cpp'; else $(CYGPATH_W) '$(srcdir)/../extern/sdsqlite/sdsqlite.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/sdsqlite.Tpo $(DEPDIR)/sdsqlite.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../extern/sdsqlite/sdsqlite.cpp' object='sdsqlite.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o sdsqlite.obj `if test -f '../extern/sdsqlite/sdsqlite.cpp'; then $(CYGPATH_W) '../extern/sdsqlite/sdsqlite.cpp'; else $(CYGPATH_W) '$(srcdir)/../extern/sdsqlite/sdsqlite.cpp'; fi`
+
+.cpp.o:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+
+.cpp.obj:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@

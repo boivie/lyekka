@@ -11,6 +11,7 @@
 #include "main.h"
 #include "index_cmd.h"
 #include "create_cmd.h"
+#include "path_cmd.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -40,7 +41,9 @@ int main(int argc, char*argv[])
     Main me;
     
     me.add_handler(new IndexCmdHandler());
-    me.add_handler(new CreateCmdHandler());
+    me.add_handler(new CreateCmdHandler()); 
+    me.add_handler(new PathCmdHandler());
+    
     return me.execute(argc, argv);
   }
 }
