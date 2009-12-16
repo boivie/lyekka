@@ -1,0 +1,19 @@
+
+Ix:~ victor$ lyekka create
+Created lyekka.db
+
+Ix:~ victor$ lyekka path add /path/to/index
+Added /path/to/index
+
+Ix:~ victor$ lyekka path show
+1 /path/to/index
+
+Ix:~ victor$ lyekka update-index
+Indexing .... Done.
+
+Ix:~ victor$ lyekka remote add work
+Added work as a remote site.
+
+Ix:~ victor$ lyekka remote push /Volumes/USBPINNE
+Copying ... Done.
+
