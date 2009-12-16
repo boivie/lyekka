@@ -30,7 +30,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = indexer$(EXEEXT)
+bin_PROGRAMS = lyekka$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -42,9 +42,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_indexer_OBJECTS = indexer.$(OBJEXT)
-indexer_OBJECTS = $(am_indexer_OBJECTS)
-indexer_LDADD = $(LDADD)
+am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT)
+lyekka_OBJECTS = $(am_lyekka_OBJECTS)
+lyekka_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -53,8 +53,12 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(indexer_SOURCES)
-DIST_SOURCES = $(indexer_SOURCES)
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+SOURCES = $(lyekka_SOURCES)
+DIST_SOURCES = $(lyekka_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -151,8 +155,8 @@ top_srcdir = @top_srcdir@
 AM_CFLAGS = --pedantic -Wall -O2
 AM_LDFLAGS = 
 INCLUDES = 
-indexer_SOURCES = \
-indexer.cc
+lyekka_SOURCES = \
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h
 
 all: all-am
 
@@ -210,9 +214,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-indexer$(EXEEXT): $(indexer_OBJECTS) $(indexer_DEPENDENCIES) 
-	@rm -f indexer$(EXEEXT)
-	$(CXXLINK) $(indexer_OBJECTS) $(indexer_LDADD) $(LIBS)
+lyekka$(EXEEXT): $(lyekka_OBJECTS) $(lyekka_DEPENDENCIES) 
+	@rm -f lyekka$(EXEEXT)
+	$(CXXLINK) $(lyekka_OBJECTS) $(lyekka_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -220,7 +224,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indexer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/index_cmd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

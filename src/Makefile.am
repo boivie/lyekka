@@ -5,7 +5,7 @@ INCLUDES =
 
 # this lists the binaries to produce, the (non-PHONY, binary) targets in
 # the previous manual Makefile
-bin_PROGRAMS = indexer
-indexer_SOURCES = \
-indexer.cc
+bin_PROGRAMS = lyekka
+lyekka_SOURCES = \
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h
 

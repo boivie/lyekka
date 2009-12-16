@@ -12,7 +12,7 @@ AC_PROG_INSTALL
 # Checks for libraries.
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADER(boost/filesystem/operations.hpp, [], [AC_MSG_ERROR([header file <boost/filesystem/operations.hpp> is required for biist])])
-LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt"
+LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

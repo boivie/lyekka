@@ -1,0 +1,17 @@
+#ifndef CMD_HANDLER_H_INCLUSION_GUARD
+#define CMD_HANDLER_H_INCLUSION_GUARD
+#include <string>
+
+namespace Lyekka 
+{
+  
+class CmdHandler 
+{
+ public:
+  virtual const std::string get_name(void) = 0;
+  virtual int execute(int argc, char* argv[]) = 0;
+};
+
+}
+
+#endif
