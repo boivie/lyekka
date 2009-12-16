@@ -1,0 +1,5 @@
+*.o
+/.DS_Store
+/config.log
+/config.status
+Makefile
