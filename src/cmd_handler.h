@@ -8,7 +8,8 @@ namespace Lyekka
 class CmdHandler 
 {
  public:
-  virtual const std::string get_name(void) = 0;
+  virtual const std::string get_cmd(void) = 0;
+  virtual const std::string get_description(void) = 0;
   virtual int execute(int argc, char* argv[]) = 0;
 };
 

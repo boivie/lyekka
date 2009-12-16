@@ -8,7 +8,12 @@ namespace Lyekka
 class IndexCmdHandler : public CmdHandler 
 {
  public:
-  const std::string get_name(void) { return "index"; }
+  const std::string get_cmd(void) { return "index"; }
+  const std::string get_description(void) 
+  {
+    return "Updates the index";
+  }
+  
   int execute(int argc, char* argv[]);
 };
 

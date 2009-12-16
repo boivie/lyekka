@@ -10,13 +10,14 @@
 #include <string>
 #include "main.h"
 #include "index_cmd.h"
+#include "create_cmd.h"
 
 using namespace std;
 using namespace Lyekka;
 
 void Main::add_handler(CmdHandler* handler_p)
 {
-  handlers[handler_p->get_name()] = handler_p;
+  handlers[handler_p->get_cmd()] = handler_p;
 }
 
 int Main::execute(int argc, char* argv[]) 
@@ -39,6 +40,7 @@ int main(int argc, char*argv[])
     Main me;
     
     me.add_handler(new IndexCmdHandler());
+    me.add_handler(new CreateCmdHandler());
     return me.execute(argc, argv);
   }
 }

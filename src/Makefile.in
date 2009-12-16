@@ -42,7 +42,8 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT)
+am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT) \
+	create_cmd.$(OBJEXT)
 lyekka_OBJECTS = $(am_lyekka_OBJECTS)
 lyekka_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -156,7 +157,7 @@ AM_CFLAGS = --pedantic -Wall -O2
 AM_LDFLAGS = 
 INCLUDES = 
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc
 
 all: all-am
 
@@ -171,9 +172,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/Makefile
+	  $(AUTOMAKE) --foreign  src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -224,6 +225,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/create_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/index_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 

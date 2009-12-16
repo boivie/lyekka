@@ -7,5 +7,6 @@ INCLUDES =
 # the previous manual Makefile
 bin_PROGRAMS = lyekka
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc
+
 
