@@ -1,6 +1,6 @@
 #include <iostream>
 #include "cmd_handler.h"
-#include "sdsqlite.h"
+#include "sdsqlite/sdsqlite.h"
 
 using namespace std;
 using namespace Lyekka;

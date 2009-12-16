@@ -1,7 +1,7 @@
 #ifndef CMD_HANDLER_H_INCLUSION_GUARD
 #define CMD_HANDLER_H_INCLUSION_GUARD
 #include <string>
-#include "sdsqlite.h"
+#include "sdsqlite/sdsqlite.h"
 
 namespace Lyekka 
 {
