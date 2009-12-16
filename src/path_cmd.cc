@@ -1,6 +1,9 @@
 #include <iostream>
 #include "path_cmd.h"
 #include "sdsqlite/sdsqlite.h"
+#include <boost/filesystem/operations.hpp>
+
+namespace fs = boost::filesystem;
 
 using namespace std;
 using namespace Lyekka;
@@ -20,16 +23,29 @@ int PathCmdHandler::execute(int argc, char* argv[])
 
   string cmd = string(argv[2]);
   
-
   if ((cmd == "add") && (argc >= 4))
   {
+    fs::path p( argv[3], fs::native );
+    p = fs::system_complete(p);
+    
+    if ( !fs::exists( p ) )
+    { 
+      std::cerr << "not found: " << p << std::endl;
+      return -2;
+    }
+    else if (!fs::is_directory(p)) 
+    {
+      std::cerr << p << " is not a directory." << endl;
+      return -2;
+    }
+    
     sd::sqlite db = get_db();
     sd::sql insert_query(db);
     insert_query << "INSERT INTO paths (path) VALUES (?)";
-    insert_query << string(argv[3]);
+    insert_query << p.string();
     insert_query.step();
     int id = db.last_rowid();
-    cout << "Path " << argv[3] << " inserted as ID " << id << "." << endl;
+    cout << "Path " << p << " inserted as ID " << id << "." << endl;
   }
   else if (cmd == "list") 
   {
