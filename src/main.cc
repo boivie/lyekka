@@ -23,9 +23,15 @@ void Main::add_handler(CmdHandler* handler_p)
 
 int Main::execute(int argc, char* argv[]) 
 {
-  CmdHandler* cmd_p = handlers[argv[1]];
+  if (handlers.find(argv[1]) == handlers.end())
+    return -1;
   
-  return cmd_p->execute(argc, argv);
+  return handlers[argv[1]]->execute(argc, argv);
+}
+
+static void print_syntax(void)
+{
+  cout << "syntax: TBD" << endl;
 }
 
 
@@ -33,7 +39,7 @@ int main(int argc, char*argv[])
 {
   if (argc < 2) 
   {
-    cout << "syntax: TBD" << endl;
+    print_syntax();
     return -1;
   }
   else
@@ -44,6 +50,10 @@ int main(int argc, char*argv[])
     me.add_handler(new CreateCmdHandler()); 
     me.add_handler(new PathCmdHandler());
     
-    return me.execute(argc, argv);
+    int ret = me.execute(argc, argv);
+    if (ret == -1)
+      print_syntax();
+    
+    return ret;
   }
 }
