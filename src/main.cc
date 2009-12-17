@@ -29,30 +29,37 @@ int Main::execute(int argc, char* argv[])
   return handlers[argv[1]]->execute(argc, argv);
 }
 
-static void print_syntax(void)
+void Main::print_syntax(void)
 {
-  cout << "syntax: TBD" << endl;
+  map<string,CmdHandler*>::iterator i;
+  cout << "Syntax: lyekka [CMD] [ARGS]" << endl;
+  
+  for (i = handlers.begin(); i != handlers.end(); i++)
+  {
+    cout << i->second->get_cmd() << string(15 - i->second->get_cmd().size(), ' ') << i->second->get_description() << endl;
+  }
 }
 
 
 int main(int argc, char*argv[])
-{
+{ 
+  Main me;
+    
+  me.add_handler(new IndexCmdHandler());
+  me.add_handler(new CreateCmdHandler()); 
+  me.add_handler(new PathCmdHandler());
+  
   if (argc < 2) 
   {
-    print_syntax();
+    me.print_syntax();
     return -1;
   }
   else
   {
-    Main me;
-    
-    me.add_handler(new IndexCmdHandler());
-    me.add_handler(new CreateCmdHandler()); 
-    me.add_handler(new PathCmdHandler());
     
     int ret = me.execute(argc, argv);
     if (ret == -1)
-      print_syntax();
+      me.print_syntax();
     
     return ret;
   }
