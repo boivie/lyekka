@@ -30,6 +30,7 @@
 #include <string>
 #include <istream>
 #include <ostream>
+#include <vector>
 #include <sqlite3.h>
 
 namespace sd
@@ -303,6 +304,8 @@ struct sql
 	///
 	/// Bind an input stream value to the current input.
 	sql&		operator<<(std::istream& val);
+
+	sql&		operator<<(std::vector<uint8_t>& val);
 	
 	///
 	/// @param	val		Reference to variable to have value returned in
@@ -408,6 +411,8 @@ struct sql
 	///
 	/// Extract a stream from the current result row.
 	sql&		operator>>(std::ostream& val);
+
+	sql&		operator>>(std::vector<uint8_t>& val);
 	
 private:
 	///

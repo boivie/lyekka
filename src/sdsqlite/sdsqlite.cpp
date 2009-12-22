@@ -286,6 +286,17 @@ sql&	sql::operator<<(std::istream& val)
 }
 
 ///
+/// @param	val		Value to bind
+/// @return			Reference to the statement
+///
+/// Bind a value to the current input.
+sql&	sql::operator<<(std::vector<uint8_t>& val)
+{
+	sqlite3_bind_blob(stmt_, ++ipos_, &val[0], val.size(), 0);
+	return *this;
+}
+
+///
 /// @param	val		Reference to variable to have value returned in
 /// @return			Reference to the statement
 ///
@@ -308,6 +319,21 @@ sql&	sql::operator>>(std::ostream& val)
 	int bytes = sqlite3_column_bytes(stmt_, opos_);
 	if(bytes > 0)
 		val.write(static_cast<const char*>(sqlite3_column_blob(stmt_, opos_)), bytes);
+	++opos_;
+	return *this;
+}
+
+///
+/// @param	val		Reference to variable to have value returned in
+/// @return			Reference to the statement
+///
+/// Extract from the current result row.
+sql&	sql::operator>>(std::vector<uint8_t>& val)
+{
+	int bytes = sqlite3_column_bytes(stmt_, opos_);
+  val.resize(bytes);
+	if(bytes > 0)
+    memcpy(&val[0], static_cast<const char*>(sqlite3_column_blob(stmt_, opos_)), bytes);
 	++opos_;
 	return *this;
 }

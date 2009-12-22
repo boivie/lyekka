@@ -1,6 +1,7 @@
 #include <iostream>
 #include "path_cmd.h"
 #include "sdsqlite/sdsqlite.h"
+#include "db.h"
 #include <boost/filesystem/operations.hpp>
 
 namespace fs = boost::filesystem;
@@ -39,7 +40,7 @@ int PathCmdHandler::execute(int argc, char* argv[])
       return -2;
     }
     
-    sd::sqlite db = get_db();
+    sd::sqlite& db = Db::get();
     sd::sql insert_query(db);
     insert_query << "INSERT INTO paths (path) VALUES (?)";
     try 
@@ -58,7 +59,7 @@ int PathCmdHandler::execute(int argc, char* argv[])
   }
   else if (cmd == "list") 
   {
-    sd::sqlite db = get_db();
+    sd::sqlite db = Db::get();
     sd::sql query(db);
     query << "SELECT id, path FROM paths ORDER BY id";
     int id;

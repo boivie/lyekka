@@ -38,6 +38,35 @@ int CreateCmdHandler::execute(int argc, char* argv[])
     sqlite3_free(errmsg);
     return -2;
   }
+  if (sqlite3_exec(db, "CREATE TABLE files (" 
+      "id INTEGER PRIMARY KEY, "
+      "parent INTEGER, "
+      "name TEXT, "
+      "mtime INTEGER, "
+      "ctime INTEGER, "
+      "type INTEGER)", NULL, NULL, &errmsg) != SQLITE_OK)
+  {
+    cerr << "DB Error: " << errmsg << endl;
+    sqlite3_free(errmsg);
+    return -2;
+  }
+  if (sqlite3_exec(db, "CREATE TABLE chunks ("
+      "file_id INTEGER, "
+      "offset INTEGER, "
+      "size INTEGER, "
+      "cid BLOB COLLATE BINARY, "
+		  "key BLOB COLLATE BINARY)", NULL, NULL, &errmsg) != SQLITE_OK)
+  {
+    cerr << "DB Error: " << errmsg << endl;
+    sqlite3_free(errmsg);
+    return -2;
+  }
+  if (sqlite3_exec(db, "PRAGMA user_version = 1", NULL, NULL, &errmsg) != SQLITE_OK)
+  {
+    cerr << "DB Error: " << errmsg << endl;
+    sqlite3_free(errmsg);
+    return -2;
+  }
   cout << "Database created." << endl;
   return 0;
 }
