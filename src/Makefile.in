@@ -159,7 +159,7 @@ AM_CFLAGS = --pedantic -Wall -O2 -DSHA2_USE_INTTYPES_H -std=c99
 AM_LDFLAGS = 
 INCLUDES = 
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c chunk.h
 
 all: all-am
 

@@ -36,12 +36,6 @@ class IndexedFile : public IndexedBase
 public:
   IndexedFile(int dbid, std::string basename, time_t mtime, time_t ctime, uint64_t size) 
     : IndexedBase(dbid, basename, mtime, ctime, size, INDEXED_TYPE_FILE) { };
-  
-  const std::vector<Chunk>& get_chunks() { return m_chunks; }
-  const void set_chunks(std::vector<Chunk>& chunks) { m_chunks = chunks; }
-  
-protected:
-  std::vector<Chunk> m_chunks;
 };
 
 class IndexedDir : public IndexedBase 
