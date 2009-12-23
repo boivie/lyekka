@@ -44,6 +44,7 @@ int CreateCmdHandler::execute(int argc, char* argv[])
       "name TEXT, "
       "mtime INTEGER, "
       "ctime INTEGER, "
+      "size INTEGER, "
       "type INTEGER)", NULL, NULL, &errmsg) != SQLITE_OK)
   {
     cerr << "DB Error: " << errmsg << endl;
@@ -61,6 +62,7 @@ int CreateCmdHandler::execute(int argc, char* argv[])
     sqlite3_free(errmsg);
     return -2;
   }
+  sqlite3_exec(db, "CREATE INDEX chunks_file_id ON chunks(file_id)", NULL, NULL, &errmsg);
   if (sqlite3_exec(db, "PRAGMA user_version = 1", NULL, NULL, &errmsg) != SQLITE_OK)
   {
     cerr << "DB Error: " << errmsg << endl;

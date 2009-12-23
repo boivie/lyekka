@@ -13,6 +13,15 @@ using namespace std;
 namespace fs = boost::filesystem;
   
 
+
+#if defined(HAVE_STAT64) && !defined(__APPLE__)
+typedef struct stat64 statbuf;
+#define file_stat(f, s) stat64(f, s)
+#else
+typedef struct stat statbuf;
+#define file_stat(f, s) stat(f, s)
+#endif
+
 void Indexer::update_index(std::string& path)
 {
   fs::path full_path( fs::initial_path<fs::path>() );
@@ -32,21 +41,56 @@ void Indexer::update_index(std::string& path)
   query.step(); 
 }
 
+#define MAX_BLOCK_SIZE (30*1024*1024)
+#ifndef MIN
+#define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
+void Indexer::make_chunks(fs::directory_iterator& itr, IndexedFile& file, uint64_t size)
+{
+  // The chunks created will be anonymous at first - they have no cid or key - only an offset and size.
+  // They will get their identity when exporting chunks. That's when we encrypt and calculate checksums
+  sd::sql delquery(m_db);
+  delquery << "DELETE FROM chunks WHERE file_id = ?";
+  delquery << file.get_dbid();
+  delquery.step();
+  uint64_t remaining = size;
+  uint64_t offset = 0;
+  while (remaining > 0)
+  {
+    uint32_t thispart = MIN(remaining, MAX_BLOCK_SIZE);
+    sd::sql insquery(m_db);
+    insquery << "INSERT INTO chunks (file_id, offset, size, cid, key) VALUES (?, ?, ?, NULL, NULL)";
+    insquery << file.get_dbid() << offset << thispart;  
+    insquery.step();
+    remaining -= thispart;
+    offset += thispart;
+  }
+}
+
 void Indexer::visit_file(fs::directory_iterator& itr, IndexedFile& file)
 {
-  struct stat statr;
-  if (stat(itr->path().string().c_str(), &statr) == 0)
+  statbuf statr;
+  if (file_stat(itr->path().string().c_str(), &statr) == 0)
   {
-    if (file.get_mtime() != statr.st_mtime) 
+    if ((file.get_mtime() != statr.st_mtime) ||
+      (file.get_ctime() != statr.st_ctime) ||
+      (file.get_size() != statr.st_size))
     {
-      cout << "UPD: " << file.get_basename() << ": " << file.get_mtime() << " <-> " << statr.st_mtime << endl;
+      // Chunkify it - will calculate chunks and add to db
+      make_chunks(itr, file, statr.st_size);
+      // Update file metadata
+      //      cout << "UPD: " << file.get_basename() << endl;
+      sd::sql query(m_db);
+      query << "UPDATE files SET mtime=?, ctime=?, size=? WHERE id=?";  
+      query << statr.st_mtime << statr.st_ctime << statr.st_size << file.get_dbid();
+      query.step();
     }
   }
 }
 
 void Indexer::visit_dir(fs::directory_iterator& itr, IndexedDir& dir)
 {
-  cout << "Dir: " << dir.get_basename() << endl;
 }
 
 void Indexer::visit_other(fs::directory_iterator& itr, IndexedOther& item)
@@ -59,28 +103,29 @@ FileList Indexer::get_known_files(int dir_db_id)
 { 
   FileList files;
   sd::sql query(m_db);
-  query << "SELECT id,name,mtime,ctime,type FROM files WHERE parent = ?";
+  query << "SELECT id,name,mtime,ctime,size,type FROM files WHERE parent = ?";
   query << dir_db_id;
   int id;
   string name;
   int64_t mtime;
   int64_t ctime;
+  uint64_t size;
   int type;
   
   while (query.step()) 
   { 
-    query >> id >> name >> mtime >> ctime >> type;
+    query >> id >> name >> mtime >> ctime >> size >> type;
     if (type == INDEXED_TYPE_FILE) 
     {
-      files.insert(pair<std::string,IndexedBase*>(name, new IndexedFile(id, name, mtime, ctime)));
+      files.insert(pair<std::string,IndexedBase*>(name, new IndexedFile(id, name, mtime, ctime, size)));
     }
     else if (type == INDEXED_TYPE_DIR) 
     {
-      files.insert(pair<std::string,IndexedBase*>(name, new IndexedDir(id, name, mtime, ctime)));
+      files.insert(pair<std::string,IndexedBase*>(name, new IndexedDir(id, name, mtime, ctime, size)));
     }
     else if (type == INDEXED_TYPE_OTHER) 
     {
-      files.insert(pair<std::string,IndexedBase*>(name, new IndexedOther(id, name, mtime, ctime)));
+      files.insert(pair<std::string,IndexedBase*>(name, new IndexedOther(id, name, mtime, ctime, size)));
     } 
     else 
     {
@@ -99,6 +144,7 @@ static IndexedType get_type_from_itr(fs::directory_iterator& itr)
 
 void Indexer::index_path(fs::path& path, int dir_db_id)
 {
+  cout << path.string() << endl;
   //  cout << "Inside " << path.string() << endl;
   FileList known = get_known_files(dir_db_id);
   std::vector<DirToVisit> subdirs;
@@ -179,45 +225,32 @@ void Indexer::delete_files(FileList& deletemap)
   }
 }
 
-void Indexer::create_db_obj(boost::filesystem::directory_iterator& itr, int type, int parent_id, time_t* mtime_p, time_t* ctime_p)
+void Indexer::create_db_obj(boost::filesystem::directory_iterator& itr, int type, int parent_id)
 {
-  struct stat statr;
   sd::sql query(m_db);
-  if (stat(itr->path().string().c_str(), &statr) == 0)
-  {
-    string name = itr->path().filename();
-    query << "INSERT INTO FILES (parent,name,type,mtime,ctime) VALUES (?, ?, ?, ?, ?)";
-    query << parent_id << name << type << statr.st_mtime << statr.st_ctime;
-    query.step();
-    *mtime_p = statr.st_mtime;
-    *ctime_p = statr.st_ctime;
-  }
-  else  
-  {
-    cerr << "Failed to get file information for " << itr->path().filename() << " - skipping." << endl;
-  }
+  string name = itr->path().filename();
+  query << "INSERT INTO FILES (parent,name,type,mtime,ctime,size) VALUES (?, ?, ?, 0, 0, 0)";
+  query << parent_id << name << type << 0 << 0 << 0;
+  query.step();
 }
 
 std::auto_ptr<IndexedFile> Indexer::create_file_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  time_t mtime, ctime;
-  create_db_obj(itr, INDEXED_TYPE_FILE, parent_id, &mtime, &ctime);
-  auto_ptr<IndexedFile> ret_p(new IndexedFile(m_db.last_rowid(), itr->path().filename(), mtime, ctime));
+  create_db_obj(itr, INDEXED_TYPE_FILE, parent_id);
+  auto_ptr<IndexedFile> ret_p(new IndexedFile(m_db.last_rowid(), itr->path().filename(), 0, 0, 0));
   return ret_p;
 }
 
 std::auto_ptr<IndexedDir> Indexer::create_dir_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  time_t mtime, ctime;
-  create_db_obj(itr, INDEXED_TYPE_DIR, parent_id, &mtime, &ctime);
-  auto_ptr<IndexedDir> ret_p(new IndexedDir(m_db.last_rowid(), itr->path().filename(), mtime, ctime));
+  create_db_obj(itr, INDEXED_TYPE_DIR, parent_id);
+  auto_ptr<IndexedDir> ret_p(new IndexedDir(m_db.last_rowid(), itr->path().filename(), 0, 0, 0));
   return ret_p;
 }
 
 std::auto_ptr<IndexedOther> Indexer::create_other_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  time_t mtime, ctime;
-  create_db_obj(itr, INDEXED_TYPE_OTHER, parent_id, &mtime, &ctime);
-  auto_ptr<IndexedOther> ret_p(new IndexedOther(m_db.last_rowid(), itr->path().filename(), mtime, ctime));
+  create_db_obj(itr, INDEXED_TYPE_OTHER, parent_id);
+  auto_ptr<IndexedOther> ret_p(new IndexedOther(m_db.last_rowid(), itr->path().filename(), 0, 0, 0));
   return ret_p;
 }
