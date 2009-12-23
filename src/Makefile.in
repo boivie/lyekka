@@ -45,7 +45,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT) \
 	create_cmd.$(OBJEXT) cmd_handler.$(OBJEXT) path_cmd.$(OBJEXT) \
 	sdsqlite.$(OBJEXT) indexer.$(OBJEXT) db.$(OBJEXT) \
-	sha2.$(OBJEXT)
+	sha2.$(OBJEXT) paths.$(OBJEXT)
 lyekka_OBJECTS = $(am_lyekka_OBJECTS)
 lyekka_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -159,7 +159,7 @@ AM_CFLAGS = --pedantic -Wall -O2 -DSHA2_USE_INTTYPES_H -std=c99
 AM_LDFLAGS = 
 INCLUDES = 
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c chunk.h
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c chunk.h paths.h paths.cc
 
 all: all-am
 
@@ -234,6 +234,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indexer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path_cmd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paths.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdsqlite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sha2.Po@am__quote@
 

@@ -1,10 +1,6 @@
 #include <iostream>
 #include "path_cmd.h"
-#include "sdsqlite/sdsqlite.h"
-#include "db.h"
-#include <boost/filesystem/operations.hpp>
-
-namespace fs = boost::filesystem;
+#include "paths.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -22,62 +18,36 @@ int PathCmdHandler::execute(int argc, char* argv[])
     return -2;
   }
 
-  string cmd = string(argv[2]);
-  
-  if ((cmd == "add") && (argc >= 4))
-  {
-    fs::path p( argv[3], fs::native );
-    p = fs::system_complete(p);
-    
-    if ( !fs::exists( p ) )
+  string cmd(argv[2]);
+
+  try 
+  { 
+    if (cmd == "add")
     { 
-      std::cerr << "not found: " << p << std::endl;
-      return -2;
+      string path(argv[3]);
+      Paths::add(path);
+      cout << "Path '" << path << "' added." << endl;
     }
-    else if (!fs::is_directory(p)) 
+    else if (cmd == "list") 
     {
-      std::cerr << p << " is not a directory." << endl;
-      return -2;
+      list<PathInfo> paths = Paths::get();
+      cout << "Indexed paths:" << endl;
+      for (list<PathInfo>::iterator i = paths.begin(); i != paths.end(); ++i)
+        cout << "[" << i->id << "] " << i->path << endl;
     }
-    
-    sd::sqlite& db = Db::get();
-    sd::sql insert_query(db);
-    insert_query << "INSERT INTO paths (path) VALUES (?)";
-    try 
+    else
     {
-      insert_query << p.string();
-      insert_query.step();
-    }
-    catch(sd::db_error& err)
-    {
-      cerr << p << " is already present." << endl;
+      print_syntax();
       return -2;
-    }    
-    
-    int id = db.last_rowid();
-    cout << "Path '" << p << "' added." << endl;
-  }
-  else if (cmd == "list") 
-  {
-    sd::sqlite db = Db::get();
-    sd::sql query(db);
-    query << "SELECT id, path FROM paths ORDER BY id";
-    int id;
-    string path;
-    cout << "Indexed paths:" << endl;
-    while (query.step()) 
-    { 
-      query >> id >> path;
-      cout << "[" << id << "] " << path << endl;
     }
   }
-  else
+  catch (PathException& e)
   {
-    print_syntax();
+    cerr << e.what() << endl;
     return -2;
   }
+
   return 0;
-  
 }
 
 
