@@ -30,13 +30,29 @@ int CreateCmdHandler::execute(int argc, char* argv[])
     "type INTEGER)";  
 
   db << "CREATE TABLE chunks ("
-    "file_id INTEGER, "
-    "offset INTEGER, "
-    "size INTEGER, "
-    "cid BLOB COLLATE BINARY, "
+    "id INTEGER PRIMARY KEY, "
+    "size INTEGER NOT NULL, "
+    "sha BLOB COLLATE BINARY UNIQUE, "
     "key BLOB COLLATE BINARY)";
 
-  db << "CREATE INDEX chunks_file_id ON chunks(file_id)";
+  db << "CREATE TABLE local_mapping("
+    "file_id INTEGER NOT NULL, "
+    "chunk_id INTEGER NOT NULL, "
+    "offset INTEGER)";
+
+  db << "CREATE INDEX local_mapping_file_id ON local_mapping(file_id)";
+  db << "CREATE INDEX local_mapping_chunk_id ON local_mapping(chunk_id)";
+
+  db << "CREATE TABLE remotes("
+    "id INTEGER PRIMARY KEY, "
+    "name TEXT NOT NULL, "
+    "default_location TEXT NOT NULL)";
+  
+  db << "CREATE TABLE remote_mapping("
+    "remote_id INTEGER, "
+    "chunk_id INTEGER)";
+
+  db << "CREATE INDEX remote_mapping_chunk_id ON remote_mapping(chunk_id)";
 
   db << "PRAGMA user_version = 1";
 
