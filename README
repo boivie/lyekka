@@ -2,11 +2,11 @@
 Ix:~ victor$ lyekka create
 Created lyekka.db
 
-Ix:~ victor$ lyekka path add /path/to/index
-Added /path/to/index
+Ix:~ victor$ lyekka path add /path/to/files
+Added /path/to/files
 
 Ix:~ victor$ lyekka path list
-[1] /path/to/index
+[1] /path/to/files
 
 Ix:~ victor$ lyekka update-index
 Indexing .... Done.
@@ -16,6 +16,9 @@ Added work as a remote site.
 
 Ix:~ victor$ lyekka remote list
 [1] work /Volumes/USBPINNE
+
+Ix:~ victor$ lyekka status work
+At most 15 GB needs to be copied.
 
 Ix:~ victor$ lyekka push work 
 Updating 'work' status ... Done.
