@@ -17,7 +17,7 @@ int CreateCmdHandler::execute(int argc, char* argv[])
   }
 
   sd::sqlite db("lyekka.db");
- 
+  db << "BEGIN EXCLUSIVE";
   db << "CREATE TABLE paths (id INTEGER PRIMARY KEY, path TEXT UNIQUE)";
 
   db << "CREATE TABLE files (" 
@@ -55,6 +55,7 @@ int CreateCmdHandler::execute(int argc, char* argv[])
   db << "CREATE INDEX remote_mapping_chunk_id ON remote_mapping(chunk_id)";
 
   db << "PRAGMA user_version = 1";
+  db << "COMMIT";
 
   cout << "Database 'lyekka.db' created." << endl;
   return 0;

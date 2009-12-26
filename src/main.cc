@@ -12,6 +12,7 @@
 #include "index_cmd.h"
 #include "create_cmd.h"
 #include "path_cmd.h"
+#include "version_cmd.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -48,6 +49,7 @@ int main(int argc, char*argv[])
   me.add_handler(new IndexCmdHandler());
   me.add_handler(new CreateCmdHandler()); 
   me.add_handler(new PathCmdHandler());
+  me.add_handler(new VersionCmdHandler());
   
   if (argc < 2) 
   {
