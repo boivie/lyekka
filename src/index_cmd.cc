@@ -3,6 +3,7 @@
 #include "index_cmd.h"
 #include "indexer.h"
 #include "db.h"
+#include "paths.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -10,9 +11,12 @@ using namespace Lyekka;
 
 int IndexCmdHandler::execute(int argc, char* argv[])
 {
-  Indexer i(Db::get());
-  string name(argv[2]);
-  i.update_index(name);
+  list<PathInfo> paths = Paths::get();
+  Indexer idx(Db::get());
+  for (list<PathInfo>::iterator i = paths.begin(); i != paths.end(); ++i)
+  {
+    idx.update_index(i->path);
+  }
 }
 
 

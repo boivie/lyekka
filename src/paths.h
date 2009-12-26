@@ -5,11 +5,11 @@
 #include <exception>
 
 namespace Lyekka {
-    class PathInfo {  
-    public:
-      int id;
-      std::string path;
-    };
+  class PathInfo {  
+  public:
+    int id;
+    std::string path;
+  };
 
   class Paths {
   public:

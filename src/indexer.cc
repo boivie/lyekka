@@ -11,8 +11,6 @@ using namespace Lyekka;
 using namespace std;
 
 namespace fs = boost::filesystem;
-  
-
 
 #if defined(HAVE_STAT64) && !defined(__APPLE__)
 typedef struct stat64 statbuf;
@@ -21,6 +19,27 @@ typedef struct stat64 statbuf;
 typedef struct stat statbuf;
 #define file_stat(f, s) stat(f, s)
 #endif
+
+int Indexer::get_root_path_id(boost::filesystem::path& path)
+{
+  // First make sure that the path exists as a root level path. If not, add it.
+  sd::sql query(m_db);
+  query << "SELECT id FROM files WHERE parent = 0 AND name = ?";
+  query << path.string();
+
+  if (query.step()) {
+    int id;
+    query >> id;
+    return id;
+  }
+  else 
+  {
+    query << "INSERT INTO FILES (parent,name,type,mtime,ctime,size) VALUES (0, ?, ?, 0, 0, 0)";
+    query << path.string() << INDEXED_TYPE_DIR;
+    query.step();
+    return m_db.last_rowid();
+  }
+}
 
 void Indexer::update_index(std::string& path)
 {
@@ -32,13 +51,11 @@ void Indexer::update_index(std::string& path)
     throw exception();
   }
 
-  std::cout << "\nIn directory: " << full_path.directory_string() << "\n\n";
-  sd::sql query(m_db);
-  query << "BEGIN TRANSACTION";
-  query.step();
-  index_path(full_path, 0);
-  query << "COMMIT";
-  query.step(); 
+  int id = get_root_path_id(full_path);
+
+  m_db << "BEGIN TRANSACTION";
+  index_path(full_path, id);
+  m_db << "COMMIT TRANSACTION";
 }
 
 #define MAX_BLOCK_SIZE (30*1024*1024)

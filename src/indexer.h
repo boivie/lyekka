@@ -35,7 +35,10 @@ private:
   std::auto_ptr<IndexedOther> create_other_obj(boost::filesystem::directory_iterator& itr, int parent_id);
   void create_db_obj(boost::filesystem::directory_iterator& itr, int type, int parent_id);
   void make_chunks(boost::filesystem::directory_iterator& itr, IndexedFile& file, uint64_t size);
+  int get_root_path_id(boost::filesystem::path& path);
+
   sd::sqlite& m_db;
+
   class DirToVisit 
   {
   public:
