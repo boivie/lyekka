@@ -45,7 +45,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT) \
 	create_cmd.$(OBJEXT) cmd_handler.$(OBJEXT) path_cmd.$(OBJEXT) \
 	sdsqlite.$(OBJEXT) indexer.$(OBJEXT) db.$(OBJEXT) \
-	sha2.$(OBJEXT) paths.$(OBJEXT) version_cmd.$(OBJEXT)
+	sha2.$(OBJEXT) paths.$(OBJEXT) version_cmd.$(OBJEXT) \
+	status_cmd.$(OBJEXT) remote_cmd.$(OBJEXT) remotes.$(OBJEXT) \
+	formatter.$(OBJEXT)
 lyekka_OBJECTS = $(am_lyekka_OBJECTS)
 lyekka_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -159,7 +161,7 @@ AM_CFLAGS = --pedantic -Wall -O2 -DSHA2_USE_INTTYPES_H -std=c99
 AM_LDFLAGS = 
 INCLUDES = 
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c chunk.h paths.h paths.cc version_cmd.h version_cmd.cc
+main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c chunk.h paths.h paths.cc version_cmd.h version_cmd.cc status_cmd.h status_cmd.cc remote_cmd.h remote_cmd.cc remotes.h remotes.cc formatter.h formatter.cc
 
 all: all-am
 
@@ -230,13 +232,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/create_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/index_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indexer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/path_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paths.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remote_cmd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdsqlite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sha2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version_cmd.Po@am__quote@
 
 .c.o:

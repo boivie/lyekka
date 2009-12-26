@@ -46,7 +46,7 @@ int CreateCmdHandler::execute(int argc, char* argv[])
   db << "CREATE TABLE remotes("
     "id INTEGER PRIMARY KEY, "
     "name TEXT NOT NULL, "
-    "default_location TEXT NOT NULL)";
+    "default_destination TEXT NOT NULL)";
   
   db << "CREATE TABLE remote_mapping("
     "remote_id INTEGER, "

@@ -1,3 +1,5 @@
+Ix:~ victor$ lyekka version
+lyekka version 0.1
 
 Ix:~ victor$ lyekka create
 Created lyekka.db
@@ -17,11 +19,12 @@ Added work as a remote site.
 Ix:~ victor$ lyekka remote list
 [1] work /Volumes/USBPINNE
 
-Ix:~ victor$ lyekka status work
-At most 15 GB needs to be copied.
+Ix:~ victor$ lyekka status
+[work] At most 15 MB needs to be copied.
 
 Ix:~ victor$ lyekka push work 
-Updating 'work' status ... Done.
-Copying ... Done.
+Copying a maximum of 15.8 GB to /Volumes/USBPINNE
+Writing objects: 5% (1/105), 180KiB/s
+
 
 

@@ -13,6 +13,8 @@
 #include "create_cmd.h"
 #include "path_cmd.h"
 #include "version_cmd.h"
+#include "status_cmd.h"
+#include "remote_cmd.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -26,8 +28,13 @@ int Main::execute(int argc, char* argv[])
 {
   if (handlers.find(argv[1]) == handlers.end())
     return -1;
-  
-  return handlers[argv[1]]->execute(argc, argv);
+  try {
+    return handlers[argv[1]]->execute(argc, argv);
+  } catch (CmdUsageException& e)
+  {
+    e.print_usage();
+    return 129;
+  }
 }
 
 void Main::print_syntax(void)
@@ -50,7 +57,9 @@ int main(int argc, char*argv[])
   me.add_handler(new CreateCmdHandler()); 
   me.add_handler(new PathCmdHandler());
   me.add_handler(new VersionCmdHandler());
-  
+  me.add_handler(new StatusCmdHandler());
+  me.add_handler(new RemoteCmdHandler());
+
   if (argc < 2) 
   {
     me.print_syntax();
