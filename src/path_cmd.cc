@@ -5,22 +5,27 @@
 using namespace std;
 using namespace Lyekka;
 
-void print_syntax(void)
-{
-  cerr << "Syntax: path [add] [remove] [list]" << endl;
-}
+class PathCmdUsageException : public CmdUsageException
+{ 
+public:
+  PathCmdUsageException(std::string e = "") : CmdUsageException(e) {}
+  ~PathCmdUsageException() throw () {};
+  void print_usage(CmdUsageStream& os) 
+  {
+    os << "path" 
+       << "path list" 
+       << "path add <path>"
+       << "path rm <path>";
+  }
+};
 
 DECLARE_COMMAND(path, "path", "Manages indexed paths");
 
 int CMD_path::execute(int argc, char* argv[])
 {
-  if (argc < 2)
-  {
-    print_syntax();
-    return -2;
-  }
-
-  string cmd(argv[1]);
+  string cmd;
+  if (argc > 1)
+    cmd = string(argv[1]);
 
   try 
   { 
@@ -30,23 +35,21 @@ int CMD_path::execute(int argc, char* argv[])
       Paths::add(path);
       cout << "Path '" << path << "' added." << endl;
     }
-    else if (cmd == "list") 
+    else if (cmd == "" || cmd == "list") 
     {
       list<PathInfo> paths = Paths::get();
-      cout << "Indexed paths:" << endl;
       for (list<PathInfo>::iterator i = paths.begin(); i != paths.end(); ++i)
-        cout << "[" << i->id << "] " << i->path << endl;
+        cout << i->path << endl;
     }
     else
     {
-      print_syntax();
-      return -2;
+      throw PathCmdUsageException("unknown command: '" + cmd + "'");
     }
   }
   catch (PathException& e)
   {
     cerr << e.what() << endl;
-    return -2;
+    return 1;
   }
 
   return 0;
