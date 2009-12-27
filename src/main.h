@@ -13,7 +13,6 @@ namespace Lyekka
 class Main 
 {
  public:
-  void add_handler(CmdHandler* handler_p);
   int execute(int argc, char* argv[]);
   void print_syntax(void);
   

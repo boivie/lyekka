@@ -1,5 +1,5 @@
 #include <iostream>
-#include "path_cmd.h"
+#include "cmd_handler.h"
 #include "paths.h"
 
 using namespace std;
@@ -10,21 +10,23 @@ void print_syntax(void)
   cerr << "Syntax: path [add] [remove] [list]" << endl;
 }
 
-int PathCmdHandler::execute(int argc, char* argv[])
+DECLARE_COMMAND(path, "path", "Manages indexed paths");
+
+int CMD_path::execute(int argc, char* argv[])
 {
-  if (argc < 3)
+  if (argc < 2)
   {
     print_syntax();
     return -2;
   }
 
-  string cmd(argv[2]);
+  string cmd(argv[1]);
 
   try 
   { 
     if (cmd == "add")
     { 
-      string path(argv[3]);
+      string path(argv[2]);
       Paths::add(path);
       cout << "Path '" << path << "' added." << endl;
     }

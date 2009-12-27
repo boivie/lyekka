@@ -7,7 +7,7 @@ INCLUDES =
 # the previous manual Makefile
 bin_PROGRAMS = lyekka
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h index_cmd.h cmd_handler.h create_cmd.h create_cmd.cc cmd_handler.cc path_cmd.cc path_cmd.h sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c chunk.h paths.h paths.cc version_cmd.h version_cmd.cc status_cmd.h status_cmd.cc remote_cmd.h remote_cmd.cc remotes.h remotes.cc formatter.h formatter.cc
+main.cc index_cmd.cc main.h cmd_handler.h create_cmd.cc cmd_handler.cc path_cmd.cc sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc sha2/sha2.h sha2/sha2.c chunk.h paths.h paths.cc version_cmd.cc status_cmd.cc remote_cmd.cc remotes.h remotes.cc formatter.h formatter.cc push_cmd.cc
 
 
 

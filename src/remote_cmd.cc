@@ -1,38 +1,43 @@
 #include <iostream>
-#include "remote_cmd.h"
+#include "cmd_handler.h"
 #include "remotes.h"
 
 using namespace std;
 using namespace Lyekka;
 
 class RemoteCmdUsageException : public CmdUsageException
-{
-  void print_usage(void) 
+{ 
+public:
+  RemoteCmdUsageException(std::string e = "") : CmdUsageException(e) {}
+  ~RemoteCmdUsageException() throw () {};
+  void print_usage(CmdUsageStream& os) 
   {
-    cerr << "usage: lyekka remote" << endl
-         << "   or: lyekka remote list" << endl
-         << "   or: lyekka remote add <name> [<default destination>]" << endl
-         << "   or: lyekka remote rm <name>" << endl;
+    os << "remote" 
+       << "remote list" 
+       << "remote add <name> [<default destination>]" 
+       << "remote rm <name>";
   }
 };
 
-int RemoteCmdHandler::execute(int argc, char* argv[])
+DECLARE_COMMAND(remote, "remote", "Manages remote destinations");
+
+int CMD_remote::execute(int argc, char* argv[])
 {
   string cmd;
-  if (argc >= 3)
-    cmd = argv[2];
+  if (argc >= 2)
+    cmd = argv[1];
 
   try 
   { 
     if (cmd == "add")
     { 
-      if (argc < 4 || argc >= 6) {
+      if (argc < 3 || argc >= 5) {
         throw RemoteCmdUsageException();
       }
-      string remote(argv[3]);
+      string remote(argv[2]);
       string default_destination;
-      if (argc == 5)
-        default_destination = argv[4];
+      if (argc == 4)
+        default_destination = argv[3];
       Remotes::add(remote, default_destination);
       cout << "Remote '" << remote << "' added." << endl;
     }
@@ -45,7 +50,7 @@ int RemoteCmdHandler::execute(int argc, char* argv[])
     }
     else
     {
-      throw RemoteCmdUsageException();
+      throw RemoteCmdUsageException("Unknown subcommand: " + cmd);
     }
   }
   catch (RemoteException& e)

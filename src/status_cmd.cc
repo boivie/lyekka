@@ -1,14 +1,17 @@
 #include <iostream>
-#include "status_cmd.h"
 #include "sdsqlite/sdsqlite.h"
 #include "db.h"
 #include "formatter.h"
 #include "remotes.h"
+#include "cmd_handler.h"
 
 using namespace std;
 using namespace Lyekka;
 
-int StatusCmdHandler::execute(int argc, char* argv[])
+DECLARE_COMMAND(status, "status", "Shows the status of the vault");
+
+
+int CMD_status::execute(int argc, char* argv[])
 {
   sd::sqlite& db = Db::get();
   list<RemoteInfo> remotes = Remotes::get();

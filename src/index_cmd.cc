@@ -1,15 +1,16 @@
 #include <iostream>
 #include <string>
-#include "index_cmd.h"
 #include "indexer.h"
 #include "db.h"
 #include "paths.h"
+#include "cmd_handler.h"
 
 using namespace std;
 using namespace Lyekka;
 
+DECLARE_COMMAND(index, "update-index", "Updates the index");
 
-int IndexCmdHandler::execute(int argc, char* argv[])
+int CMD_index::execute(int argc, char* argv[])
 {
   list<PathInfo> paths = Paths::get();
   Indexer idx(Db::get());

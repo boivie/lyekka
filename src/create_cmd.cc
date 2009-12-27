@@ -2,13 +2,15 @@
 #include "sdsqlite/sdsqlite.h"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
-#include "create_cmd.h"
+#include "cmd_handler.h"
 
 using namespace std;
 using namespace Lyekka;
 namespace fs = boost::filesystem;
 
-int CreateCmdHandler::execute(int argc, char* argv[])
+DECLARE_COMMAND(create, "create", "Creates a new configuration");
+
+int CMD_create::execute(int argc, char* argv[])
 {
   if (fs::exists(fs::path("lyekka.db")))
   {
