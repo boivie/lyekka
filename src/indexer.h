@@ -4,7 +4,6 @@
 #include "sdsqlite/sdsqlite.h"
 #include "boost/filesystem/path.hpp"
 #include "boost/filesystem/operations.hpp"
-#include "chunk.h"
 #include "indexed_obj.h"
 #include <memory>
 #include <map>

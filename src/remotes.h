@@ -15,6 +15,7 @@ namespace Lyekka {
   class Remotes {
   public:
     static std::list<RemoteInfo> get(void);
+    static RemoteInfo get(std::string& name);
     static int add(std::string name, std::string default_destination);
     static void remove(std::string name);
   };
@@ -23,6 +24,9 @@ namespace Lyekka {
   };
   class RemoteAlreadyAddedException : public RemoteException {
     virtual const char* what() const throw() { return "The remote site has already been added."; } 
+  };
+  class NoSuchRemoteException : public RemoteException {
+    virtual const char* what() const throw() { return "No remote site found with this name."; } 
   };
 
 }

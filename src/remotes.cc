@@ -19,6 +19,21 @@ std::list<RemoteInfo> Remotes::get(void)
   return result;
 }
 
+RemoteInfo Remotes::get(string& name)
+{
+  RemoteInfo info;
+  sd::sqlite& db = Db::get();
+  sd::sql query(db);
+  query << "SELECT id, name, default_destination FROM remotes WHERE name = ?";
+  query << name;
+  if (!query.step()) 
+    throw NoSuchRemoteException();
+
+  query >> info.id >> info.name >> info.default_destination;
+  return info;
+}
+
+
 int Remotes::add(std::string name, std::string default_destination)
 {
   sd::sqlite& db = Db::get();
