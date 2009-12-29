@@ -50,7 +50,7 @@ int CMD_remote::execute(int argc, char* argv[])
     }
     else
     {
-      throw RemoteCmdUsageException("Unknown subcommand: " + cmd);
+      throw RemoteCmdUsageException("Unknown command: " + cmd);
     }
   }
   catch (RemoteException& e)
