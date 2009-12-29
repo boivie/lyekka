@@ -4673,7 +4673,7 @@ echo "$as_me: error: header file <boost/filesystem.hpp> is required for boost fi
 fi
 
 
-LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3"
+LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3 -lbotan"
 
 # Checks for typedefs, structures, and compiler characteristics.
 { echo "$as_me:$LINENO: checking for stdbool.h that conforms to C99" >&5

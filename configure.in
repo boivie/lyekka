@@ -34,7 +34,7 @@ if test "${lyekka_boost_libdir}"; then
 fi
 
 AC_CHECK_HEADER(boost/filesystem.hpp, [], [AC_MSG_ERROR([header file <boost/filesystem.hpp> is required for boost filesystem])])
-LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3"
+LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3 -lbotan"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
