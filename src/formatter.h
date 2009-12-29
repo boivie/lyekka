@@ -8,6 +8,7 @@ namespace Lyekka {
   class Formatter {
   public:
     static std::string format_size(uint64_t size);
+    static std::string format_rate(uint64_t rate);
   };
 }
 

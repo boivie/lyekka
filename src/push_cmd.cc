@@ -3,12 +3,13 @@
 #include <boost/filesystem/path.hpp>
 #include "cmd_handler.h"
 #include "sdsqlite/sdsqlite.h"
-
+#include "formatter.h"
 #include "indexed_obj.h"
 #include "db.h"
 #include "foldermap.h"
 #include "remotes.h"
 #include "chunkfactory.h"
+#include <sys/time.h>
 
 using namespace std;
 using namespace Lyekka;
@@ -68,6 +69,46 @@ void update_chunk(sd::sqlite& db, int64_t id, Chunk& chunk, int64_t file_id)
   }
 }
 
+string get_rate(uint64_t size)
+{
+  string ret;
+  static uint64_t last_size = 0;
+  static struct timeval last_tv = {0};
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+
+  if (last_size != 0)
+  {
+    uint64_t size_diff = size - last_size;
+    uint64_t time_diff;
+    const int divisor = 1000000/1024;
+    time_diff = (tv.tv_sec - last_tv.tv_sec) * 1024;
+    time_diff += (int)(tv.tv_usec - last_tv.tv_usec) / divisor;
+    ret = Formatter::format_rate(size_diff / time_diff);
+  }
+  else  
+  {
+    ret = "-- KiB/s";
+  } 
+
+  memcpy(&last_tv, &tv, sizeof(tv));
+  last_size = size; 
+  return ret;
+}
+
+void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& sum_size)
+{
+  sd::sql countq(db);
+  countq << "SELECT COUNT(c.id), SUM(c.size) " 
+    "FROM chunks c, local_mapping l, files f "
+    "WHERE l.file_id=f.id AND c.id=l.chunk_id AND f.type = ? "
+    "AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?) "
+    "ORDER BY f.mtime ASC";
+  countq << INDEXED_TYPE_FILE << remote_id;
+  countq.step();
+  countq >> count >> sum_size;
+}
+
 int CMD_push::execute(int argc, char* argv[])
 {
   FolderMap fm;
@@ -76,26 +117,16 @@ int CMD_push::execute(int argc, char* argv[])
   if (argc < 2)
     throw PushCmdUsageException();
 
-  int i = 0;
-
+  size_t count, i = 0;
+  uint64_t cur_size, sum_size;
   string remote(argv[1]);
   try {
     RemoteInfo remote_info = Remotes::get(remote);
 
     sd::sqlite& db = Db::get();
+    get_count(db, remote_info.id, count, sum_size);
+    cout << "Copying a maximum of " << count << " objects, " << Formatter::format_size(sum_size) << " to '" << remote_info.name << "'." << endl;
     
-    // Get max count.
-    sd::sql countq(db);
-    countq << "SELECT COUNT(c.id) " 
-      "FROM chunks c, local_mapping l, files f "
-      "WHERE l.file_id=f.id AND c.id=l.chunk_id AND f.type = ? "
-      "AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?) "
-      "ORDER BY f.mtime ASC";
-    countq << INDEXED_TYPE_FILE << remote_info.id;
-    countq.step();
-    size_t count;
-    countq >> count;
-
     sd::sql query(db);  
     query << "SELECT c.id, c.sha, c.size, l.offset, f.name, f.parent, f.mtime, f.id " 
       "FROM chunks c, local_mapping l, files f "
@@ -105,17 +136,13 @@ int CMD_push::execute(int argc, char* argv[])
     query << INDEXED_TYPE_FILE << remote_info.id;
     while (query.step())
     {
-      int64_t id;
-      string sha;
+      int64_t id, offset, file_id, parent_id;
+      string sha, name;
       int size;
-      int64_t offset;
-      string name;
-      int parent;
       time_t mtime;
-      int64_t file_id;
-      query >> id >> sha >> size >> offset >> name >> parent >> mtime >> file_id;
+      query >> id >> sha >> size >> offset >> name >> parent_id >> mtime >> file_id;
       boost::filesystem::path path;
-      fm.build_path(parent, path);
+      fm.build_path(parent_id, path);
       path /= name;
       // TODO: Verify that the mtime is correct
       std::ofstream out("/dev/null");
@@ -123,8 +150,13 @@ int CMD_push::execute(int argc, char* argv[])
       update_chunk(db, id, chunk, file_id);
       // TODO: Write to file  
       i++;
-      cout << "Processed " << i << "/" << count << endl;
+      cur_size += size;
+
+      cout << "                      \rProcessed " << i << "/" << count << " (" << Formatter::format_size(cur_size) 
+           << " | " << get_rate(cur_size) 
+           << ")" << flush;
     }
+    cout << endl << "Done." << endl;
   } 
   catch (NoSuchRemoteException& e)
   {
