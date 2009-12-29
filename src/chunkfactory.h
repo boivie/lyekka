@@ -2,14 +2,13 @@
 #define CHUNKFACTORY_H_INCLUSION_GUARD
 
 #include "chunk.h"
-#include <boost/filesystem/path.hpp>
 #include <iostream>
 
 namespace Lyekka {
   class ChunkFactory {
   public: 
-    static Chunk create(boost::filesystem::path& path, uint64_t offset, size_t size, std::ostream& out);
-    
+    static ChunkHash generate_hash(std::istream& in, uint64_t offset, size_t size);
+    static Chunk generate_chunk(std::istream& in, uint64_t offset, size_t size, const ChunkHash& key, std::ostream& out);
   };
 } 
 

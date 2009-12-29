@@ -38,34 +38,44 @@ void print_vector(string name, vector<uint8_t>& vec)
   cout << endl;
 }
 
-void update_chunk(sd::sqlite& db, int64_t id, Chunk& chunk, int64_t file_id)
+bool set_as_duplicate(sd::sqlite& db, int64_t chunk_id, const ChunkHash& key, int64_t file_id, uint64_t offset)
 {
-  vector<uint8_t> sha(SHA_SIZE_BYTES);
-  vector<uint8_t> key(SHA_SIZE_BYTES);
+  sd::sql selquery(db);
+  selquery << "SELECT id FROM chunks WHERE key = ?";
+  selquery << key.get_hash();
+  if (selquery.step())
+  {
+    int64_t new_id;
+    selquery >> new_id;
 
-  chunk.get_sha(&sha[0]);
-  chunk.get_key(&key[0]);
-  
+    sd::sql updquery(db);
+    updquery << "UPDATE local_mapping SET chunk_id = ? WHERE file_id = ? AND chunk_id = ? AND offset = ?";
+    updquery << new_id << file_id << chunk_id << offset;
+    updquery.step();  
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool update_chunk(sd::sqlite& db, int64_t chunk_id, const Chunk& chunk, int64_t file_id, uint64_t offset)
+{
   try {
     sd::sql query(db);
+    const vector<uint8_t>& sha = chunk.get_sha().get_hash();
+    const vector<uint8_t>& key = chunk.get_key().get_hash();
+
     query << "UPDATE OR ABORT chunks SET sha=?, key=? WHERE id=?";
-    query << sha << key << id;
+    query << sha << key << chunk_id;
     query.step();
+    return false;
   } 
   catch (sd::db_error& err)
   {
     // Constraint failed. That means that we have a chunk with this checksum already. Find it and use it.
-    int64_t new_id;
-    sd::sql selquery(db);
-    selquery << "SELECT id FROM chunks WHERE key = ?";
-    selquery << key;
-    selquery.step();
-    selquery >> new_id;
-
-    sd::sql updquery(db);
-    updquery << "UPDATE local_mapping SET chunk_id = ? WHERE file_id = ? AND chunk_id = ?";
-    updquery << new_id << file_id << id;
-    updquery.step();
+    return set_as_duplicate(db, chunk_id, chunk.get_key(), file_id, offset);
   }
 }
 
@@ -125,7 +135,8 @@ int CMD_push::execute(int argc, char* argv[])
 
     sd::sqlite& db = Db::get();
     get_count(db, remote_info.id, count, sum_size);
-    cout << "Copying a maximum of " << count << " objects, " << Formatter::format_size(sum_size) << " to '" << remote_info.name << "'." << endl;
+    cout << "Copying a maximum of " << count << " objects, " 
+         << Formatter::format_size(sum_size) << " to '" << remote_info.name << "'." << endl;
     
     sd::sql query(db);  
     query << "SELECT c.id, c.sha, c.size, l.offset, f.name, f.parent, f.mtime, f.id " 
@@ -134,29 +145,43 @@ int CMD_push::execute(int argc, char* argv[])
       "AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?) "
       "ORDER BY f.mtime ASC";
     query << INDEXED_TYPE_FILE << remote_info.id;
+    int reused = 0;
     while (query.step())
     {
-      int64_t id, offset, file_id, parent_id;
+      int64_t chunk_id, offset, file_id, parent_id;
       string sha, name;
       int size;
       time_t mtime;
-      query >> id >> sha >> size >> offset >> name >> parent_id >> mtime >> file_id;
+      query >> chunk_id >> sha >> size >> offset >> name >> parent_id >> mtime >> file_id;
       boost::filesystem::path path;
       fm.build_path(parent_id, path);
       path /= name;
       // TODO: Verify that the mtime is correct
       std::ofstream out("/dev/null");
-      Chunk chunk = ChunkFactory::create(path, offset, size, out); 
-      update_chunk(db, id, chunk, file_id);
+      std::ifstream in(path.string().c_str(), ios_base::in | ios_base::binary);
+
+      ChunkHash key = ChunkFactory::generate_hash(in, offset, size);
+      if (set_as_duplicate(db, chunk_id, key, file_id, offset))
+      { 
+        reused++;
+      }
+      else  
+      {
+        Chunk chunk = ChunkFactory::generate_chunk(in, offset, size, key, out);
+        update_chunk(db, chunk_id, chunk, file_id, offset);
+      }
       // TODO: Write to file  
       i++;
       cur_size += size;
 
-      cout << "                      \rProcessed " << i << "/" << count << " (" << Formatter::format_size(cur_size) 
+      // Clear old line and write new one.
+      cout << string(80, ' ') << "\r"
+           << "Progress: " << i << "/" << count << " (" << Formatter::format_size(cur_size) 
            << " | " << get_rate(cur_size) 
            << ")" << flush;
-    }
-    cout << endl << "Done." << endl;
+    } 
+    cout << endl << "Done. Total " << i << ", reused " << reused << "." << endl;
+    
   } 
   catch (NoSuchRemoteException& e)
   {
