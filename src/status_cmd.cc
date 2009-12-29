@@ -18,7 +18,7 @@ int CMD_status::execute(int argc, char* argv[])
   for (list<RemoteInfo>::iterator i = remotes.begin(); i != remotes.end(); ++i)
   {
     sd::sql sizeq(db);
-    sizeq << "SELECT SUM(size) FROM chunks WHERE id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?)";
+    sizeq << "SELECT SUM(c.size) FROM chunks c, local_mapping l WHERE l.chunk_id = c.id AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?)";
     sizeq << i->id;
     sizeq.step();
     
