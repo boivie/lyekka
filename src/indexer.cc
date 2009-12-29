@@ -97,6 +97,7 @@ void Indexer::visit_file(fs::directory_iterator& itr, IndexedFile& file)
       (file.get_ctime() != statr.st_ctime) ||
       (file.get_size() != statr.st_size))
     {
+      m_stats.updated++;
       // Chunkify it - will calculate chunks and add to db
       make_chunks(itr, file, statr.st_size);
       // Update file metadata
@@ -201,7 +202,11 @@ void Indexer::index_path(fs::path& path, int dir_db_id)
       else if (fs::is_regular_file(dir_itr->status()))
       {
         if (!item_p.get())
+        {
           item_p = create_file_obj(dir_itr, dir_db_id);
+          m_stats.added++;
+        }
+        m_stats.found++;
         visit_file(dir_itr, *(IndexedFile*)item_p.get());
       }
       else
@@ -233,6 +238,7 @@ void Indexer::delete_obj(IndexedBase& obj)
   insert_query << "DELETE FROM chunks WHERE file_id = ?";
   insert_query << obj.get_dbid();
   insert_query.step();
+  m_stats.deleted++;
 }
 
 

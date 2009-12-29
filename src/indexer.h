@@ -13,12 +13,22 @@ namespace Lyekka
 {
   typedef std::map<std::string,IndexedBase*> FileList;
 
+  class IndexerStats {
+  public:
+    IndexerStats() : found(0), updated(0), deleted(0), added(0) {}
+    size_t found;
+    size_t updated;
+    size_t deleted;
+    size_t added;
+  };
+
 class Indexer 
 {
 public:
   Indexer(sd::sqlite& db) : m_db(db) { };
   
   void update_index(std::string& path);
+  const IndexerStats& get_stats() { return m_stats; }
 
 private:
   void index_path(boost::filesystem::path& path, int dir_id);
@@ -35,7 +45,6 @@ private:
   void create_db_obj(boost::filesystem::directory_iterator& itr, int type, int parent_id);
   void make_chunks(boost::filesystem::directory_iterator& itr, IndexedFile& file, uint64_t size);
   int get_root_path_id(boost::filesystem::path& path);
-
   sd::sqlite& m_db;
 
   class DirToVisit 
@@ -47,6 +56,7 @@ private:
     int dir_db_id;
   };
   std::vector<DirToVisit> m_dirs_to_visit;
+  IndexerStats m_stats;
 };
 
 }
