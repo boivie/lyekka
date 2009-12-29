@@ -305,7 +305,7 @@ struct sql
 	/// Bind an input stream value to the current input.
 	sql&		operator<<(std::istream& val);
 
-	sql&		operator<<(std::vector<uint8_t>& val);
+	sql&		operator<<(const std::vector<uint8_t>& val);
 	
 	///
 	/// @param	val		Reference to variable to have value returned in

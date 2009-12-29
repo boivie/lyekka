@@ -290,7 +290,7 @@ sql&	sql::operator<<(std::istream& val)
 /// @return			Reference to the statement
 ///
 /// Bind a value to the current input.
-sql&	sql::operator<<(std::vector<uint8_t>& val)
+sql&	sql::operator<<(const std::vector<uint8_t>& val)
 {
 	sqlite3_bind_blob(stmt_, ++ipos_, &val[0], val.size(), 0);
 	return *this;
