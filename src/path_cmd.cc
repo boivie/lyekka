@@ -1,55 +1,52 @@
 #include <iostream>
 #include "cmd_handler.h"
+#include "cmd_parser.h"
 #include "paths.h"
 
 using namespace std;
 using namespace Lyekka;
-
-class PathCmdUsageException : public CmdUsageException
-{ 
-public:
-  PathCmdUsageException(std::string e = "") : CmdUsageException(e) {}
-  ~PathCmdUsageException() throw () {};
-  void print_usage(CmdUsageStream& os) 
-  {
-    os << "path" 
-       << "path list" 
-       << "path add <path>"
-       << "path rm <path>";
-  }
-};
+namespace bpo = boost::program_options;
 
 DECLARE_COMMAND(path, "path", "Manages indexed paths");
 
 int CMD_path::execute(int argc, char* argv[])
 {
-  string cmd;
-  if (argc > 1)
-    cmd = string(argv[1]);
+  CmdParser parser(argc, argv);
+  parser.parse_command(parser.create_commands()
+    ("list", "")
+    ("add", "<name>")
+    ("rm", "<name>"));
 
   try 
   { 
-    if (cmd == "add")
+    if (parser.is_cmd("add"))
     { 
-      string path(argv[2]);
+      string path;
+      bpo::options_description o, po;
+      bpo::positional_options_description p;
+      po.add_options()
+        ("path", bpo::value<string>(&path), "path");
+      p.add("path", 1);
+      parser.parse_options(o, po, p);
+
       Paths::add(path);
       cout << "Path '" << path << "' added." << endl;
     }
-    else if (cmd == "" || cmd == "list") 
+    else if (parser.is_cmd("list"))
     {
+      string path;
+      bpo::options_description o, po;
+      bpo::positional_options_description p;
+      parser.parse_options(o, po, p);
+
       list<PathInfo> paths = Paths::get();
       for (list<PathInfo>::iterator i = paths.begin(); i != paths.end(); ++i)
         cout << i->path << endl;
     }
-    else
-    {
-      throw PathCmdUsageException("unknown command: '" + cmd + "'");
-    }
   }
   catch (PathException& e)
   {
-    cerr << e.what() << endl;
-    return 1;
+    throw parser.syntax_exception(e.what());
   }
 
   return 0;

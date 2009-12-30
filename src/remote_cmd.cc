@@ -51,7 +51,7 @@ int CMD_remote::execute(int argc, char* argv[])
       for (list<RemoteInfo>::iterator i = remotes.begin(); i != remotes.end(); ++i)
       {
         if (verbose)
-          cout << i->name << " " <<  i->default_destination << endl;
+          cout << i->id << ": " << i->name << " " <<  i->default_destination << endl;
         else
           cout << i->name << endl;
       }

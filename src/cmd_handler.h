@@ -12,7 +12,7 @@ namespace Lyekka
     virtual const std::string get_cmd(void) = 0;
     virtual const std::string get_description(void) = 0;
     virtual int execute(int argc, char* argv[]) = 0;
-};
+  };
 
   class CmdManager 
   {
@@ -24,25 +24,6 @@ namespace Lyekka
   private:
     static std::map<std::string, CmdHandler*>* m_handlers_p;
   };
-
-  class CmdUsageStream {
-  public:
-    CmdUsageStream(void) : first(true) {};
-    CmdUsageStream& operator<<(const char* str);
-  private:
-    bool first;
-  };
-
-class CmdUsageException : public std::exception
-{
-public:
-  CmdUsageException(std::string error = "") : std::exception(), m_error(error) {};
-  ~CmdUsageException() throw () {};
-  virtual void print_usage(CmdUsageStream& os) = 0;
-  void print_error(void);
-private:  
-  std::string m_error;
-};
 
 }
 

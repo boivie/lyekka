@@ -49,6 +49,7 @@ bool CmdParser::is_cmd(std::string cmd)
 void CmdParser::parse_command(Commands& commands)
 {
   const std::list<Command> cmds = commands.get_list();
+  if (cmds.size() == 0) return;
   for (list<Command>::const_iterator i = cmds.begin(); i != cmds.end(); ++i)
     if (i->name == "")
       return;

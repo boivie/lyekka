@@ -16,23 +16,6 @@ static int file_exists(string filename)
   return false;
 }
 
-
-CmdUsageStream& CmdUsageStream::operator<<(const char* str)
-{
-  if (first)
-    cerr << "usage: lyekka " << str << endl;
-  else
-    cerr << "   or: lyekka " << str << endl;
-  first = false;
-  return *this;
-}
-
-void CmdUsageException::print_error(void) 
-{
-  if (m_error != "")
-    cerr << "error: " << m_error << endl;
-}
-
 void CmdManager::print_cmdlist(void)
 {
   for (map<string,CmdHandler*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
@@ -56,13 +39,6 @@ int CmdManager::execute(string cmd, int argc, char* argv[])
   try {
     return (*m_handlers_p)[cmd]->execute(argc, argv);
   } 
-  catch (CmdUsageException& e)
-  { 
-    e.print_error();
-    CmdUsageStream os;
-    e.print_usage(os);
-    return 129;
-  }
   catch (CmdParseException& e)
   {
     e.print_usage();

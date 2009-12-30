@@ -10,22 +10,11 @@
 #include "remotes.h"
 #include "chunkfactory.h"
 #include <sys/time.h>
+#include "cmd_parser.h"
 
 using namespace std;
 using namespace Lyekka;
-
-class PushCmdUsageException : public CmdUsageException
-{ 
-public:
-  PushCmdUsageException(std::string e = "") : CmdUsageException(e) {}
-  ~PushCmdUsageException() throw () {};
-  void print_usage(CmdUsageStream& os) 
-  {
-    os << "push <remote>" 
-       << "push <remote> <destination-path>";
-  }
-};
-
+namespace bpo = boost::program_options;
 DECLARE_COMMAND(push, "push", "Copies the latest data.");
 
 void print_vector(string name, vector<uint8_t>& vec)
@@ -121,15 +110,28 @@ void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& sum_size)
 
 int CMD_push::execute(int argc, char* argv[])
 {
+  CmdParser parser(argc, argv);
+  parser.parse_command(parser.create_commands()
+    ("", "<remote-name> [<destination-path>]"));
+  string remote;
+  string destination_path;
+  bpo::options_description o, po;
+  bpo::positional_options_description p;
+  po.add_options()
+    ("remote_name", bpo::value<string>(&remote), "remote name")
+    ("destination_path", bpo::value<string>(&destination_path), "remote name");
+  p.add("remote_name", 1);
+  p.add("destination_path", 1);
+  parser.parse_options(o, po, p);
+
+  if (remote == "")
+    throw parser.syntax_exception("missing <remote-name>");
+
   FolderMap fm;
   fm.load();
-  
-  if (argc < 2)
-    throw PushCmdUsageException();
 
   size_t count, i = 0;
   uint64_t cur_size, sum_size;
-  string remote(argv[1]);
   try {
     RemoteInfo remote_info = Remotes::get(remote);
 
@@ -185,7 +187,7 @@ int CMD_push::execute(int argc, char* argv[])
   } 
   catch (NoSuchRemoteException& e)
   {
-    throw PushCmdUsageException("Remote site not found: '" + remote + "'");
+    throw parser.syntax_exception("Remote site not found: '" + remote + "'");
   }
 
   return 0;
