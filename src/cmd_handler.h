@@ -6,12 +6,12 @@
 
 namespace Lyekka 
 {
-class CmdHandler 
-{
- public:
-  virtual const std::string get_cmd(void) = 0;
-  virtual const std::string get_description(void) = 0;
-  virtual int execute(int argc, char* argv[]) = 0;
+  class CmdHandler
+  {
+  public:
+    virtual const std::string get_cmd(void) = 0;
+    virtual const std::string get_description(void) = 0;
+    virtual int execute(int argc, char* argv[]) = 0;
 };
 
   class CmdManager 
@@ -20,6 +20,7 @@ class CmdHandler
     static void reg_handler(CmdHandler* handler_p);
     static void print_cmdlist(void);
     static int execute(std::string cmd, int argc, char* argv[]);
+    static bool is_command(std::string& cmd);
   private:
     static std::map<std::string, CmdHandler*>* m_handlers_p;
   };

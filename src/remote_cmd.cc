@@ -1,56 +1,60 @@
 #include <iostream>
 #include "cmd_handler.h"
+#include "cmd_parser.h"
 #include "remotes.h"
 
 using namespace std;
 using namespace Lyekka;
-
-class RemoteCmdUsageException : public CmdUsageException
-{ 
-public:
-  RemoteCmdUsageException(std::string e = "") : CmdUsageException(e) {}
-  ~RemoteCmdUsageException() throw () {};
-  void print_usage(CmdUsageStream& os) 
-  {
-    os << "remote" 
-       << "remote list" 
-       << "remote add <name> [<default destination>]" 
-       << "remote rm <name>";
-  }
-};
+namespace bpo = boost::program_options;
 
 DECLARE_COMMAND(remote, "remote", "Manages remote destinations");
 
 int CMD_remote::execute(int argc, char* argv[])
 {
-  string cmd;
-  if (argc >= 2)
-    cmd = argv[1];
+  CmdParser parser(argc, argv);
+  parser.parse_command(parser.create_commands()
+    ("list", "")
+    ("add", "<name> [<default destination>]")
+    ("rm", "<name>"));
 
   try 
   { 
-    if (cmd == "add")
+    if (parser.is_cmd("add"))
     { 
-      if (argc < 3 || argc >= 5) {
-        throw RemoteCmdUsageException();
-      }
-      string remote(argv[2]);
+      string remote_name;
       string default_destination;
-      if (argc == 4)
-        default_destination = argv[3];
-      Remotes::add(remote, default_destination);
-      cout << "Remote '" << remote << "' added." << endl;
+      bpo::options_description o, po;
+      bpo::positional_options_description p;
+      po.add_options()
+        ("remote_name", bpo::value<string>(&remote_name), "remote name")
+        ("default_destination", bpo::value<string>(&default_destination), "default destination");
+      p.add("remote_name", 1);
+      p.add("default_destination", 1);
+
+      parser.parse_options(o, po, p);
+      if (remote_name == "")
+        throw parser.syntax_exception("Missing <name>");
+
+      Remotes::add(remote_name, default_destination);
+      cout << "Remote '" << remote_name << "' added." << endl;
     }
-    else if (cmd == "list" || cmd == "") 
+    else if (parser.is_cmd("list") || parser.is_cmd(""))
     {
+      bool verbose = false;
+      bpo::options_description o, po;
+      bpo::positional_options_description p;
+      o.add_options()
+        ("verbose,v", bpo::bool_switch(&verbose), "be verbose");
+      parser.parse_options(o, po, p);
       list<RemoteInfo> remotes = Remotes::get();
-      cout << "Remote sites:" << endl;
+
       for (list<RemoteInfo>::iterator i = remotes.begin(); i != remotes.end(); ++i)
-        cout << i->name << endl;
-    }
-    else
-    {
-      throw RemoteCmdUsageException("Unknown command: " + cmd);
+      {
+        if (verbose)
+          cout << i->name << " " <<  i->default_destination << endl;
+        else
+          cout << i->name << endl;
+      }
     }
   }
   catch (RemoteException& e)

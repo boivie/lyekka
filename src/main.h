@@ -14,9 +14,6 @@ class Main
 {
  public:
   int execute(int argc, char* argv[]);
-  void print_syntax(void);
-  
-  
  protected:
   std::map<std::string, CmdHandler*> handlers;
   

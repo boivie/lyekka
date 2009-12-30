@@ -1,6 +1,7 @@
 #include <iostream>
 #include "cmd_handler.h"
 #include "sdsqlite/sdsqlite.h"
+#include "cmd_parser.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -36,13 +37,18 @@ void CmdManager::print_cmdlist(void)
 {
   for (map<string,CmdHandler*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
   {
-    cout << i->second->get_cmd() << string(15 - i->second->get_cmd().size(), ' ') << i->second->get_description() << endl;
+    cout << "   " << i->second->get_cmd() << string(21 - i->second->get_cmd().size(), ' ') << i->second->get_description() << endl;
   }
+}
+
+bool CmdManager::is_command(string& cmd)
+{
+  return (m_handlers_p->find(cmd) != m_handlers_p->end());
 }
 
 int CmdManager::execute(string cmd, int argc, char* argv[])
 {
-  if (m_handlers_p->find(cmd) == m_handlers_p->end()) 
+  if (!is_command(cmd)) 
   {
     cerr << "lyekka: '" << cmd << "' is not a valid command." << endl; 
     return 1;  
@@ -55,6 +61,11 @@ int CmdManager::execute(string cmd, int argc, char* argv[])
     e.print_error();
     CmdUsageStream os;
     e.print_usage(os);
+    return 129;
+  }
+  catch (CmdParseException& e)
+  {
+    e.print_usage();
     return 129;
   }
 }
