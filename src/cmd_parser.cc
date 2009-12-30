@@ -27,11 +27,15 @@ void CmdParseException::print_usage(void)
     else
       cerr << "   or:";
     
-    cerr << " lyekka " << m_name << " " << i->name << " " << i->args << endl;
+    cerr << " lyekka " << m_name;
+    if (i->name != "")
+      cerr << " " << i->name;
+    cerr << " " << i->args << endl;
   }
   
   if (m_desc.options().size() > 0)
   {
+    cerr << endl;
     cerr << m_desc;
   }
 }
@@ -44,13 +48,17 @@ bool CmdParser::is_cmd(std::string cmd)
 
 void CmdParser::parse_command(Commands& commands)
 {
+  const std::list<Command> cmds = commands.get_list();
+  for (list<Command>::const_iterator i = cmds.begin(); i != cmds.end(); ++i)
+    if (i->name == "")
+      return;
+
   if (m_argc < 3)
     throw CmdParseException(m_argv[1], commands.get_list());
 
   m_has_cmd = true;
   string arg_cmd(m_argv[2]);
   bool found_cmd = false;
-  const std::list<Command> cmds = commands.get_list();
   for (list<Command>::const_iterator i = cmds.begin(); i != cmds.end(); ++i)
   {
     if (i->name == arg_cmd)
@@ -67,10 +75,14 @@ void CmdParser::parse_options(
   boost::program_options::positional_options_description& p)
 {
   boost::program_options::options_description ao;
+  o.add_options()("help", "shows help");
   ao.add(o).add(po);
-  boost::program_options::store(boost::program_options::command_line_parser(m_argc - 2, m_argv + 2).
+  int offset = m_has_cmd ? 2 : 1;
+  boost::program_options::store(boost::program_options::command_line_parser(m_argc - offset, m_argv + offset).
                                 options(ao).positional(p).run(), m_vm);
   boost::program_options::notify(m_vm);
+  if (m_vm.count("help"))
+    throw CmdParseException(m_argv[1], m_cmds.get_list(), o, "");
 }
 
 CmdParseException CmdParser::syntax_exception(std::string extra)
