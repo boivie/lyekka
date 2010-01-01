@@ -18,8 +18,6 @@ int CMD_purge::execute(int argc, char* argv[])
     ("remote-index", "--force"));
 
   bool force = false;
-  bpo::options_description o, po;
-  bpo::positional_options_description p;
   o.add_options()("force", bpo::bool_switch(&force), "force");
   parser.parse_options(o, po, p);
   

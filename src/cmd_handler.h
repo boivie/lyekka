@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <exception>
+#include <boost/program_options.hpp>
 
 namespace Lyekka 
 {
@@ -12,6 +13,9 @@ namespace Lyekka
     virtual const std::string get_cmd(void) = 0;
     virtual const std::string get_description(void) = 0;
     virtual int execute(int argc, char* argv[]) = 0;
+  protected:
+    boost::program_options::options_description o, po;
+    boost::program_options::positional_options_description p;
   };
 
   class CmdManager 

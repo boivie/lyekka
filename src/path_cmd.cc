@@ -22,8 +22,6 @@ int CMD_path::execute(int argc, char* argv[])
     if (parser.is_cmd("add"))
     { 
       string path;
-      bpo::options_description o, po;
-      bpo::positional_options_description p;
       po.add_options()
         ("path", bpo::value<string>(&path), "path");
       p.add("path", 1);
@@ -35,8 +33,6 @@ int CMD_path::execute(int argc, char* argv[])
     else if (parser.is_cmd("list"))
     {
       string path;
-      bpo::options_description o, po;
-      bpo::positional_options_description p;
       parser.parse_options(o, po, p);
 
       list<PathInfo> paths = Paths::get();

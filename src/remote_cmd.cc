@@ -23,8 +23,6 @@ int CMD_remote::execute(int argc, char* argv[])
     { 
       string remote_name;
       string default_destination;
-      bpo::options_description o, po;
-      bpo::positional_options_description p;
       po.add_options()
         ("remote_name", bpo::value<string>(&remote_name), "remote name")
         ("default_destination", bpo::value<string>(&default_destination), "default destination");
@@ -41,8 +39,6 @@ int CMD_remote::execute(int argc, char* argv[])
     else if (parser.is_cmd("list") || parser.is_cmd(""))
     {
       bool verbose = false;
-      bpo::options_description o, po;
-      bpo::positional_options_description p;
       o.add_options()
         ("verbose,v", bpo::bool_switch(&verbose), "be verbose");
       parser.parse_options(o, po, p);

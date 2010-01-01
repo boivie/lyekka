@@ -117,8 +117,6 @@ int CMD_push::execute(int argc, char* argv[])
     ("", "<remote-name> [<destination-path>]"));
   string remote;
   string destination_path;
-  bpo::options_description o, po;
-  bpo::positional_options_description p;
   po.add_options()
     ("remote_name", bpo::value<string>(&remote), "remote name")
     ("destination_path", bpo::value<string>(&destination_path), "remote name");
