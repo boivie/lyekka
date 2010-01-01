@@ -13,7 +13,7 @@ std::list<PathInfo> Paths::get(void)
   std::list<PathInfo> result;
   sd::sqlite& db = Db::get();
   sd::sql query(db);
-  query << "SELECT id, path FROM paths ORDER BY id";
+  query << "SELECT id, name FROM paths WHERE parent = 0 ORDER BY id";
   while (query.step()) 
   { 
     PathInfo pi;
@@ -21,6 +21,17 @@ std::list<PathInfo> Paths::get(void)
     result.push_back(pi);
   }
   return result;
+}
+
+static bool already_in_db(sd::sqlite& db, string name)
+{
+  sd::sql query(db);
+  query << "SELECT COUNT(*) FROM paths WHERE name = ?";
+  query << name; 
+  query.step();
+  int count;
+  query >> count;
+  return count > 0;
 }
 
 int Paths::add(std::string& path)
@@ -36,16 +47,13 @@ int Paths::add(std::string& path)
   
   sd::sqlite& db = Db::get();
   sd::sql insert_query(db);
-  insert_query << "INSERT INTO paths (path) VALUES (?)";
-  try 
-  {
-    insert_query << p.string();
-    insert_query.step();
-  }
-  catch(sd::db_error& err)
-  { 
+
+  if (already_in_db(db, p.string()))
     throw PathAlreadyAddedException();
-  }    
+
+  insert_query << "INSERT INTO paths (parent, name, mtime, ctime) VALUES (0, ?, 0, 0)";
+  insert_query << p.string();
+  insert_query.step();
   
   int id = db.last_rowid();
   return id;

@@ -19,7 +19,7 @@ int CMD_gc::execute(int argc, char* argv[])
   
   db << "BEGIN EXCLUSIVE";
   db << "DELETE FROM chunks WHERE id NOT IN (SELECT chunk_id FROM local_mapping UNION SELECT chunk_id FROM remote_mapping)";
-  db << "COMMIT"; 
+  db << "COMMIT";
   db << "VACUUM";
   cout << "The database has been cleaned." << endl;
 

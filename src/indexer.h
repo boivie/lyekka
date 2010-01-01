@@ -27,7 +27,7 @@ class Indexer
 public:
   Indexer(sd::sqlite& db) : m_db(db) { };
   
-  void update_index(std::string& path);
+  void update();
   const IndexerStats& get_stats() { return m_stats; }
 
 private:
@@ -36,12 +36,10 @@ private:
   std::auto_ptr<IndexedBase> get_obj(boost::filesystem::directory_iterator& itr);
   void visit_file(boost::filesystem::directory_iterator& itr, IndexedFile& file);
   void visit_dir(boost::filesystem::directory_iterator& itr, IndexedDir& dir);
-  void visit_other(boost::filesystem::directory_iterator& itr, IndexedOther& item); 
   void delete_files(FileList& filelist);
   void delete_obj(IndexedBase& item);
   std::auto_ptr<IndexedFile> create_file_obj(boost::filesystem::directory_iterator& itr, int parent_id);
   std::auto_ptr<IndexedDir> create_dir_obj(boost::filesystem::directory_iterator& itr, int parent_id);
-  std::auto_ptr<IndexedOther> create_other_obj(boost::filesystem::directory_iterator& itr, int parent_id);
   void create_db_obj(boost::filesystem::directory_iterator& itr, int type, int parent_id);
   void make_chunks(boost::filesystem::directory_iterator& itr, IndexedFile& file, uint64_t size);
   int get_root_path_id(boost::filesystem::path& path);

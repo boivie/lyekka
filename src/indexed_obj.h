@@ -41,18 +41,11 @@ public:
 class IndexedDir : public IndexedBase 
 {
 public:
-  IndexedDir(int dbid, std::string basename, time_t mtime, time_t ctime, uint64_t size) 
-    : IndexedBase(dbid, basename, mtime, ctime, size, INDEXED_TYPE_DIR) { };
+  IndexedDir(int dbid, std::string basename, time_t mtime, time_t ctime) 
+    : IndexedBase(dbid, basename, mtime, ctime, 0, INDEXED_TYPE_DIR) { };
 
 };
 
-class IndexedOther : public IndexedBase 
-{
-public:
-  IndexedOther(int dbid, std::string basename, time_t mtime, time_t ctime, uint64_t size) 
-    : IndexedBase(dbid, basename, mtime, ctime, size, INDEXED_TYPE_OTHER) { };
-
-};
 }
 
 #endif

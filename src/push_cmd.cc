@@ -102,10 +102,10 @@ void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& sum_size)
   sd::sql countq(db);
   countq << "SELECT COUNT(c.id), SUM(c.size) " 
     "FROM chunks c, local_mapping l, files f "
-    "WHERE l.file_id=f.id AND c.id=l.chunk_id AND f.type = ? "
+    "WHERE l.file_id=f.id AND c.id=l.chunk_id "
     "AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?) "
     "ORDER BY f.mtime ASC";
-  countq << INDEXED_TYPE_FILE << remote_id;
+  countq << remote_id;
   countq.step();
   countq >> count >> sum_size;
 }
@@ -150,10 +150,10 @@ int CMD_push::execute(int argc, char* argv[])
     sd::sql query(db);  
     query << "SELECT c.id, c.sha, c.size, l.offset, f.name, f.parent, f.mtime, f.id " 
       "FROM chunks c, local_mapping l, files f "
-      "WHERE l.file_id=f.id AND c.id=l.chunk_id AND f.type = ? "
+      "WHERE l.file_id=f.id AND c.id=l.chunk_id "
       "AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?) "
       "ORDER BY f.mtime ASC";
-    query << INDEXED_TYPE_FILE << remote_info.id;
+    query << remote_info.id;
     int reused = 0;
     while (query.step())
     {

@@ -20,7 +20,12 @@ int CMD_create::execute(int argc, char* argv[])
 
   sd::sqlite db("lyekka.db");
   db << "BEGIN EXCLUSIVE";
-  db << "CREATE TABLE paths (id INTEGER PRIMARY KEY, path TEXT UNIQUE)";
+  db << "CREATE TABLE paths ("  
+    "id INTEGER PRIMARY KEY, " 
+    "parent INTEGER, "
+    "name TEXT, "
+    "mtime INTEGER, "
+    "ctime INTEGER)";
 
   db << "CREATE TABLE files (" 
     "id INTEGER PRIMARY KEY, "
@@ -28,8 +33,7 @@ int CMD_create::execute(int argc, char* argv[])
     "name TEXT, "
     "mtime INTEGER, "
     "ctime INTEGER, "
-    "size INTEGER, "
-    "type INTEGER)";  
+    "size INTEGER)";
 
   db << "CREATE TABLE chunks ("
     "id INTEGER PRIMARY KEY, "

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sys/stat.h>
 #include "indexer.h"
+#include "paths.h"
 
 using namespace Lyekka;
 using namespace std;
@@ -20,41 +21,21 @@ typedef struct stat statbuf;
 #define file_stat(f, s) stat(f, s)
 #endif
 
-int Indexer::get_root_path_id(boost::filesystem::path& path)
+void Indexer::update()
 {
-  // First make sure that the path exists as a root level path. If not, add it.
-  sd::sql query(m_db);
-  query << "SELECT id FROM files WHERE parent = 0 AND name = ?";
-  query << path.string();
-
-  if (query.step()) {
-    int id;
-    query >> id;
-    return id;
-  }
-  else 
-  {
-    query << "INSERT INTO FILES (parent,name,type,mtime,ctime,size) VALUES (0, ?, ?, 0, 0, 0)";
-    query << path.string() << INDEXED_TYPE_DIR;
-    query.step();
-    return m_db.last_rowid();
-  }
-}
-
-void Indexer::update_index(std::string& path)
-{
-  fs::path full_path( fs::initial_path<fs::path>() );
-  full_path = fs::system_complete( fs::path( path ) );
-
-  if (!fs::exists(full_path) || !fs::is_directory( full_path ))
-  {
-    throw exception();
-  }
-
-  int id = get_root_path_id(full_path);
-
+  list<PathInfo> paths = Paths::get();
   m_db << "BEGIN TRANSACTION";
-  index_path(full_path, id);
+  for (list<PathInfo>::iterator i = paths.begin(); i != paths.end(); ++i)
+  {
+    fs::path full_path = fs::system_complete( fs::path( i->path ) );
+
+    if (!fs::exists(full_path) || !fs::is_directory( full_path ))
+    {
+      throw exception();
+    }
+
+    index_path(full_path, i->id);
+  }
   m_db << "COMMIT TRANSACTION";
 }
 
@@ -114,45 +95,32 @@ void Indexer::visit_dir(fs::directory_iterator& itr, IndexedDir& dir)
 {
 }
 
-void Indexer::visit_other(fs::directory_iterator& itr, IndexedOther& item)
-{
-  cout << "Other: " << item.get_basename() << endl;
-}
-
-
-FileList Indexer::get_known_files(int dir_db_id)
+FileList Indexer::get_known_files(int path_db_id)
 { 
   FileList files;
   sd::sql query(m_db);
-  query << "SELECT id,name,mtime,ctime,size,type FROM files WHERE parent = ?";
-  query << dir_db_id;
+  query << "SELECT id,name,mtime,ctime,size FROM files WHERE parent = ?";
+  query << path_db_id;
   int id;
   string name;
   int64_t mtime;
   int64_t ctime;
   uint64_t size;
-  int type;
   
   while (query.step()) 
   { 
-    query >> id >> name >> mtime >> ctime >> size >> type;
-    if (type == INDEXED_TYPE_FILE) 
-    {
-      files.insert(pair<std::string,IndexedBase*>(name, new IndexedFile(id, name, mtime, ctime, size)));
-    }
-    else if (type == INDEXED_TYPE_DIR) 
-    {
-      files.insert(pair<std::string,IndexedBase*>(name, new IndexedDir(id, name, mtime, ctime, size)));
-    }
-    else if (type == INDEXED_TYPE_OTHER) 
-    {
-      files.insert(pair<std::string,IndexedBase*>(name, new IndexedOther(id, name, mtime, ctime, size)));
-    } 
-    else 
-    {
-      assert(0);
-    }
-  }    
+    query >> id >> name >> mtime >> ctime >> size;
+    files.insert(pair<std::string,IndexedBase*>(name, new IndexedFile(id, name, mtime, ctime, size)));
+  }
+
+  query << "SELECT id,name,mtime,ctime FROM paths WHERE parent = ?";
+  query << path_db_id;
+  while (query.step())
+  {
+    query >> id >> name >> mtime >> ctime;
+    files.insert(pair<std::string,IndexedBase*>(name, new IndexedDir(id, name, mtime, ctime)));
+  }
+
   return files;
 }
 
@@ -211,9 +179,7 @@ void Indexer::index_path(fs::path& path, int dir_db_id)
       }
       else
       {
-        if (!item_p.get())
-          item_p = create_other_obj(dir_itr, dir_db_id);
-        visit_other(dir_itr, *(IndexedOther*)item_p.get());
+        cout << "Other: " << dir_itr->path() << endl;
       }
     }
     catch ( const std::exception & ex )
@@ -241,7 +207,6 @@ void Indexer::delete_obj(IndexedBase& obj)
   m_stats.deleted++;
 }
 
-
 void Indexer::delete_files(FileList& deletemap) 
 {
   for (FileList::iterator delete_i = deletemap.begin(); delete_i != deletemap.end(); delete_i++)
@@ -251,32 +216,24 @@ void Indexer::delete_files(FileList& deletemap)
   }
 }
 
-void Indexer::create_db_obj(boost::filesystem::directory_iterator& itr, int type, int parent_id)
-{
-  sd::sql query(m_db);
-  string name = itr->path().filename();
-  query << "INSERT INTO FILES (parent,name,type,mtime,ctime,size) VALUES (?, ?, ?, 0, 0, 0)";
-  query << parent_id << name << type << 0 << 0 << 0;
-  query.step();
-}
-
 std::auto_ptr<IndexedFile> Indexer::create_file_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  create_db_obj(itr, INDEXED_TYPE_FILE, parent_id);
-  auto_ptr<IndexedFile> ret_p(new IndexedFile(m_db.last_rowid(), itr->path().filename(), 0, 0, 0));
+  string filename = itr->path().filename();
+  sd::sql query(m_db);
+  query << "INSERT INTO files (parent,name,mtime,ctime,size) VALUES (?, ?, 0, 0, 0)";
+  query << parent_id << filename;
+  query.step();
+  auto_ptr<IndexedFile> ret_p(new IndexedFile(m_db.last_rowid(), filename, 0, 0, 0));
   return ret_p;
 }
 
 std::auto_ptr<IndexedDir> Indexer::create_dir_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  create_db_obj(itr, INDEXED_TYPE_DIR, parent_id);
-  auto_ptr<IndexedDir> ret_p(new IndexedDir(m_db.last_rowid(), itr->path().filename(), 0, 0, 0));
-  return ret_p;
-}
-
-std::auto_ptr<IndexedOther> Indexer::create_other_obj(boost::filesystem::directory_iterator& itr, int parent_id)
-{
-  create_db_obj(itr, INDEXED_TYPE_OTHER, parent_id);
-  auto_ptr<IndexedOther> ret_p(new IndexedOther(m_db.last_rowid(), itr->path().filename(), 0, 0, 0));
+  string filename = itr->path().filename();
+  sd::sql query(m_db);
+  query << "INSERT INTO paths (parent,name,mtime,ctime) VALUES (?, ?, 0, 0)";
+  query << parent_id << filename;
+  query.step();
+  auto_ptr<IndexedDir> ret_p(new IndexedDir(m_db.last_rowid(), filename, 0, 0));
   return ret_p;
 }

@@ -10,8 +10,7 @@ size_t get_count(sd::sqlite& db)
 {
   sd::sql countq(db);
   size_t count;
-  countq << "SELECT COUNT(*) FROM files WHERE type = ?";
-  countq << INDEXED_TYPE_DIR;
+  countq << "SELECT COUNT(*) FROM paths";
   countq.step();
   countq >> count;
   return count;
@@ -43,8 +42,7 @@ void FolderMap::load(void)
   list_p = new Folder[m_count]();
 
   sd::sql selq(db);
-  selq << "SELECT id, name, parent FROM files WHERE type = ? ORDER BY id";
-  selq << INDEXED_TYPE_DIR;
+  selq << "SELECT id, name, parent FROM paths ORDER BY id";
   size_t i;
 
   for (i = 0; i < m_count; i++)
