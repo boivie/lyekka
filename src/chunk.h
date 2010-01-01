@@ -33,6 +33,7 @@ public:
   uint64_t get_offset() { return m_offset; }
   const ChunkHash& get_sha() const { return m_sha; }
   const ChunkHash& get_key() const { return m_key; }
+  std::string get_cid_hex() const;
 
  private:
   size_t m_orig_size;

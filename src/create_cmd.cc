@@ -33,9 +33,9 @@ int CMD_create::execute(int argc, char* argv[])
 
   db << "CREATE TABLE chunks ("
     "id INTEGER PRIMARY KEY, "
-    "size INTEGER NOT NULL, "
+    "size INTEGER, "
     "sha BLOB COLLATE BINARY UNIQUE, "
-    "key BLOB COLLATE BINARY)";
+    "key BLOB COLLATE BINARY UNIQUE)";
 
   db << "CREATE TABLE local_mapping("
     "file_id INTEGER NOT NULL, "

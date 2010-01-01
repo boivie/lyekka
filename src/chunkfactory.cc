@@ -10,16 +10,19 @@ Botan::byte buffer[8192];
 
 void feed_pipe(Botan::Pipe& pipe, std::istream& in, uint64_t offset, size_t size)
 {
+  in.clear();
   pipe.start_msg(); 
-  in.seekg(offset, ios_base::beg);
+  in.seekg(offset);
+  assert(in.tellg() == offset);
   size_t remaining = size;
   while (remaining) {
     in.read((char*)buffer, sizeof(buffer));
     size_t read = in.gcount();
     pipe.write(buffer, read);
-    remaining -= read;
+    remaining -= read;  
     if (read == 0) break;
   }
+  assert(remaining == 0);
   pipe.end_msg();  
 }
 
@@ -54,4 +57,21 @@ Chunk ChunkFactory::generate_chunk(std::istream& in, uint64_t offset, size_t siz
 
   Chunk chunk(sha, key, offset, size);
   return chunk;
+}
+
+
+std::string Chunk::get_cid_hex() const
+{
+  static const char table[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+  const std::vector<uint8_t> sha = m_sha.get_hash();
+  char hash[SHA_SIZE_B16 + 1];
+  int j = 0;
+  // Add SHA
+  for (int i = 0; i < SHA_SIZE_BYTES; i++)
+  {
+    hash[j++] = table[sha[i] >> 4];
+    hash[j++] = table[sha[i] & 0x0F];
+  }
+  hash[SHA_SIZE_B16] = 0;
+  return string(hash);
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include "cmd_handler.h"
 #include "sdsqlite/sdsqlite.h"
 #include "formatter.h"
@@ -15,6 +15,8 @@
 using namespace std;
 using namespace Lyekka;
 namespace bpo = boost::program_options;
+namespace fs = boost::filesystem;
+
 DECLARE_COMMAND(push, "push", "Copies the latest data.");
 
 void print_vector(string name, vector<uint8_t>& vec)
@@ -134,11 +136,16 @@ int CMD_push::execute(int argc, char* argv[])
   uint64_t cur_size, sum_size;
   try {
     RemoteInfo remote_info = Remotes::get(remote);
+    if (destination_path == "")
+      destination_path = remote_info.default_destination;
+
+    fs::path destination(destination_path);
 
     sd::sqlite& db = Db::get();
     get_count(db, remote_info.id, count, sum_size);
     cout << "Copying a maximum of " << count << " objects, " 
          << Formatter::format_size(sum_size) << " to '" << remote_info.name << "'." << endl;
+    cout << "Using destination directory: '" << destination << "'" << endl;
     
     sd::sql query(db);  
     query << "SELECT c.id, c.sha, c.size, l.offset, f.name, f.parent, f.mtime, f.id " 
@@ -159,20 +166,28 @@ int CMD_push::execute(int argc, char* argv[])
       fm.build_path(parent_id, path);
       path /= name;
       // TODO: Verify that the mtime is correct
-      std::ofstream out("/dev/null");
       std::ifstream in(path.string().c_str(), ios_base::in | ios_base::binary);
 
       ChunkHash key = ChunkFactory::generate_hash(in, offset, size);
       if (set_as_duplicate(db, chunk_id, key, file_id, offset))
       { 
+        // Only do this if already at destination
         reused++;
       }
-      else  
+
+      fs::path tmp_filename("lyekka.tmp");
+      fs::path tmp_path = destination_path / tmp_filename;
+      std::ofstream out(tmp_path.string().c_str(), ios_base::out | ios_base::binary);
+      Chunk chunk = ChunkFactory::generate_chunk(in, offset, size, key, out);
+      update_chunk(db, chunk_id, chunk, file_id, offset);
+      fs::path new_filename(chunk.get_cid_hex() + ".chunk");
+      fs::path out_path = destination_path / new_filename;
+
+      if (!fs::exists(out_path))
       {
-        Chunk chunk = ChunkFactory::generate_chunk(in, offset, size, key, out);
-        update_chunk(db, chunk_id, chunk, file_id, offset);
+        fs::rename(tmp_path, out_path);
       }
-      // TODO: Write to file  
+
       i++;
       cur_size += size;
 
