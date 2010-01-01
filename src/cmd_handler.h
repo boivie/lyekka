@@ -23,12 +23,24 @@ namespace Lyekka
   public:
     static void reg_handler(CmdHandler* handler_p);
     static void print_cmdlist(void);
-    static int execute(std::string cmd, int argc, char* argv[]);
-    static bool is_command(std::string& cmd);
+    static int execute(int argc, char* argv[]);
   private:
     static std::map<std::string, CmdHandler*>* m_handlers_p;
   };
 
+  class LyCommand : public CmdHandler
+  {
+  public:
+    int execute(int argc, char* argv[]);
+    virtual int run(void) = 0;
+  protected:
+    int print_usage(const char* extra = "");
+    void parse_options(void);
+    boost::program_options::variables_map m_vm;
+  private:
+    int m_argc;
+    char** m_argv;
+  };
 }
 
 #define DECLARE_COMMAND(id, cmd, description) \
@@ -40,5 +52,18 @@ public: \
   int execute(int argc, char* argv[]); \
 }; \
 static CMD_ ## id __cmd_ ## id
+
+
+#define LYEKKA_COMMAND(id, cmd, args, description) \
+class CMD_ ## id ## _impl : public LyCommand { \
+public: \
+ CMD_ ## id ## _impl(void) { CmdManager::reg_handler(this); } \
+  const std::string get_cmd() { return cmd; }; \
+  const std::string get_args() { return args; }; \
+  const std::string get_description() { return description; } \
+  int run(); \
+}; \
+static CMD_ ## id ## _impl __cmd_ ## id; \
+int CMD_ ## id ## _impl::run()
 
 #endif
