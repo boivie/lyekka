@@ -10,16 +10,13 @@
 #include "remotes.h"
 #include "chunkfactory.h"
 #include <sys/time.h>
-#include "cmd_parser.h"
 
 using namespace std;
 using namespace Lyekka;
 namespace bpo = boost::program_options;
 namespace fs = boost::filesystem;
 
-DECLARE_COMMAND(push, "push", "Copies the latest data.");
-
-void print_vector(string name, vector<uint8_t>& vec)
+static void print_vector(string name, vector<uint8_t>& vec)
 {
   cout << name << ": ";
   for (int i = 0; i < vec.size(); i++)
@@ -29,7 +26,7 @@ void print_vector(string name, vector<uint8_t>& vec)
   cout << endl;
 }
 
-bool set_as_duplicate(sd::sqlite& db, int64_t chunk_id, const ChunkHash& key, int64_t file_id, uint64_t offset)
+static bool set_as_duplicate(sd::sqlite& db, int64_t chunk_id, const ChunkHash& key, int64_t file_id, uint64_t offset)
 {
   sd::sql selquery(db);
   selquery << "SELECT id FROM chunks WHERE key = ?";
@@ -51,7 +48,7 @@ bool set_as_duplicate(sd::sqlite& db, int64_t chunk_id, const ChunkHash& key, in
   }
 }
 
-bool update_chunk(sd::sqlite& db, int64_t chunk_id, const Chunk& chunk, int64_t file_id, uint64_t offset)
+static bool update_chunk(sd::sqlite& db, int64_t chunk_id, const Chunk& chunk, int64_t file_id, uint64_t offset)
 {
   try {
     sd::sql query(db);
@@ -97,7 +94,7 @@ string get_rate(uint64_t size)
   return ret;
 }
 
-void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& sum_size)
+static void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& sum_size)
 {
   sd::sql countq(db);
   countq << "SELECT COUNT(c.id), SUM(c.size) " 
@@ -110,22 +107,19 @@ void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& sum_size)
   countq >> count >> sum_size;
 }
 
-int CMD_push::execute(int argc, char* argv[])
+static int push(CommandLineParser& c)
 {
-  CmdParser parser(argc, argv);
-  parser.parse_command(parser.create_commands()
-    ("", "<remote-name> [<destination-path>]"));
   string remote;
   string destination_path;
-  po.add_options()
+  c.po.add_options()
     ("remote_name", bpo::value<string>(&remote), "remote name")
     ("destination_path", bpo::value<string>(&destination_path), "remote name");
-  p.add("remote_name", 1);
-  p.add("destination_path", 1);
-  parser.parse_options(o, po, p);
+  c.p.add("remote_name", 1);
+  c.p.add("destination_path", 1);
+  c.parse_options();
 
   if (remote == "")
-    throw parser.syntax_exception("missing <remote-name>");
+    throw CommandUsageException("missing <remote-name>");
 
   FolderMap fm;
   fm.load();
@@ -200,9 +194,12 @@ int CMD_push::execute(int argc, char* argv[])
   } 
   catch (NoSuchRemoteException& e)
   {
-    throw parser.syntax_exception("Remote site not found: '" + remote + "'");
+    throw CommandUsageException("Remote site not found: '" + remote + "'");
   }
 
   return 0;
 }
+
+
+LYEKKA_COMMAND(push, "push", "", "Copies the latest data.");
 

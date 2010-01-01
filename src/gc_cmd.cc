@@ -1,20 +1,14 @@
 #include <iostream>
 #include <string>
 #include "cmd_handler.h"
-#include "cmd_parser.h"
 #include "db.h"
 
 using namespace std;
 using namespace Lyekka;
-namespace bpo = boost::program_options;
 
-DECLARE_COMMAND(gc, "gc", "Cleanup and optimizes the database.");
-
-int CMD_gc::execute(int argc, char* argv[])
+static int gc(CommandLineParser& c)
 {
-  CmdParser parser(argc, argv);
-  parser.parse_command(parser.create_commands());
-
+  c.parse_options();
   sd::sqlite& db = Db::get();
   
   db << "BEGIN EXCLUSIVE";
@@ -26,5 +20,5 @@ int CMD_gc::execute(int argc, char* argv[])
   return 0;
 }
 
-
+LYEKKA_COMMAND(gc, "gc", "", "Cleanup and optimizes the database.");
 

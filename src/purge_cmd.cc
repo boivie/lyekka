@@ -1,46 +1,52 @@
 #include <iostream>
 #include <string>
 #include "cmd_handler.h"
-#include "cmd_parser.h"
 #include "db.h"
 
 using namespace std;
 using namespace Lyekka;
 namespace bpo = boost::program_options;
 
-DECLARE_COMMAND(purge, "purge", "Purges parts of the database");
-
-int CMD_purge::execute(int argc, char* argv[])
+static int purge_local(CommandLineParser& c)
 {
-  CmdParser parser(argc, argv);
-  parser.parse_command(parser.create_commands()
-    ("local-index", "--force")
-    ("remote-index", "--force"));
-
   bool force = false;
-  o.add_options()("force", bpo::bool_switch(&force), "force");
-  parser.parse_options(o, po, p);
+  c.o.add_options()("force", bpo::bool_switch(&force), "force");
+  c.parse_options();
   
   if (!force)
-    throw parser.syntax_exception("will not do anything unless --force is specified.");
+    throw CommandUsageException("will not do anything unless --force is specified.");
 
-  if (parser.is_cmd("local-index"))
-  {
-    sd::sqlite& db = Db::get();
-    db << "BEGIN EXCLUSIVE";
-    db << "DELETE FROM files";
-    db << "DELETE FROM local_mapping";
-    db << "COMMIT";
-    cout << "Local index has been purged." << endl;
-  }
-  else if (parser.is_cmd("remote-index"))
-  {
-    cerr << "Currently not supported." << endl;
-    return 1;
-  }
-
+  sd::sqlite& db = Db::get();
+  db << "BEGIN EXCLUSIVE";
+  db << "DELETE FROM files";
+  db << "DELETE FROM local_mapping";
+  db << "COMMIT";
+  cout << "Local index has been purged." << endl;
   return 0;
+}
+
+static int purge_remote(CommandLineParser& c)
+{
+  bool force = false;
+  c.o.add_options()("force", bpo::bool_switch(&force), "force");
+  c.parse_options();
+  
+  if (!force)
+    throw CommandUsageException("will not do anything unless --force is specified.");
+
+  cout << "Currently not supported" << endl;
+  return 1;
+}
+
+static int purge(CommandLineParser& c)
+{
+  c.parse_options();
+  throw CommandUsageException("");
 }
 
 
 
+
+LYEKKA_COMMAND(purge, "purge", "", "Purges the index");
+LYEKKA_COMMAND(purge_local, "purge/local-index", "", "Purges local index");
+LYEKKA_COMMAND(purge_remote, "purge/remote-index", "", "Purges remote index");

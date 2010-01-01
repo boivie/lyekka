@@ -7,9 +7,7 @@
 using namespace std;
 using namespace Lyekka;
 
-DECLARE_COMMAND(index, "update-index", "Updates the index");
-
-int CMD_index::execute(int argc, char* argv[])
+static int index(CommandLineParser& c)
 {
   cout << "Updating index." << endl;
   Indexer idx(Db::get());
@@ -20,7 +18,8 @@ int CMD_index::execute(int argc, char* argv[])
        << stats.added << " added, "
        << stats.updated << " updated and "
        << stats.deleted << " deleted." << endl;
+  return 0;
 }
 
-
+LYEKKA_COMMAND(index, "update-index", "", "Updates the index");
 

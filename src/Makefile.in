@@ -48,7 +48,7 @@ am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT) \
 	paths.$(OBJEXT) status_cmd.$(OBJEXT) remote_cmd.$(OBJEXT) \
 	remotes.$(OBJEXT) formatter.$(OBJEXT) push_cmd.$(OBJEXT) \
 	foldermap.$(OBJEXT) chunkfactory.$(OBJEXT) gc_cmd.$(OBJEXT) \
-	purge_cmd.$(OBJEXT) cmd_parser.$(OBJEXT)
+	purge_cmd.$(OBJEXT)
 lyekka_OBJECTS = $(am_lyekka_OBJECTS)
 lyekka_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -162,7 +162,7 @@ AM_CFLAGS = --pedantic -Wall -O2 -std=c99
 AM_LDFLAGS = 
 INCLUDES = 
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h cmd_handler.h create_cmd.cc cmd_handler.cc path_cmd.cc sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc chunk.h paths.h paths.cc status_cmd.cc remote_cmd.cc remotes.h remotes.cc formatter.h formatter.cc push_cmd.cc foldermap.h foldermap.cc chunkfactory.h chunkfactory.cc gc_cmd.cc purge_cmd.cc cmd_parser.h cmd_parser.cc
+main.cc index_cmd.cc main.h cmd_handler.h create_cmd.cc cmd_handler.cc path_cmd.cc sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc chunk.h paths.h paths.cc status_cmd.cc remote_cmd.cc remotes.h remotes.cc formatter.h formatter.cc push_cmd.cc foldermap.h foldermap.cc chunkfactory.h chunkfactory.cc gc_cmd.cc purge_cmd.cc
 
 all: all-am
 
@@ -232,7 +232,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chunkfactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd_handler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/create_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/foldermap.Po@am__quote@

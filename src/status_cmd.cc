@@ -4,13 +4,10 @@
 #include "formatter.h"
 #include "remotes.h"
 #include "cmd_handler.h"
-#include "cmd_parser.h"
 
 using namespace std;
 using namespace Lyekka;
 namespace bpo = boost::program_options;
-
-DECLARE_COMMAND(status, "status", "Shows the status of the vault");
 
 void print_remote_status(sd::sqlite& db, RemoteInfo& ri)
 {
@@ -25,18 +22,13 @@ void print_remote_status(sd::sqlite& db, RemoteInfo& ri)
   cout << "[" << ri.name << "] At most " << Formatter::format_size(size) << " bytes needs to be copied." << endl;
 }
 
-int CMD_status::execute(int argc, char* argv[])
+static int status(CommandLineParser& c)
 {
-  CmdParser parser(argc, argv);
-  parser.parse_command(parser.create_commands()
-    ("", "[<remote-name>]"));
   string remote_name;
-  bpo::options_description o, po;
-  bpo::positional_options_description p;
-  po.add_options()
+  c.po.add_options()
     ("remote_name", bpo::value<string>(&remote_name), "remote name");
-  p.add("remote_name", 1);
-  parser.parse_options(o, po, p);
+  c.p.add("remote_name", 1);
+  c.parse_options();
   
   sd::sqlite& db = Db::get();
   if (remote_name != "") 
@@ -55,4 +47,7 @@ int CMD_status::execute(int argc, char* argv[])
   }
   return 0;
 }
+
+
+LYEKKA_COMMAND(status, "status", "[<remote-name>]", "Shows the status of the vault");
 

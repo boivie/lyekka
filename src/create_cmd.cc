@@ -8,10 +8,9 @@ using namespace std;
 using namespace Lyekka;
 namespace fs = boost::filesystem;
 
-DECLARE_COMMAND(create, "create", "Creates a new configuration");
-
-int CMD_create::execute(int argc, char* argv[])
+int create(CommandLineParser& c)
 {
+  c.parse_options();
   if (fs::exists(fs::path("lyekka.db")))
   {
     cerr << "Refuses to overwrite already existing 'lyekka.db'" << endl;
@@ -67,5 +66,4 @@ int CMD_create::execute(int argc, char* argv[])
   return 0;
 }
 
-
-
+LYEKKA_COMMAND(create, "create", "", "Creates a new configuration");

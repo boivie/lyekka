@@ -13,7 +13,7 @@ void print_syntax()
   cout << "Syntax: lyekka [--help] [--version] CMD [ARGS]" << endl  
        << endl
        << "Available commands:" << endl;
-  CmdManager::print_cmdlist();
+  CmdManager::print_main_cmdlist();
 }
 
 

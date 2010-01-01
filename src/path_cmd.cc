@@ -6,27 +6,22 @@ using namespace std;
 using namespace Lyekka;
 namespace bpo = boost::program_options;
 
-LYEKKA_COMMAND(path, "path", "", "Manages indexed paths")
-{
-  return print_usage();
-}
-
-LYEKKA_COMMAND(path_add, "path/add", "<name>", "Adds path to as indexed path")
+static int path_add(CommandLineParser& c)
 {
   string path;
-  po.add_options()
+  c.po.add_options()
     ("path", bpo::value<string>(&path), "path");
-  p.add("path", 1);
-  parse_options();
+  c.p.add("path", 1);
+  c.parse_options();
   
   Paths::add(path);
   cout << "Path '" << path << "' added." << endl;
   return 0;
 }
 
-LYEKKA_COMMAND(path_list, "path/list", "", "Lists indexed paths")
+static int path_list(CommandLineParser& c)
 {
-  parse_options();
+  c.parse_options();
   list<PathInfo> paths = Paths::get();
 
   for (list<PathInfo>::iterator i = paths.begin(); i != paths.end(); ++i)
@@ -34,5 +29,6 @@ LYEKKA_COMMAND(path_list, "path/list", "", "Lists indexed paths")
   return 0;
 }
 
-
-
+LYEKKA_COMMAND(path_add, "path/add", "<name>", "Adds path to as indexed path");
+LYEKKA_COMMAND(path_list, "path/list", "", "Lists indexed paths");
+LYEKKA_COMMAND(path_list, "path", "", "Manages indexed paths");

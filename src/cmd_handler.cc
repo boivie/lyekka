@@ -1,23 +1,52 @@
 #include <iostream>
 #include "cmd_handler.h"
 #include "sdsqlite/sdsqlite.h"
-#include "cmd_parser.h"
 
 using namespace std;
 using namespace Lyekka;
 
-void CmdManager::print_cmdlist(void)
+void CmdManager::print_main_cmdlist()
 {
   for (map<string,CmdHandler*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
   {
     string cmd = i->second->get_cmd();
-    // Don't print sub commands
+
     if (cmd.find('/') == string::npos)
     {
-      cout << "   " << i->second->get_cmd() << string(21 - i->second->get_cmd().size(), ' ') << i->second->get_description() << endl;
+      cout << "   " << cmd << string(21 - i->second->get_cmd().size(), ' ') << i->second->get_description() << endl;
     }
   }
 }
+
+string& string_snr(string& str, const string& search, const string& replace)
+{
+  string::size_type pos = 0;
+  while ((pos = str.find(search, pos)) != string::npos) {
+    str.replace(pos, search.size(), replace);
+    pos++;
+  }
+  return str;
+}
+
+void CmdManager::print_sub_cmdlist(const string prefix)
+{
+  bool first = true;
+  for (map<string,CmdHandler*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
+  {
+    string cmd = i->second->get_cmd();
+
+    if (cmd.compare(0, prefix.size(), prefix) != 0)
+      continue;
+
+    if (first)
+      cout << "usage: ";
+    else  
+      cout << "   or: ";
+    first = false;
+    cout << string_snr(cmd, "/", " ") << " " << i->second->get_args() << endl;
+  }
+}
+
 
 int CmdManager::execute(int argc, char* argv[])
 {
@@ -69,38 +98,45 @@ void CmdManager::reg_handler(CmdHandler* handler_p)
 
 std::map<std::string, CmdHandler*>* CmdManager::m_handlers_p = NULL;
 
-int LyCommand::print_usage(const char* extra)
+int LyCommand::print_usage(CommandLineParser& c, const char* extra)
 {
   if (extra[0] != 0)
     cout << "lyekka: " << extra << endl;
-  cout << "USAGE" << endl;
+  
+  CmdManager::print_sub_cmdlist(get_cmd());
+  cout << endl;
+  cout << "Available Options:" << endl;
+  cout << c.o << endl;
   return 0;
 }
 
 int LyCommand::execute(int argc, char* argv[])
 {
-  m_argc = argc;
-  m_argv = argv;
+  CommandLineParser c(argc, argv);
   try
   {
-    return run();
+    return m_cmdh(c);
   }
   catch (boost::program_options::unknown_option& ex)
   {
-    return print_usage(ex.what());
+    return print_usage(c, ex.what());
+  }
+  catch (CommandUsageException& ex)
+  {
+    return print_usage(c, ex.what());
   }
 }
 
-void LyCommand::parse_options(void)
+void CommandLineParser::parse_options(void)
 {
   boost::program_options::options_description ao;
   o.add_options()("help", "shows help");
   ao.add(o).add(po);
   boost::program_options::store(boost::program_options::command_line_parser(m_argc, m_argv).
-                                options(ao).positional(p).run(), m_vm);
-  boost::program_options::notify(m_vm);
-  if (m_vm.count("help"))
-    throw "help";
+                                options(ao).positional(p).run(), vm);
+  boost::program_options::notify(vm);
+  if (vm.count("help"))
+    throw CommandUsageException();
 }
 
 
