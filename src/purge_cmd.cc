@@ -48,5 +48,5 @@ static int purge(CommandLineParser& c)
 
 
 LYEKKA_COMMAND(purge, "purge", "", "Purges the index");
-LYEKKA_COMMAND(purge_local, "purge/local-index", "", "Purges local index");
-LYEKKA_COMMAND(purge_remote, "purge/remote-index", "", "Purges remote index");
+LYEKKA_COMMAND(purge_local, "purge/local-index", "[--force]", "Purges local index");
+LYEKKA_COMMAND(purge_remote, "purge/remote-index", "[--force]", "Purges remote index");

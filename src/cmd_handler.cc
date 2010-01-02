@@ -7,7 +7,7 @@ using namespace Lyekka;
 
 void CmdManager::print_main_cmdlist()
 {
-  for (map<string,CmdHandler*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
+  for (map<string,Command*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
   {
     string cmd = i->second->get_cmd();
 
@@ -31,7 +31,7 @@ string& string_snr(string& str, const string& search, const string& replace)
 void CmdManager::print_sub_cmdlist(const string prefix)
 {
   bool first = true;
-  for (map<string,CmdHandler*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
+  for (map<string,Command*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); i++)
   {
     string cmd = i->second->get_cmd();
 
@@ -64,7 +64,7 @@ int CmdManager::execute(int argc, char* argv[])
     // Found a matching command. Note that we may have sub-commands - in that case, we must see if one is matching.
     string subcommand(argv[1]);
     subcommand += "/";
-    for (std::map<std::string, CmdHandler*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); ++i)
+    for (std::map<std::string, Command*>::iterator i = m_handlers_p->begin(); i != m_handlers_p->end(); ++i)
     {
       if (i->first.compare(0, subcommand.size(), subcommand) == 0)
       { 
@@ -88,20 +88,20 @@ int CmdManager::execute(int argc, char* argv[])
   return (*m_handlers_p)[cmd]->execute(argc - 1, argv + 1);
 }
 
-void CmdManager::reg_handler(CmdHandler* handler_p)
+void CmdManager::reg_handler(Command* handler_p)
 {
   if (m_handlers_p == NULL)
-    m_handlers_p = new std::map<std::string, CmdHandler*>();
+    m_handlers_p = new std::map<std::string, Command*>();
   
   (*m_handlers_p)[handler_p->get_cmd()] = handler_p; 
 }
 
-std::map<std::string, CmdHandler*>* CmdManager::m_handlers_p = NULL;
+std::map<std::string, Command*>* CmdManager::m_handlers_p = NULL;
 
-int LyCommand::print_usage(CommandLineParser& c, const char* extra)
+int Command::print_usage(CommandLineParser& c, const char* extra)
 {
   if (extra[0] != 0)
-    cout << "lyekka: " << extra << endl;
+    cout << "error: " << extra << endl;
   
   CmdManager::print_sub_cmdlist(get_cmd());
   cout << endl;
@@ -110,7 +110,7 @@ int LyCommand::print_usage(CommandLineParser& c, const char* extra)
   return 0;
 }
 
-int LyCommand::execute(int argc, char* argv[])
+int Command::execute(int argc, char* argv[])
 {
   CommandLineParser c(argc, argv);
   try
