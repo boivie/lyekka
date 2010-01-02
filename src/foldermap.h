@@ -18,6 +18,8 @@ namespace Lyekka {
     ~FolderMap();
     void load(); 
     void build_path(int folder_id, boost::filesystem::path& path);
+    typedef void (*WalkerFn)(Folder& folder);
+    void walk_post_order(WalkerFn fn);
   private:
     Folder* list_p;
     size_t m_count;
