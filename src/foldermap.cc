@@ -61,7 +61,14 @@ void FolderMap::load(void)
     Folder& folder = list_p[i];
     if (folder.parent_id == 0) 
       continue;
-    folder.parent_p = get_folder(folder.parent_id, list_p, m_count);
+    struct Folder* parent_p = get_folder(folder.parent_id, list_p, m_count);
+    folder.parent_p = parent_p;
+    if (parent_p != NULL)
+    {
+      struct Folder* prev_child_p = parent_p->first_child_p;
+      parent_p->first_child_p = &folder;
+      folder.sibling_p = prev_child_p;
+    }
   }
 }
 
@@ -79,6 +86,29 @@ void FolderMap::build_path(int folder_id, boost::filesystem::path& path)
     recurse_build(folder_p, path);
 }
 
+void visit_folder(Folder& folder, WalkerFn walker)
+{
+  Folder* child_p;
+  // Visit children first.
+  for (child_p = folder.first_child_p; child_p != NULL; child_p = child_p->sibling_p)
+  {
+    visit_folder(*child_p, walker);
+  }
+  // We call the callback after traversing children, since we are in post-order-walk mode.
+  walker(folder);
+}
+
+void FolderMap::walk_post_order(WalkerFn walker)
+{
+  for (int i = 0; i < m_count; i++)
+  {
+    Folder& folder = list_p[i]; 
+    if (folder.parent_id == 0)
+    {
+      visit_folder(folder, walker);
+    } 
+  }
+}
 FolderMap::~FolderMap()
 {
   

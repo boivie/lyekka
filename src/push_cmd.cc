@@ -37,7 +37,7 @@ static bool set_as_duplicate(sd::sqlite& db, int64_t chunk_id, const ChunkHash& 
     selquery >> new_id;
 
     sd::sql updquery(db);
-    updquery << "UPDATE local_mapping SET chunk_id = ? WHERE file_id = ? AND chunk_id = ? AND offset = ?";
+    updquery << "UPDATE file_mapping SET chunk_id = ? WHERE file_id = ? AND chunk_id = ? AND offset = ?";
     updquery << new_id << file_id << chunk_id << offset;
     updquery.step();  
     return true;
@@ -98,7 +98,7 @@ static void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& su
 {
   sd::sql countq(db);
   countq << "SELECT COUNT(c.id), SUM(c.size) " 
-    "FROM chunks c, local_mapping l, files f "
+    "FROM chunks c, file_mapping l, files f "
     "WHERE l.file_id=f.id AND c.id=l.chunk_id "
     "AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?) "
     "ORDER BY f.mtime ASC";
@@ -141,7 +141,7 @@ static int push(CommandLineParser& c)
     
     sd::sql query(db);  
     query << "SELECT c.id, c.sha, c.size, l.offset, f.name, f.parent, f.mtime, f.id " 
-      "FROM chunks c, local_mapping l, files f "
+      "FROM chunks c, file_mapping l, files f "
       "WHERE l.file_id=f.id AND c.id=l.chunk_id "
       "AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?) "
       "ORDER BY f.mtime ASC";

@@ -24,7 +24,8 @@ int create(CommandLineParser& c)
     "parent INTEGER, "
     "name TEXT, "
     "mtime INTEGER, "
-    "ctime INTEGER)";
+    "ctime INTEGER, "
+    "chunk_id INTEGER)";
 
   db << "CREATE TABLE files (" 
     "id INTEGER PRIMARY KEY, "
@@ -40,13 +41,13 @@ int create(CommandLineParser& c)
     "sha BLOB COLLATE BINARY UNIQUE, "
     "key BLOB COLLATE BINARY UNIQUE)";
 
-  db << "CREATE TABLE local_mapping("
+  db << "CREATE TABLE file_mapping("
     "file_id INTEGER NOT NULL, "
     "chunk_id INTEGER NOT NULL, "
     "offset INTEGER)";
 
-  db << "CREATE INDEX local_mapping_file_id ON local_mapping(file_id)";
-  db << "CREATE INDEX local_mapping_chunk_id ON local_mapping(chunk_id)";
+  db << "CREATE INDEX file_mapping_file_id ON file_mapping(file_id)";
+  db << "CREATE INDEX file_mapping_chunk_id ON file_mapping(chunk_id)";
 
   db << "CREATE TABLE remotes("
     "id INTEGER PRIMARY KEY, "

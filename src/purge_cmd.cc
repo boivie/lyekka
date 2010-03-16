@@ -19,7 +19,8 @@ static int purge_local(CommandLineParser& c)
   sd::sqlite& db = Db::get();
   db << "BEGIN EXCLUSIVE";
   db << "DELETE FROM files";
-  db << "DELETE FROM local_mapping";
+  db << "DELETE FROM file_mapping";
+  db << "DELETE FROM paths";
   db << "COMMIT";
   cout << "Local index has been purged." << endl;
   return 0;

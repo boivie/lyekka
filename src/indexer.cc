@@ -49,7 +49,7 @@ void Indexer::make_chunks(fs::directory_iterator& itr, IndexedFile& file, uint64
   // The chunks created will be anonymous at first - they have no cid or key - only an offset and size.
   // They will get their identity when exporting chunks. That's when we encrypt and calculate checksums
   sd::sql delquery(m_db);
-  delquery << "DELETE FROM local_mapping WHERE file_id = ?";
+  delquery << "DELETE FROM file_mapping WHERE file_id = ?";
   delquery << file.get_dbid();
   delquery.step();
   uint64_t remaining = size;
@@ -61,7 +61,7 @@ void Indexer::make_chunks(fs::directory_iterator& itr, IndexedFile& file, uint64
     insquery << "INSERT INTO chunks (size, sha, key) VALUES (?, NULL, NULL)";
     insquery << thispart;
     insquery.step();
-    insquery << "INSERT INTO local_mapping (file_id, chunk_id, offset) VALUES (?, ?, ?)";
+    insquery << "INSERT INTO file_mapping (file_id, chunk_id, offset) VALUES (?, ?, ?)";
     insquery << file.get_dbid() << m_db.last_rowid() << offset;
     insquery.step();
     remaining -= thispart;

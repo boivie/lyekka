@@ -30,6 +30,6 @@ string Formatter::format_rate(uint64_t rate)
 		snprintf(buf, sizeof(buf), "%u.%2.2u MiB/s",
 			 x >> 10, ((x & ((1 << 10) - 1)) * 100) >> 10);
 	} else if (rate)
-		snprintf(buf, sizeof(buf), "KiB/s", rate);
+		snprintf(buf, sizeof(buf), "%u KiB/s", rate);
   return string(buf);
 }

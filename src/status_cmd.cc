@@ -12,13 +12,15 @@ namespace bpo = boost::program_options;
 void print_remote_status(sd::sqlite& db, RemoteInfo& ri)
 {
   sd::sql sizeq(db);
-  sizeq << "SELECT SUM(c.size) FROM chunks c, local_mapping l WHERE l.chunk_id = c.id AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?)";
+  sizeq << "SELECT SUM(c.size) FROM chunks c, file_mapping l WHERE l.chunk_id = c.id AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?)";
   sizeq << ri.id;
   sizeq.step();
     
   uint64_t size;
   sizeq >> size;
     
+  // TODO: Path chunks are not included in this.
+
   cout << "[" << ri.name << "] At most " << Formatter::format_size(size) << " bytes needs to be copied." << endl;
 }
 

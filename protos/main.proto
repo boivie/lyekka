@@ -1,0 +1,92 @@
+package Lyekka.pb;
+option optimize_for = SPEED;
+
+//------------
+
+message TreeRef {
+  required string name = 1;     // The name of the directory (basename)
+  required int32 mode = 2;      // Unix mode, but in decimal form.
+  required int64 mtime = 3;     // The modification time, in unix timestamp, in ms
+  required int64 ctime = 4;     // The creation time, in unix timestamp, in ms
+  required int32 sha1_idx = 5;
+  optional bytes key = 6;
+}
+
+enum Compression {
+  GZIP = 0;
+  NONE = 1;
+}
+
+message FileEntry {
+  required string name = 1; 
+  required int32 mode = 2;      
+  required uint64 size = 3; 
+  required int64 mtime = 4; 
+  required int64 ctime = 5; 
+
+  message Part {
+    optional uint64 offset = 1;  
+    required uint32 size = 2;    // The size of the (possibly unencrypted) data 
+    
+    required int32 sha1_idx = 3;     // The SHA1 of the blob object
+    optional bytes key = 4;      // The encryption key, which is the SHA256 of the unencrypted contents.
+    optional Compress compression = 5;
+  }
+
+  repeated Part parts = 6; // Note: parts may be missing.  
+}
+
+message Tree {
+  // NOTE: The 'subdirs' and 'files' are sorted by name, ascending, using memcmp()
+  // NOTE: Only files where at least one chunk is available, and trees where atleast one child
+  // has a chunk available are present. The rest are not present at all, and the index will instead
+  // inform how complete it is.
+  repeated TreeRef subdirs = 1;
+  repeated FileEntry files = 2;
+}
+
+// ----------------
+
+message Property {
+  required string key = 1;
+  optional string str_val = 2;
+}
+
+message Properties {
+  repeated Property properties = 1;
+}
+
+message SecureProperties {
+  repeated Property properties = 1;
+  optional bytes tree_key = 2;
+}
+
+message Signature {
+  optional bytes signature = 1;
+}
+
+message Manifest {
+  optional bytes tree_sha = 1;
+  optional bool is_tree_encrypted = 2;
+  optional Properties properties = 3;
+  optional bytes secure_properties = 4; // An encrypted 'SecureProperties protocol buffer'
+  repeated bytes pgp_encrypted_key = 5; // The encrypted key needed to decrypt secure_properties
+}
+
+// ---------------
+
+//struct Index_V1 {
+//  uint32 entrypoint; [none = 0xFFFFFFFF];
+//  uint32 fanout[256];
+//  sha256 shas[count];
+//  uint32 offsets[count];
+//  uint64 largeoffset
+//}
+
+//struct Index_V2 {
+//  uint32 entrypoint; [none = 0xFFFFFFFF];
+//  uint32 fanout[256];
+//  sha256 shas[count];
+//  uint64 offsets[count];
+//}
+
