@@ -3,3 +3,4 @@
 /config.status
 Makefile
 .DS_Store
+**/*~

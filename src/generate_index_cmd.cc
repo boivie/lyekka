@@ -5,7 +5,7 @@
 #include "foldermap.h"
 #include "db.h"
 #include "sdsqlite/sdsqlite.h"
-#include "main.pb.h"
+#include "lyekka.pb.h"
 #include "hash_stream.h"
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
@@ -90,11 +90,6 @@ static void walker(Folder& f)
       while (cquery.step())
       {
         cquery >> offset >> size >> sha >> key;
-        pb::Chunk* c_p = fe_p->add_chunks();
-        c_p->set_offset(offset);
-        c_p->set_size(size);
-        c_p->set_sha(&sha[0], sha.size());
-        c_p->set_key(&key[0], key.size());  
         file_chunks.push_back(sha);
       }
     }

@@ -4536,7 +4536,7 @@ else
 fi
 
 
-LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3 -lbotan -lprotobuf -lz -lssl"
+LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3 -lbotan -lprotobuf -lz -lssl -lexpat"
 
 # Checks for typedefs, structures, and compiler characteristics.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5

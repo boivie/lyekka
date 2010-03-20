@@ -15,7 +15,7 @@ void init_from_mem(Blob& blob, const void* mem_p, uint32_t size, int out_fd)
   } header;
   unsigned char compressed[4096];
   SHA256_CTX ctx;
-	z_stream stream;
+  z_stream stream;
   int ret;
 
   header.id[0] = 'b'; header.id[1] = 'l';
@@ -25,21 +25,21 @@ void init_from_mem(Blob& blob, const void* mem_p, uint32_t size, int out_fd)
   SHA256_Update(&ctx, &header, sizeof(header));
   write(out_fd, &header, sizeof(header));
 
-	deflateInit(&stream, 6);
-	stream.next_in = (Bytef*)mem_p;
-	stream.avail_in = size;
+  deflateInit(&stream, 6);
+  stream.next_in = (Bytef*)mem_p;
+  stream.avail_in = size;
   stream.next_out = compressed;
   stream.avail_out = sizeof(compressed);
-	do {
-		ret = deflate(&stream, Z_FINISH);
-	  SHA256_Update(&ctx, compressed, stream.next_out - compressed);
-		if (write(out_fd, compressed, stream.next_out - compressed) < 0)
-			exit(4);
-		stream.next_out = compressed;
-		stream.avail_out = sizeof(compressed);
-	} while (ret == Z_OK);
-
-	ret = deflateEnd(&stream);
+  do {
+    ret = deflate(&stream, Z_FINISH);
+    SHA256_Update(&ctx, compressed, stream.next_out - compressed);
+    if (write(out_fd, compressed, stream.next_out - compressed) < 0)
+      exit(4);
+    stream.next_out = compressed;
+    stream.avail_out = sizeof(compressed);
+  } while (ret == Z_OK);
+  
+  ret = deflateEnd(&stream);
   SHA256_Final(blob.hash, &ctx);
 }
 

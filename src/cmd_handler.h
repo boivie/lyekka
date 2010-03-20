@@ -17,6 +17,15 @@ namespace Lyekka
     const std::string m_extra;
   };
 
+  class BadSyntaxException
+  {
+  public:
+    BadSyntaxException(const std::string extra = "") : m_extra(extra) {};
+    const char* what() { return m_extra.c_str(); }
+  private:
+    const std::string m_extra;    
+  };
+
   class CommandLineParser 
   {
   public:
@@ -70,6 +79,9 @@ namespace Lyekka
   CONCAT(a, b)
 
 #define LYEKKA_COMMAND(func, cmd, args, description) \
+  static Command MAKE_ID(func, __LINE__)(func, cmd, args, description)
+
+#define LYEKKA_LL_COMMAND(func, cmd, args, description) \
   static Command MAKE_ID(func, __LINE__)(func, cmd, args, description)
 
 #endif

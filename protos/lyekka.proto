@@ -6,10 +6,14 @@ option optimize_for = SPEED;
 message TreeRef {
   required string name = 1;     // The name of the directory (basename)
   required int32 mode = 2;      // Unix mode, but in decimal form.
-  required int64 mtime = 3;     // The modification time, in unix timestamp, in ms
-  required int64 ctime = 4;     // The creation time, in unix timestamp, in ms
-  required int32 sha1_idx = 5;
+  required int64 mtime = 3;     // The modification time, in unix timestamp
+  optional int32 mtime_ns = 7;  // Nanosecond part of the mtime
+  required int64 ctime = 4;     // The creation time, in unix timestamp
+  optional int32 ctime_ns = 8;
+  required int32 sha_idx = 5;
   optional bytes key = 6;
+  
+  extensions 1000 to 1999;
 }
 
 enum Compression {
@@ -17,21 +21,24 @@ enum Compression {
   NONE = 1;
 }
 
+message Part {
+  optional uint64 offset = 1;  
+  required uint32 size = 2;    // The size of the (possibly unencrypted) data 
+    
+  required int32 sha_idx = 3;  // The index to the refs table
+  optional bytes key = 4;      // The encryption key, which is the SHA256 of the unencrypted contents.
+  optional Compression compression = 5 [default = GZIP];
+  extensions 1000 to 1999;
+}
+
 message FileEntry {
   required string name = 1; 
   required int32 mode = 2;      
   required uint64 size = 3; 
   required int64 mtime = 4; 
+  optional int32 mtime_ns = 7;
   required int64 ctime = 5; 
-
-  message Part {
-    optional uint64 offset = 1;  
-    required uint32 size = 2;    // The size of the (possibly unencrypted) data 
-    
-    required int32 sha1_idx = 3;     // The SHA1 of the blob object
-    optional bytes key = 4;      // The encryption key, which is the SHA256 of the unencrypted contents.
-    optional Compress compression = 5;
-  }
+  optional int32 ctime_ns = 8;
 
   repeated Part parts = 6; // Note: parts may be missing.  
 }

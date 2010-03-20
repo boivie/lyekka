@@ -40,7 +40,7 @@ EOF
 
 test_expect_success 'large blob' '
   (
-    dd if=/dev/zero of=input_file bs=31457280 count=1 &&
+    dd if=/dev/zero of=input_file bs=3145728 count=10 &&
     lyekka create-blob -i input_file -o blob.blob > actual &&
     test -f blob.blob &&
     test_cmp expected actual &&
