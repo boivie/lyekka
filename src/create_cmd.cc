@@ -24,7 +24,6 @@ int create(CommandLineParser& c)
     "parent INTEGER, "
     "name TEXT, "
     "mtime INTEGER, "
-    "ctime INTEGER, "
     "chunk_id INTEGER)";
 
   db << "CREATE TABLE files (" 
@@ -32,22 +31,25 @@ int create(CommandLineParser& c)
     "parent INTEGER, "
     "name TEXT, "
     "mtime INTEGER, "
-    "ctime INTEGER, "
     "size INTEGER)";
 
-  db << "CREATE TABLE chunks ("
+  db << "CREATE TABLE objects ("
     "id INTEGER PRIMARY KEY, "
     "size INTEGER, "
     "sha BLOB COLLATE BINARY UNIQUE, "
-    "key BLOB COLLATE BINARY UNIQUE)";
+    "key BLOB)";
 
-  db << "CREATE TABLE file_mapping("
+  // The 'size' is associated with the object and not the part (as
+  // you might think would be better) because we track remote objects
+  // and they are not in the parts list, but we still need to be able
+  // to sum up their sizes.
+  db << "CREATE TABLE parts("
     "file_id INTEGER NOT NULL, "
-    "chunk_id INTEGER NOT NULL, "
-    "offset INTEGER)";
+    "object_id INTEGER NOT NULL, "
+    "offset BIGINT)";
 
-  db << "CREATE INDEX file_mapping_file_id ON file_mapping(file_id)";
-  db << "CREATE INDEX file_mapping_chunk_id ON file_mapping(chunk_id)";
+  db << "CREATE INDEX parts_file_id ON parts(object_id)";
+  db << "CREATE INDEX parts_object_id ON parts(object_id)";
 
   db << "CREATE TABLE remotes("
     "id INTEGER PRIMARY KEY, "
@@ -56,9 +58,9 @@ int create(CommandLineParser& c)
   
   db << "CREATE TABLE remote_mapping("
     "remote_id INTEGER, "
-    "chunk_id INTEGER)";
+    "object_id INTEGER)";
 
-  db << "CREATE INDEX remote_mapping_chunk_id ON remote_mapping(chunk_id)";
+  db << "CREATE INDEX remote_mapping_object_id ON remote_mapping(object_id)";
 
   db << "PRAGMA user_version = 1";
   db << "COMMIT";

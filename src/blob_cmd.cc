@@ -7,9 +7,11 @@
 #include "lyekka.h"
 #include "blob.h"
 #include <sys/stat.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 using namespace std;
 using namespace Lyekka;
+using namespace google::protobuf::io;
 namespace fs = boost::filesystem;
 namespace bpo = boost::program_options;
 
@@ -45,9 +47,11 @@ static int create_blob(CommandLineParser& c)
   if (length > (st.st_size - offset))
     length = st.st_size - offset;
 
-  Blob blob = Blob::create_from_fd(in_fd, offset, length, out_fd);
+  FileOutputStream fos(out_fd);
+  fos.SetCloseOnDelete(true);
+  Blob blob = Blob::create_from_fd(in_fd, offset, length, &fos);
   char buf[256/4 + 1];
-  cout << sha256_base16(blob.hash, buf) << endl;
+  cout << blob.hash().base16(buf) << endl;
   return 0;
 }
 
@@ -69,7 +73,9 @@ static int cat_blob(CommandLineParser& c)
     return -1;
   }
 
-  Blob::unpack_from_fd(in_fd, st.st_size, STDOUT_FILENO);
+  FileOutputStream fos(STDOUT_FILENO);
+
+  Blob::unpack_from_fd(in_fd, st.st_size, &fos);
   return 0;
 }
 

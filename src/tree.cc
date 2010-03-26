@@ -75,15 +75,13 @@ shared_ptr<Tree> TreeBuilder::build(void)
   return old_p;
 }
 
-void Tree::serialize(int fd)
+void Tree::serialize(ZeroCopyOutputStream* os_p)
 {
   // Write to stream.
-  FileOutputStream fos(fd);
-  Sha256OutputStream hos(&fos);
+  Sha256OutputStream hos(os_p);
   {
     CodedOutputStream cos(&hos);
-    const char header[4] = {'t', 'r', 'e', 'e'};
-    cos.WriteRaw(header, sizeof(header));
+    cos.WriteRaw("tree", 4);
     
     uint32_t refs_size = htonl(m_refs.size() * SHA_BITS/8);
     cos.WriteRaw(&refs_size, sizeof(refs_size));
@@ -96,20 +94,15 @@ void Tree::serialize(int fd)
     cos.WriteRaw(&pb_size, sizeof(pb_size));
     m_pb.SerializeToCodedStream(&cos);
   }
-  Sha256Digest dgst = hos.get_digest();
-  memcpy(m_sha.mutable_data(), dgst.m_digest, SHA_BITS/8);
+  m_sha = hos.get_digest();
 }
 
-void Tree::deserialize(int fd)
+void Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p)
 {
-  FileInputStream fis(fd);
-  fis.SetCloseOnDelete(true);
-  CodedInputStream cis(&fis);
-  
+  CodedInputStream cis(is_p);
   char header[4];
-  const char magic[4] = {'t', 'r', 'e', 'e'};
   cis.ReadRaw(&header, sizeof(header));
-  if (memcmp(header, magic, sizeof(header)) != 0) 
+  if (memcmp(header, "tree", 4) != 0) 
     throw InvalidTreeException("Invalid magic");
 
   int32_t refs_size = -1;
@@ -129,7 +122,8 @@ void Tree::deserialize(int fd)
   if (pb_size < 0)
     throw InvalidTreeException("Invalid pb size");
   
-  cis.PushLimit(pb_size);
+  size_t old = cis.PushLimit(pb_size);
   if (!m_pb.ParseFromCodedStream(&cis))
     throw InvalidTreeException("Invalid protocol buffer");
+  cis.PopLimit(old);
 }

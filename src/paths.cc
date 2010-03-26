@@ -37,7 +37,6 @@ static bool already_in_db(sd::sqlite& db, string name)
 int Paths::add(std::string& path)
 {
   fs::path p(path, fs::native);
-  p = fs::system_complete(p);
   
   if (!fs::exists(p) || 
     !fs::is_directory(p))
@@ -51,7 +50,7 @@ int Paths::add(std::string& path)
   if (already_in_db(db, p.string()))
     throw PathAlreadyAddedException();
 
-  insert_query << "INSERT INTO paths (parent, name, mtime, ctime) VALUES (0, ?, 0, 0)";
+  insert_query << "INSERT INTO paths (parent, name, mtime) VALUES (0, ?, 0)";
   insert_query << p.string();
   insert_query.step();
   

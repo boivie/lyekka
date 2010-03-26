@@ -2,89 +2,82 @@
 #include "blob.h"
 #include <zlib.h>
 #include <sys/mman.h>
-#include <openssl/sha.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/io/coded_stream.h>
+#include "hash_stream.h"
+
 using namespace Lyekka;
 using namespace std;
+using namespace google::protobuf::io;
 
 #define SMALL_FILE_SIZE 32*1024
 
-void init_from_mem(Blob& blob, const void* mem_p, uint32_t size, int out_fd)
+void Blob::init_from_mem(const void* mem_p, uint32_t size, ZeroCopyOutputStream* os_p)
 {
-  struct {
-    char id[4];
-  } header;
-  unsigned char compressed[4096];
-  SHA256_CTX ctx;
+  Sha256OutputStream hos(os_p);
+  void* dest_p;
+  int dest_size;
   z_stream stream;
   int ret;
 
-  header.id[0] = 'b'; header.id[1] = 'l';
-  header.id[2] = 'o'; header.id[3] = 'b';
-  // Hash and write the header
-  SHA256_Init(&ctx);
-  SHA256_Update(&ctx, &header, sizeof(header));
-  write(out_fd, &header, sizeof(header));
-
+  hos.Next(&dest_p, &dest_size);
+  assert(dest_size >= 4);
+  memcpy(dest_p, "blob", 4);
+  hos.BackUp(dest_size - 4);
+    
+  memset(&stream, 0, sizeof(stream));
   deflateInit(&stream, 6);
+
   stream.next_in = (Bytef*)mem_p;
   stream.avail_in = size;
-  stream.next_out = compressed;
-  stream.avail_out = sizeof(compressed);
   do {
+    hos.Next((void**)&stream.next_out, (int*)&stream.avail_out);
     ret = deflate(&stream, Z_FINISH);
-    SHA256_Update(&ctx, compressed, stream.next_out - compressed);
-    if (write(out_fd, compressed, stream.next_out - compressed) < 0)
-      exit(4);
-    stream.next_out = compressed;
-    stream.avail_out = sizeof(compressed);
-  } while (ret == Z_OK);
-  
+    // TODO: Check for errors
+    hos.BackUp(stream.avail_out);
+  } while (stream.avail_in);
   ret = deflateEnd(&stream);
-  SHA256_Final(blob.hash, &ctx);
+  m_hash = hos.get_digest();
 }
 
-
-int unpack_from_mem(const void* mem_p, uint32_t size, int out_fd)
+int unpack_from_mem(const void* mem_p, uint32_t size, ZeroCopyOutputStream* os_p)
 {
-  static const char header[4] = {'b', 'l', 'o', 'b'};
-  unsigned char decompressed[16384];
-	z_stream stream;
+  z_stream stream;
   int ret;
 
-  if (memcmp(mem_p, header, sizeof(header)) != 0)
+  if (memcmp(mem_p, "blob", 4) != 0)
     return 0;
 
-  // Hash and write the header
-	inflateInit(&stream);
-	stream.next_in = (Bytef*)mem_p + 4;
-	stream.avail_in = size - 4;
-	do {
-    stream.next_out = decompressed;
-    stream.avail_out = sizeof(decompressed);
-		ret = inflate(&stream, Z_NO_FLUSH);
-		if (write(out_fd, decompressed, stream.next_out - decompressed) < 0)
-			exit(4);
-	} while (ret == Z_OK);
+  memset(&stream, 0, sizeof(stream));
+  inflateInit(&stream);
+  stream.next_in = (Bytef*)mem_p + 4;
+  stream.avail_in = size - 4;
+  do {
+    os_p->Next((void**)&stream.next_out, (int*)&stream.avail_out);
+    size_t consumed_bytes = stream.avail_out;
+    ret = inflate(&stream, Z_NO_FLUSH);
+    // TODO: Check for errors
+    os_p->BackUp(stream.avail_out);
+  } while (ret == Z_OK);
 
-	deflateEnd(&stream);
+  deflateEnd(&stream);
   return 0;
 }
 
-
-Blob Blob::create_from_fd(int in_fd, uint64_t offset, uint32_t size, int out_fd)
+Blob Blob::create_from_fd(int in_fd, uint64_t offset, uint32_t size, ZeroCopyOutputStream* os_p)
 {
   Blob ret;
-	unsigned char sha1[20];
+  unsigned char sha1[20];
 
-	void *buf = xmmap(NULL, size, PROT_READ, MAP_PRIVATE, in_fd, offset);
-	init_from_mem(ret, buf, size, out_fd);
-	munmap(buf, size);
-	return ret;
+  void *buf = xmmap(NULL, size, PROT_READ, MAP_PRIVATE, in_fd, offset);
+  ret.init_from_mem(buf, size, os_p);
+  munmap(buf, size);
+  return ret;
 }
 
-void Blob::unpack_from_fd(int in_fd, uint32_t size, int out_fd)
+void Blob::unpack_from_fd(int in_fd, uint32_t size, ZeroCopyOutputStream* os_p)
 {
-	void *buf = xmmap(NULL, size, PROT_READ, MAP_PRIVATE, in_fd, 0);
-	unpack_from_mem(buf, size, out_fd);
-	munmap(buf, size);
+  void *buf = xmmap(NULL, size, PROT_READ, MAP_PRIVATE, in_fd, 0);
+  unpack_from_mem(buf, size, os_p);
+  munmap(buf, size);
 }

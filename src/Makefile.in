@@ -36,7 +36,7 @@ bin_PROGRAMS = lyekka$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -44,18 +44,18 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_lyekka_OBJECTS = main.$(OBJEXT) index_cmd.$(OBJEXT) \
-	create_cmd.$(OBJEXT) cmd_handler.$(OBJEXT) path_cmd.$(OBJEXT) \
-	sdsqlite.$(OBJEXT) indexer.$(OBJEXT) db.$(OBJEXT) \
-	paths.$(OBJEXT) status_cmd.$(OBJEXT) remote_cmd.$(OBJEXT) \
-	remotes.$(OBJEXT) formatter.$(OBJEXT) push_cmd.$(OBJEXT) \
-	foldermap.$(OBJEXT) chunkfactory.$(OBJEXT) gc_cmd.$(OBJEXT) \
-	purge_cmd.$(OBJEXT) generate_index_cmd.$(OBJEXT) \
-	ls_files_cmd.$(OBJEXT) sha2.$(OBJEXT) hash_stream.$(OBJEXT) \
-	lyekka.pb.$(OBJEXT) lyekka_impl.pb.$(OBJEXT) \
-	blob_cmd.$(OBJEXT) blob.$(OBJEXT) wrappers.$(OBJEXT) \
-	mktree_cmd.$(OBJEXT) sha.$(OBJEXT) tree.$(OBJEXT) \
-	lstree_cmd.$(OBJEXT)
+am_lyekka_OBJECTS = main.$(OBJEXT) cmd_handler.$(OBJEXT) \
+	indexer.$(OBJEXT) db.$(OBJEXT) paths.$(OBJEXT) \
+	sdsqlite.$(OBJEXT) remotes.$(OBJEXT) formatter.$(OBJEXT) \
+	foldermap.$(OBJEXT) chunkfactory.$(OBJEXT) sha2.$(OBJEXT) \
+	hash_stream.$(OBJEXT) blob.$(OBJEXT) wrappers.$(OBJEXT) \
+	sha.$(OBJEXT) tree.$(OBJEXT) lyekka.pb.$(OBJEXT) \
+	lyekka_impl.pb.$(OBJEXT) index_cmd.$(OBJEXT) \
+	create_cmd.$(OBJEXT) path_cmd.$(OBJEXT) status_cmd.$(OBJEXT) \
+	remote_cmd.$(OBJEXT) push_cmd.$(OBJEXT) gc_cmd.$(OBJEXT) \
+	purge_cmd.$(OBJEXT) ls_files_cmd.$(OBJEXT) blob_cmd.$(OBJEXT) \
+	mktree_cmd.$(OBJEXT) lstree_cmd.$(OBJEXT) \
+	gen_objects_cmd.$(OBJEXT)
 lyekka_OBJECTS = $(am_lyekka_OBJECTS)
 lyekka_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -172,7 +172,37 @@ AM_CFLAGS = --pedantic -Wall -std=c99
 AM_LDFLAGS = 
 INCLUDES = 
 lyekka_SOURCES = \
-main.cc index_cmd.cc main.h cmd_handler.h create_cmd.cc cmd_handler.cc path_cmd.cc sdsqlite/sdsqlite.cpp sdsqlite/sdsqlite.h indexer.cc indexer.h indexed_obj.h db.h db.cc chunk.h paths.h paths.cc status_cmd.cc remote_cmd.cc remotes.h remotes.cc formatter.h formatter.cc push_cmd.cc foldermap.h foldermap.cc chunkfactory.h chunkfactory.cc gc_cmd.cc purge_cmd.cc generate_index_cmd.cc ls_files_cmd.cc sha2/sha2.h sha2/sha2.c hash_stream.h hash_stream.cc lyekka.pb.h lyekka.pb.cc lyekka_impl.pb.h lyekka_impl.pb.cc blob_cmd.cc blob.h blob.cc wrappers.cc lyekka.h mktree_cmd.cc tree.h sha.h sha.cc tree.cc lstree_cmd.cc
+  main.cc \
+  cmd_handler.cc \
+  indexer.cc \
+  db.cc \
+  paths.cc  \
+  sdsqlite/sdsqlite.cpp \
+  remotes.cc  \
+  formatter.cc  \
+  foldermap.cc  \
+  chunkfactory.cc \
+  sha2/sha2.c \
+  hash_stream.cc \
+  blob.cc  \
+  wrappers.cc \
+  sha.cc  \
+  tree.cc \
+  lyekka.pb.cc \
+  lyekka_impl.pb.cc \
+  index_cmd.cc \
+  create_cmd.cc \
+  path_cmd.cc  \
+  status_cmd.cc  \
+  remote_cmd.cc \
+  push_cmd.cc  \
+  gc_cmd.cc \
+  purge_cmd.cc \
+  ls_files_cmd.cc \
+  blob_cmd.cc \
+  mktree_cmd.cc \
+  lstree_cmd.cc \
+  gen_objects_cmd.cc
 
 all: all-am
 
@@ -187,9 +217,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/Makefile
+	  $(AUTOMAKE) --gnu src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -264,7 +294,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/foldermap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gc_cmd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate_index_cmd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_objects_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash_stream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/index_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indexer.Po@am__quote@

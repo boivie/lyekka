@@ -1,6 +1,3 @@
-//  As an example program, we don't want to use any deprecated features
-#define BOOST_FILESYSTEM_NO_DEPRECATED
-
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include <iostream>
@@ -27,7 +24,7 @@ void Indexer::update()
   m_db << "BEGIN TRANSACTION";
   for (list<PathInfo>::iterator i = paths.begin(); i != paths.end(); ++i)
   {
-    fs::path full_path = fs::system_complete( fs::path( i->path ) );
+    fs::path full_path = fs::path( i->path );
 
     if (!fs::exists(full_path) || !fs::is_directory( full_path ))
     {
@@ -49,7 +46,7 @@ void Indexer::make_chunks(fs::directory_iterator& itr, IndexedFile& file, uint64
   // The chunks created will be anonymous at first - they have no cid or key - only an offset and size.
   // They will get their identity when exporting chunks. That's when we encrypt and calculate checksums
   sd::sql delquery(m_db);
-  delquery << "DELETE FROM file_mapping WHERE file_id = ?";
+  delquery << "DELETE FROM parts WHERE file_id = ?";
   delquery << file.get_dbid();
   delquery.step();
   uint64_t remaining = size;
@@ -58,10 +55,10 @@ void Indexer::make_chunks(fs::directory_iterator& itr, IndexedFile& file, uint64
   {
     uint32_t thispart = MIN(remaining, MAX_BLOCK_SIZE);
     sd::sql insquery(m_db);
-    insquery << "INSERT INTO chunks (size, sha, key) VALUES (?, NULL, NULL)";
+    insquery << "INSERT INTO objects (size, sha, key) VALUES (?, NULL, NULL)";
     insquery << thispart;
     insquery.step();
-    insquery << "INSERT INTO file_mapping (file_id, chunk_id, offset) VALUES (?, ?, ?)";
+    insquery << "INSERT INTO parts (file_id, object_id, offset) VALUES (?, ?, ?)";
     insquery << file.get_dbid() << m_db.last_rowid() << offset;
     insquery.step();
     remaining -= thispart;
@@ -75,7 +72,6 @@ void Indexer::visit_file(fs::directory_iterator& itr, IndexedFile& file)
   if (file_stat(itr->path().string().c_str(), &statr) == 0)
   {
     if ((file.get_mtime() != statr.st_mtime) ||
-      (file.get_ctime() != statr.st_ctime) ||
       (file.get_size() != statr.st_size))
     {
       m_stats.updated++;
@@ -84,8 +80,8 @@ void Indexer::visit_file(fs::directory_iterator& itr, IndexedFile& file)
       // Update file metadata
       //      cout << "UPD: " << file.get_basename() << endl;
       sd::sql query(m_db);
-      query << "UPDATE files SET mtime=?, ctime=?, size=? WHERE id=?";  
-      query << statr.st_mtime << statr.st_ctime << statr.st_size << file.get_dbid();
+      query << "UPDATE files SET mtime=?, size=? WHERE id=?";  
+      query << statr.st_mtime << statr.st_size << file.get_dbid();
       query.step();
     }
   }
@@ -99,26 +95,25 @@ FileList Indexer::get_known_files(int path_db_id)
 { 
   FileList files;
   sd::sql query(m_db);
-  query << "SELECT id,name,mtime,ctime,size FROM files WHERE parent = ?";
+  query << "SELECT id,name,mtime,size FROM files WHERE parent = ?";
   query << path_db_id;
   int id;
   string name;
   int64_t mtime;
-  int64_t ctime;
   uint64_t size;
   
   while (query.step()) 
   { 
-    query >> id >> name >> mtime >> ctime >> size;
-    files.insert(pair<std::string,IndexedBase*>(name, new IndexedFile(id, name, mtime, ctime, size)));
+    query >> id >> name >> mtime >> size;
+    files.insert(pair<std::string,IndexedBase*>(name, new IndexedFile(id, name, mtime, size)));
   }
 
-  query << "SELECT id,name,mtime,ctime FROM paths WHERE parent = ?";
+  query << "SELECT id,name,mtime FROM paths WHERE parent = ?";
   query << path_db_id;
   while (query.step())
   {
-    query >> id >> name >> mtime >> ctime;
-    files.insert(pair<std::string,IndexedBase*>(name, new IndexedDir(id, name, mtime, ctime)));
+    query >> id >> name >> mtime;
+    files.insert(pair<std::string,IndexedBase*>(name, new IndexedDir(id, name, mtime)));
   }
 
   return files;
@@ -201,7 +196,7 @@ void Indexer::delete_obj(IndexedBase& obj)
 {
   sd::sql insert_query(m_db);
   //  assert(obj.get_type() != INDEXED_TYPE_DIR); // Subdirs have to be handled
-  insert_query << "DELETE FROM chunks WHERE file_id = ?";
+  insert_query << "DELETE FROM objects WHERE file_id = ?";
   insert_query << obj.get_dbid();
   insert_query.step();
   m_stats.deleted++;
@@ -220,10 +215,10 @@ std::auto_ptr<IndexedFile> Indexer::create_file_obj(boost::filesystem::directory
 {
   string filename = itr->path().filename();
   sd::sql query(m_db);
-  query << "INSERT INTO files (parent,name,mtime,ctime,size) VALUES (?, ?, 0, 0, 0)";
+  query << "INSERT INTO files (parent,name,mtime,size) VALUES (?, ?, 0, 0)";
   query << parent_id << filename;
   query.step();
-  auto_ptr<IndexedFile> ret_p(new IndexedFile(m_db.last_rowid(), filename, 0, 0, 0));
+  auto_ptr<IndexedFile> ret_p(new IndexedFile(m_db.last_rowid(), filename, 0, 0));
   return ret_p;
 }
 
@@ -231,9 +226,9 @@ std::auto_ptr<IndexedDir> Indexer::create_dir_obj(boost::filesystem::directory_i
 {
   string filename = itr->path().filename();
   sd::sql query(m_db);
-  query << "INSERT INTO paths (parent,name,mtime,ctime) VALUES (?, ?, 0, 0)";
+  query << "INSERT INTO paths (parent,name,mtime) VALUES (?, ?, 0)";
   query << parent_id << filename;
   query.step();
-  auto_ptr<IndexedDir> ret_p(new IndexedDir(m_db.last_rowid(), filename, 0, 0));
+  auto_ptr<IndexedDir> ret_p(new IndexedDir(m_db.last_rowid(), filename, 0));
   return ret_p;
 }

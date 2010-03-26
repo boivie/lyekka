@@ -25,8 +25,8 @@ class TreeBuilder;
 class Tree {
 public:
   friend class TreeBuilder;
-  void serialize(int fd);
-  void deserialize(int fd);
+  void serialize(google::protobuf::io::ZeroCopyOutputStream* os_p);
+  void deserialize(google::protobuf::io::ZeroCopyInputStream* is_p);
   const Sha& get_sha(void) { return m_sha; }
   const std::vector<Sha>& get_refs() const { return m_refs; }
   const Lyekka::pb::Tree& get_pb() const { return m_pb; }

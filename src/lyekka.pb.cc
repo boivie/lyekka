@@ -54,13 +54,11 @@ void protobuf_AssignDesc_lyekka_2eproto() {
       "lyekka.proto");
   GOOGLE_CHECK(file != NULL);
   TreeRef_descriptor_ = file->message_type(0);
-  static const int TreeRef_offsets_[8] = {
+  static const int TreeRef_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, mode_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, mtime_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, mtime_ns_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, ctime_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, ctime_ns_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, sha_idx_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TreeRef, key_),
   };
@@ -95,14 +93,12 @@ void protobuf_AssignDesc_lyekka_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Part));
   FileEntry_descriptor_ = file->message_type(2);
-  static const int FileEntry_offsets_[8] = {
+  static const int FileEntry_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, mode_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, size_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, mtime_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, mtime_ns_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, ctime_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, ctime_ns_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileEntry, parts_),
   };
   FileEntry_reflection_ =
@@ -276,30 +272,28 @@ void protobuf_AddDesc_lyekka_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\014lyekka.proto\022\tLyekka.pb\"\215\001\n\007TreeRef\022\014\n"
-    "\004name\030\001 \002(\t\022\014\n\004mode\030\002 \002(\005\022\r\n\005mtime\030\003 \002(\003"
-    "\022\020\n\010mtime_ns\030\007 \001(\005\022\r\n\005ctime\030\004 \002(\003\022\020\n\010cti"
-    "me_ns\030\010 \001(\005\022\017\n\007sha_idx\030\005 \002(\005\022\013\n\003key\030\006 \001("
-    "\014*\006\010\350\007\020\320\017\"}\n\004Part\022\016\n\006offset\030\001 \001(\004\022\014\n\004siz"
-    "e\030\002 \002(\r\022\017\n\007sha_idx\030\003 \002(\005\022\013\n\003key\030\004 \001(\014\0221\n"
-    "\013compression\030\005 \001(\0162\026.Lyekka.pb.Compressi"
-    "on:\004GZIP*\006\010\350\007\020\320\017\"\227\001\n\tFileEntry\022\014\n\004name\030\001"
-    " \002(\t\022\014\n\004mode\030\002 \002(\005\022\014\n\004size\030\003 \002(\004\022\r\n\005mtim"
-    "e\030\004 \002(\003\022\020\n\010mtime_ns\030\007 \001(\005\022\r\n\005ctime\030\005 \002(\003"
-    "\022\020\n\010ctime_ns\030\010 \001(\005\022\036\n\005parts\030\006 \003(\0132\017.Lyek"
-    "ka.pb.Part\"P\n\004Tree\022#\n\007subdirs\030\001 \003(\0132\022.Ly"
-    "ekka.pb.TreeRef\022#\n\005files\030\002 \003(\0132\024.Lyekka."
-    "pb.FileEntry\"(\n\010Property\022\013\n\003key\030\001 \002(\t\022\017\n"
-    "\007str_val\030\002 \001(\t\"5\n\nProperties\022\'\n\nproperti"
-    "es\030\001 \003(\0132\023.Lyekka.pb.Property\"M\n\020SecureP"
-    "roperties\022\'\n\nproperties\030\001 \003(\0132\023.Lyekka.p"
-    "b.Property\022\020\n\010tree_key\030\002 \001(\014\"\036\n\tSignatur"
-    "e\022\021\n\tsignature\030\001 \001(\014\"\230\001\n\010Manifest\022\020\n\010tre"
-    "e_sha\030\001 \001(\014\022\031\n\021is_tree_encrypted\030\002 \001(\010\022)"
-    "\n\nproperties\030\003 \001(\0132\025.Lyekka.pb.Propertie"
-    "s\022\031\n\021secure_properties\030\004 \001(\014\022\031\n\021pgp_encr"
-    "ypted_key\030\005 \003(\014*!\n\013Compression\022\010\n\004GZIP\020\000"
-    "\022\010\n\004NONE\020\001B\002H\001", 934);
+    "\n\014lyekka.proto\022\tLyekka.pb\"l\n\007TreeRef\022\014\n\004"
+    "name\030\001 \002(\t\022\014\n\004mode\030\002 \002(\005\022\r\n\005mtime\030\003 \002(\003\022"
+    "\020\n\010mtime_ns\030\004 \001(\005\022\017\n\007sha_idx\030\005 \002(\005\022\013\n\003ke"
+    "y\030\006 \001(\014*\006\010\350\007\020\320\017\"}\n\004Part\022\016\n\006offset\030\001 \001(\004\022"
+    "\014\n\004size\030\002 \002(\r\022\017\n\007sha_idx\030\003 \002(\005\022\013\n\003key\030\004 "
+    "\001(\014\0221\n\013compression\030\005 \001(\0162\026.Lyekka.pb.Com"
+    "pression:\004GZIP*\006\010\350\007\020\320\017\"v\n\tFileEntry\022\014\n\004n"
+    "ame\030\001 \002(\t\022\014\n\004mode\030\002 \002(\005\022\014\n\004size\030\003 \002(\004\022\r\n"
+    "\005mtime\030\004 \002(\003\022\020\n\010mtime_ns\030\005 \001(\005\022\036\n\005parts\030"
+    "\006 \003(\0132\017.Lyekka.pb.Part\"P\n\004Tree\022#\n\007subdir"
+    "s\030\001 \003(\0132\022.Lyekka.pb.TreeRef\022#\n\005files\030\002 \003"
+    "(\0132\024.Lyekka.pb.FileEntry\"(\n\010Property\022\013\n\003"
+    "key\030\001 \002(\t\022\017\n\007str_val\030\002 \001(\t\"5\n\nProperties"
+    "\022\'\n\nproperties\030\001 \003(\0132\023.Lyekka.pb.Propert"
+    "y\"M\n\020SecureProperties\022\'\n\nproperties\030\001 \003("
+    "\0132\023.Lyekka.pb.Property\022\020\n\010tree_key\030\002 \001(\014"
+    "\"\036\n\tSignature\022\021\n\tsignature\030\001 \001(\014\"\230\001\n\010Man"
+    "ifest\022\020\n\010tree_sha\030\001 \001(\014\022\031\n\021is_tree_encry"
+    "pted\030\002 \001(\010\022)\n\nproperties\030\003 \001(\0132\025.Lyekka."
+    "pb.Properties\022\031\n\021secure_properties\030\004 \001(\014"
+    "\022\031\n\021pgp_encrypted_key\030\005 \003(\014*!\n\013Compressi"
+    "on\022\010\n\004GZIP\020\000\022\010\n\004NONE\020\001B\002H\001", 866);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "lyekka.proto", &protobuf_RegisterTypes);
   TreeRef::default_instance_ = new TreeRef();
@@ -354,8 +348,6 @@ const int TreeRef::kNameFieldNumber;
 const int TreeRef::kModeFieldNumber;
 const int TreeRef::kMtimeFieldNumber;
 const int TreeRef::kMtimeNsFieldNumber;
-const int TreeRef::kCtimeFieldNumber;
-const int TreeRef::kCtimeNsFieldNumber;
 const int TreeRef::kShaIdxFieldNumber;
 const int TreeRef::kKeyFieldNumber;
 #endif  // !_MSC_VER
@@ -380,8 +372,6 @@ void TreeRef::SharedCtor() {
   mode_ = 0;
   mtime_ = GOOGLE_LONGLONG(0);
   mtime_ns_ = 0;
-  ctime_ = GOOGLE_LONGLONG(0);
-  ctime_ns_ = 0;
   sha_idx_ = 0;
   key_ = const_cast< ::std::string*>(&_default_key_);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -433,10 +423,8 @@ void TreeRef::Clear() {
     mode_ = 0;
     mtime_ = GOOGLE_LONGLONG(0);
     mtime_ns_ = 0;
-    ctime_ = GOOGLE_LONGLONG(0);
-    ctime_ns_ = 0;
     sha_idx_ = 0;
-    if (_has_bit(7)) {
+    if (_has_bit(5)) {
       if (key_ != &_default_key_) {
         key_->clear();
       }
@@ -496,19 +484,19 @@ bool TreeRef::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(32)) goto parse_ctime;
+        if (input->ExpectTag(32)) goto parse_mtime_ns;
         break;
       }
       
-      // required int64 ctime = 4;
+      // optional int32 mtime_ns = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_ctime:
+         parse_mtime_ns:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &ctime_)));
-          _set_bit(4);
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &mtime_ns_)));
+          _set_bit(3);
         } else {
           goto handle_uninterpreted;
         }
@@ -524,7 +512,7 @@ bool TreeRef::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &sha_idx_)));
-          _set_bit(6);
+          _set_bit(4);
         } else {
           goto handle_uninterpreted;
         }
@@ -539,38 +527,6 @@ bool TreeRef::MergePartialFromCodedStream(
          parse_key:
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_key()));
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(56)) goto parse_mtime_ns;
-        break;
-      }
-      
-      // optional int32 mtime_ns = 7;
-      case 7: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_mtime_ns:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &mtime_ns_)));
-          _set_bit(3);
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(64)) goto parse_ctime_ns;
-        break;
-      }
-      
-      // optional int32 ctime_ns = 8;
-      case 8: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_ctime_ns:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &ctime_ns_)));
-          _set_bit(5);
         } else {
           goto handle_uninterpreted;
         }
@@ -620,30 +576,20 @@ void TreeRef::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->mtime(), output);
   }
   
-  // required int64 ctime = 4;
-  if (_has_bit(4)) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->ctime(), output);
+  // optional int32 mtime_ns = 4;
+  if (_has_bit(3)) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->mtime_ns(), output);
   }
   
   // required int32 sha_idx = 5;
-  if (_has_bit(6)) {
+  if (_has_bit(4)) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->sha_idx(), output);
   }
   
   // optional bytes key = 6;
-  if (_has_bit(7)) {
+  if (_has_bit(5)) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       6, this->key(), output);
-  }
-  
-  // optional int32 mtime_ns = 7;
-  if (_has_bit(3)) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(7, this->mtime_ns(), output);
-  }
-  
-  // optional int32 ctime_ns = 8;
-  if (_has_bit(5)) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(8, this->ctime_ns(), output);
   }
   
   // Extension range [1000, 2000)
@@ -678,31 +624,21 @@ void TreeRef::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->mtime(), target);
   }
   
-  // required int64 ctime = 4;
-  if (_has_bit(4)) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->ctime(), target);
+  // optional int32 mtime_ns = 4;
+  if (_has_bit(3)) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->mtime_ns(), target);
   }
   
   // required int32 sha_idx = 5;
-  if (_has_bit(6)) {
+  if (_has_bit(4)) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->sha_idx(), target);
   }
   
   // optional bytes key = 6;
-  if (_has_bit(7)) {
+  if (_has_bit(5)) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         6, this->key(), target);
-  }
-  
-  // optional int32 mtime_ns = 7;
-  if (_has_bit(3)) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(7, this->mtime_ns(), target);
-  }
-  
-  // optional int32 ctime_ns = 8;
-  if (_has_bit(5)) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(8, this->ctime_ns(), target);
   }
   
   // Extension range [1000, 2000)
@@ -741,25 +677,11 @@ int TreeRef::ByteSize() const {
           this->mtime());
     }
     
-    // optional int32 mtime_ns = 7;
+    // optional int32 mtime_ns = 4;
     if (has_mtime_ns()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->mtime_ns());
-    }
-    
-    // required int64 ctime = 4;
-    if (has_ctime()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int64Size(
-          this->ctime());
-    }
-    
-    // optional int32 ctime_ns = 8;
-    if (has_ctime_ns()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->ctime_ns());
     }
     
     // required int32 sha_idx = 5;
@@ -818,15 +740,9 @@ void TreeRef::MergeFrom(const TreeRef& from) {
       set_mtime_ns(from.mtime_ns());
     }
     if (from._has_bit(4)) {
-      set_ctime(from.ctime());
-    }
-    if (from._has_bit(5)) {
-      set_ctime_ns(from.ctime_ns());
-    }
-    if (from._has_bit(6)) {
       set_sha_idx(from.sha_idx());
     }
-    if (from._has_bit(7)) {
+    if (from._has_bit(5)) {
       set_key(from.key());
     }
   }
@@ -847,7 +763,7 @@ void TreeRef::CopyFrom(const TreeRef& from) {
 }
 
 bool TreeRef::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000057) != 0x00000057) return false;
+  if ((_has_bits_[0] & 0x00000017) != 0x00000017) return false;
   
   
   if (!_extensions_.IsInitialized()) return false;  return true;
@@ -859,8 +775,6 @@ void TreeRef::Swap(TreeRef* other) {
     std::swap(mode_, other->mode_);
     std::swap(mtime_, other->mtime_);
     std::swap(mtime_ns_, other->mtime_ns_);
-    std::swap(ctime_, other->ctime_);
-    std::swap(ctime_ns_, other->ctime_ns_);
     std::swap(sha_idx_, other->sha_idx_);
     std::swap(key_, other->key_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -1290,8 +1204,6 @@ const int FileEntry::kModeFieldNumber;
 const int FileEntry::kSizeFieldNumber;
 const int FileEntry::kMtimeFieldNumber;
 const int FileEntry::kMtimeNsFieldNumber;
-const int FileEntry::kCtimeFieldNumber;
-const int FileEntry::kCtimeNsFieldNumber;
 const int FileEntry::kPartsFieldNumber;
 #endif  // !_MSC_VER
 
@@ -1316,8 +1228,6 @@ void FileEntry::SharedCtor() {
   size_ = GOOGLE_ULONGLONG(0);
   mtime_ = GOOGLE_LONGLONG(0);
   mtime_ns_ = 0;
-  ctime_ = GOOGLE_LONGLONG(0);
-  ctime_ns_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1364,8 +1274,6 @@ void FileEntry::Clear() {
     size_ = GOOGLE_ULONGLONG(0);
     mtime_ = GOOGLE_LONGLONG(0);
     mtime_ns_ = 0;
-    ctime_ = GOOGLE_LONGLONG(0);
-    ctime_ns_ = 0;
   }
   parts_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1438,19 +1346,19 @@ bool FileEntry::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(40)) goto parse_ctime;
+        if (input->ExpectTag(40)) goto parse_mtime_ns;
         break;
       }
       
-      // required int64 ctime = 5;
+      // optional int32 mtime_ns = 5;
       case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_ctime:
+         parse_mtime_ns:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &ctime_)));
-          _set_bit(5);
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &mtime_ns_)));
+          _set_bit(4);
         } else {
           goto handle_uninterpreted;
         }
@@ -1469,38 +1377,6 @@ bool FileEntry::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(50)) goto parse_parts;
-        if (input->ExpectTag(56)) goto parse_mtime_ns;
-        break;
-      }
-      
-      // optional int32 mtime_ns = 7;
-      case 7: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_mtime_ns:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &mtime_ns_)));
-          _set_bit(4);
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(64)) goto parse_ctime_ns;
-        break;
-      }
-      
-      // optional int32 ctime_ns = 8;
-      case 8: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_ctime_ns:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &ctime_ns_)));
-          _set_bit(6);
-        } else {
-          goto handle_uninterpreted;
-        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1547,25 +1423,15 @@ void FileEntry::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->mtime(), output);
   }
   
-  // required int64 ctime = 5;
-  if (_has_bit(5)) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(5, this->ctime(), output);
+  // optional int32 mtime_ns = 5;
+  if (_has_bit(4)) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->mtime_ns(), output);
   }
   
   // repeated .Lyekka.pb.Part parts = 6;
   for (int i = 0; i < this->parts_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       6, this->parts(i), output);
-  }
-  
-  // optional int32 mtime_ns = 7;
-  if (_has_bit(4)) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(7, this->mtime_ns(), output);
-  }
-  
-  // optional int32 ctime_ns = 8;
-  if (_has_bit(6)) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(8, this->ctime_ns(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -1601,9 +1467,9 @@ void FileEntry::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->mtime(), target);
   }
   
-  // required int64 ctime = 5;
-  if (_has_bit(5)) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(5, this->ctime(), target);
+  // optional int32 mtime_ns = 5;
+  if (_has_bit(4)) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->mtime_ns(), target);
   }
   
   // repeated .Lyekka.pb.Part parts = 6;
@@ -1611,16 +1477,6 @@ void FileEntry::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         6, this->parts(i), target);
-  }
-  
-  // optional int32 mtime_ns = 7;
-  if (_has_bit(4)) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(7, this->mtime_ns(), target);
-  }
-  
-  // optional int32 ctime_ns = 8;
-  if (_has_bit(6)) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(8, this->ctime_ns(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -1662,25 +1518,11 @@ int FileEntry::ByteSize() const {
           this->mtime());
     }
     
-    // optional int32 mtime_ns = 7;
+    // optional int32 mtime_ns = 5;
     if (has_mtime_ns()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->mtime_ns());
-    }
-    
-    // required int64 ctime = 5;
-    if (has_ctime()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int64Size(
-          this->ctime());
-    }
-    
-    // optional int32 ctime_ns = 8;
-    if (has_ctime_ns()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->ctime_ns());
     }
     
   }
@@ -1734,12 +1576,6 @@ void FileEntry::MergeFrom(const FileEntry& from) {
     if (from._has_bit(4)) {
       set_mtime_ns(from.mtime_ns());
     }
-    if (from._has_bit(5)) {
-      set_ctime(from.ctime());
-    }
-    if (from._has_bit(6)) {
-      set_ctime_ns(from.ctime_ns());
-    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1757,7 +1593,7 @@ void FileEntry::CopyFrom(const FileEntry& from) {
 }
 
 bool FileEntry::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000002f) != 0x0000002f) return false;
+  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
   
   for (int i = 0; i < parts_size(); i++) {
     if (!this->parts(i).IsInitialized()) return false;
@@ -1772,8 +1608,6 @@ void FileEntry::Swap(FileEntry* other) {
     std::swap(size_, other->size_);
     std::swap(mtime_, other->mtime_);
     std::swap(mtime_ns_, other->mtime_ns_);
-    std::swap(ctime_, other->ctime_);
-    std::swap(ctime_ns_, other->ctime_ns_);
     parts_.Swap(&other->parts_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);

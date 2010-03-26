@@ -142,26 +142,12 @@ class TreeRef : public ::google::protobuf::Message {
   inline ::google::protobuf::int64 mtime() const;
   inline void set_mtime(::google::protobuf::int64 value);
   
-  // optional int32 mtime_ns = 7;
+  // optional int32 mtime_ns = 4;
   inline bool has_mtime_ns() const;
   inline void clear_mtime_ns();
-  static const int kMtimeNsFieldNumber = 7;
+  static const int kMtimeNsFieldNumber = 4;
   inline ::google::protobuf::int32 mtime_ns() const;
   inline void set_mtime_ns(::google::protobuf::int32 value);
-  
-  // required int64 ctime = 4;
-  inline bool has_ctime() const;
-  inline void clear_ctime();
-  static const int kCtimeFieldNumber = 4;
-  inline ::google::protobuf::int64 ctime() const;
-  inline void set_ctime(::google::protobuf::int64 value);
-  
-  // optional int32 ctime_ns = 8;
-  inline bool has_ctime_ns() const;
-  inline void clear_ctime_ns();
-  static const int kCtimeNsFieldNumber = 8;
-  inline ::google::protobuf::int32 ctime_ns() const;
-  inline void set_ctime_ns(::google::protobuf::int32 value);
   
   // required int32 sha_idx = 5;
   inline bool has_sha_idx() const;
@@ -192,8 +178,6 @@ class TreeRef : public ::google::protobuf::Message {
   ::google::protobuf::int32 mode_;
   ::google::protobuf::int64 mtime_;
   ::google::protobuf::int32 mtime_ns_;
-  ::google::protobuf::int64 ctime_;
-  ::google::protobuf::int32 ctime_ns_;
   ::google::protobuf::int32 sha_idx_;
   ::std::string* key_;
   static const ::std::string _default_key_;
@@ -201,7 +185,7 @@ class TreeRef : public ::google::protobuf::Message {
   friend void protobuf_AssignDesc_lyekka_2eproto();
   friend void protobuf_ShutdownFile_lyekka_2eproto();
   
-  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
   inline bool _has_bit(int index) const {
@@ -431,26 +415,12 @@ class FileEntry : public ::google::protobuf::Message {
   inline ::google::protobuf::int64 mtime() const;
   inline void set_mtime(::google::protobuf::int64 value);
   
-  // optional int32 mtime_ns = 7;
+  // optional int32 mtime_ns = 5;
   inline bool has_mtime_ns() const;
   inline void clear_mtime_ns();
-  static const int kMtimeNsFieldNumber = 7;
+  static const int kMtimeNsFieldNumber = 5;
   inline ::google::protobuf::int32 mtime_ns() const;
   inline void set_mtime_ns(::google::protobuf::int32 value);
-  
-  // required int64 ctime = 5;
-  inline bool has_ctime() const;
-  inline void clear_ctime();
-  static const int kCtimeFieldNumber = 5;
-  inline ::google::protobuf::int64 ctime() const;
-  inline void set_ctime(::google::protobuf::int64 value);
-  
-  // optional int32 ctime_ns = 8;
-  inline bool has_ctime_ns() const;
-  inline void clear_ctime_ns();
-  static const int kCtimeNsFieldNumber = 8;
-  inline ::google::protobuf::int32 ctime_ns() const;
-  inline void set_ctime_ns(::google::protobuf::int32 value);
   
   // repeated .Lyekka.pb.Part parts = 6;
   inline int parts_size() const;
@@ -475,14 +445,12 @@ class FileEntry : public ::google::protobuf::Message {
   ::google::protobuf::uint64 size_;
   ::google::protobuf::int64 mtime_;
   ::google::protobuf::int32 mtime_ns_;
-  ::google::protobuf::int64 ctime_;
-  ::google::protobuf::int32 ctime_ns_;
   ::google::protobuf::RepeatedPtrField< ::Lyekka::pb::Part > parts_;
   friend void  protobuf_AddDesc_lyekka_2eproto();
   friend void protobuf_AssignDesc_lyekka_2eproto();
   friend void protobuf_ShutdownFile_lyekka_2eproto();
   
-  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
   inline bool _has_bit(int index) const {
@@ -1222,7 +1190,7 @@ inline void TreeRef::set_mtime(::google::protobuf::int64 value) {
   mtime_ = value;
 }
 
-// optional int32 mtime_ns = 7;
+// optional int32 mtime_ns = 4;
 inline bool TreeRef::has_mtime_ns() const {
   return _has_bit(3);
 }
@@ -1238,90 +1206,58 @@ inline void TreeRef::set_mtime_ns(::google::protobuf::int32 value) {
   mtime_ns_ = value;
 }
 
-// required int64 ctime = 4;
-inline bool TreeRef::has_ctime() const {
-  return _has_bit(4);
-}
-inline void TreeRef::clear_ctime() {
-  ctime_ = GOOGLE_LONGLONG(0);
-  _clear_bit(4);
-}
-inline ::google::protobuf::int64 TreeRef::ctime() const {
-  return ctime_;
-}
-inline void TreeRef::set_ctime(::google::protobuf::int64 value) {
-  _set_bit(4);
-  ctime_ = value;
-}
-
-// optional int32 ctime_ns = 8;
-inline bool TreeRef::has_ctime_ns() const {
-  return _has_bit(5);
-}
-inline void TreeRef::clear_ctime_ns() {
-  ctime_ns_ = 0;
-  _clear_bit(5);
-}
-inline ::google::protobuf::int32 TreeRef::ctime_ns() const {
-  return ctime_ns_;
-}
-inline void TreeRef::set_ctime_ns(::google::protobuf::int32 value) {
-  _set_bit(5);
-  ctime_ns_ = value;
-}
-
 // required int32 sha_idx = 5;
 inline bool TreeRef::has_sha_idx() const {
-  return _has_bit(6);
+  return _has_bit(4);
 }
 inline void TreeRef::clear_sha_idx() {
   sha_idx_ = 0;
-  _clear_bit(6);
+  _clear_bit(4);
 }
 inline ::google::protobuf::int32 TreeRef::sha_idx() const {
   return sha_idx_;
 }
 inline void TreeRef::set_sha_idx(::google::protobuf::int32 value) {
-  _set_bit(6);
+  _set_bit(4);
   sha_idx_ = value;
 }
 
 // optional bytes key = 6;
 inline bool TreeRef::has_key() const {
-  return _has_bit(7);
+  return _has_bit(5);
 }
 inline void TreeRef::clear_key() {
   if (key_ != &_default_key_) {
     key_->clear();
   }
-  _clear_bit(7);
+  _clear_bit(5);
 }
 inline const ::std::string& TreeRef::key() const {
   return *key_;
 }
 inline void TreeRef::set_key(const ::std::string& value) {
-  _set_bit(7);
+  _set_bit(5);
   if (key_ == &_default_key_) {
     key_ = new ::std::string;
   }
   key_->assign(value);
 }
 inline void TreeRef::set_key(const char* value) {
-  _set_bit(7);
+  _set_bit(5);
   if (key_ == &_default_key_) {
     key_ = new ::std::string;
   }
   key_->assign(value);
 }
 inline void TreeRef::set_key(const void* value, size_t size) {
-  _set_bit(7);
+  _set_bit(5);
   if (key_ == &_default_key_) {
     key_ = new ::std::string;
   }
   key_->assign(reinterpret_cast<const char*>(value), size);
 }
 inline ::std::string* TreeRef::mutable_key() {
-  _set_bit(7);
+  _set_bit(5);
   if (key_ == &_default_key_) {
     key_ = new ::std::string;
   }
@@ -1533,7 +1469,7 @@ inline void FileEntry::set_mtime(::google::protobuf::int64 value) {
   mtime_ = value;
 }
 
-// optional int32 mtime_ns = 7;
+// optional int32 mtime_ns = 5;
 inline bool FileEntry::has_mtime_ns() const {
   return _has_bit(4);
 }
@@ -1547,38 +1483,6 @@ inline ::google::protobuf::int32 FileEntry::mtime_ns() const {
 inline void FileEntry::set_mtime_ns(::google::protobuf::int32 value) {
   _set_bit(4);
   mtime_ns_ = value;
-}
-
-// required int64 ctime = 5;
-inline bool FileEntry::has_ctime() const {
-  return _has_bit(5);
-}
-inline void FileEntry::clear_ctime() {
-  ctime_ = GOOGLE_LONGLONG(0);
-  _clear_bit(5);
-}
-inline ::google::protobuf::int64 FileEntry::ctime() const {
-  return ctime_;
-}
-inline void FileEntry::set_ctime(::google::protobuf::int64 value) {
-  _set_bit(5);
-  ctime_ = value;
-}
-
-// optional int32 ctime_ns = 8;
-inline bool FileEntry::has_ctime_ns() const {
-  return _has_bit(6);
-}
-inline void FileEntry::clear_ctime_ns() {
-  ctime_ns_ = 0;
-  _clear_bit(6);
-}
-inline ::google::protobuf::int32 FileEntry::ctime_ns() const {
-  return ctime_ns_;
-}
-inline void FileEntry::set_ctime_ns(::google::protobuf::int32 value) {
-  _set_bit(6);
-  ctime_ns_ = value;
 }
 
 // repeated .Lyekka.pb.Part parts = 6;

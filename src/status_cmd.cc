@@ -12,7 +12,7 @@ namespace bpo = boost::program_options;
 void print_remote_status(sd::sqlite& db, RemoteInfo& ri)
 {
   sd::sql sizeq(db);
-  sizeq << "SELECT SUM(c.size) FROM chunks c, file_mapping l WHERE l.chunk_id = c.id AND c.id NOT IN (SELECT chunk_id FROM remote_mapping WHERE remote_id = ?)";
+  sizeq << "SELECT SUM(c.size) FROM objects c, parts l WHERE l.object_id = c.id AND c.id NOT IN (SELECT object_id FROM remote_mapping WHERE remote_id = ?)";
   sizeq << ri.id;
   sizeq.step();
     

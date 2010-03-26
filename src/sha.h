@@ -1,4 +1,5 @@
-
+#ifndef SHA_H_INCLUSION_GUARD
+#define SHA_H_INCLUSION_GUARD
 #define SHA_BITS 256
 
 namespace Lyekka {
@@ -17,3 +18,5 @@ private:
 };
 
 }
+
+#endif

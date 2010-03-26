@@ -7,10 +7,12 @@
 #include "tree.h"
 #include "cmd_handler.h"
 #include "lyekka_impl.pb.h"
+#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 using namespace std;
 using namespace Lyekka;
 using namespace boost;
+using namespace google::protobuf::io;
 
 struct MkTree {
   enum { ROOT, TREE, TREEREF, FILEREF, PART } state;
@@ -31,8 +33,6 @@ static void handle_treeref(MkTree* self_p, const char** attr)
       tr_p->set_mode(strtoul(value_p, NULL, 8));
     else if (!strcmp(key_p, "mtime"))
       tr_p->set_mtime(strtoull(value_p, NULL, 10));
-    else if (!strcmp(key_p, "ctime"))
-      tr_p->set_ctime(strtoull(value_p, NULL, 10));
     else if (!strcmp(key_p, "sha")) {
       Sha sha;
       string str;
@@ -60,8 +60,6 @@ static void handle_fileref(MkTree* self_p, const char** attr)
       fe_p->set_mode(strtoul(value_p, NULL, 8));
     else if (!strcmp(key_p, "mtime"))
       fe_p->set_mtime(strtoull(value_p, NULL, 10));
-    else if (!strcmp(key_p, "ctime"))
-      fe_p->set_ctime(strtoull(value_p, NULL, 10));
     else if (!strcmp(key_p, "size"))
       fe_p->set_size(strtoull(value_p, NULL, 10));
     else {
@@ -152,9 +150,10 @@ static int mktree(CommandLineParser& c)
   XML_ParserFree(parser);
 
   int fd = open("_tree.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  FileOutputStream fos(fd);
+  fos.SetCloseOnDelete(true);
   shared_ptr<Tree> tree_p = self.tb.build();
-  tree_p->serialize(fd);
-  close(fd);
+  tree_p->serialize(&fos);
 
   char base16[256/4 + 1];
   cout << tree_p->get_sha().base16(base16) << endl;

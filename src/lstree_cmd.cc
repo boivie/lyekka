@@ -5,11 +5,13 @@
 #include <vector>
 #include "tree.h"
 #include "cmd_handler.h"
+#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 using namespace std;
 using namespace Lyekka;
 using namespace boost;
 namespace bpo = boost::program_options;
+using namespace google::protobuf::io;
 
 const char* mode_str(int mode) {
   static char buf[11];
@@ -44,8 +46,10 @@ static int lstree(CommandLineParser& c)
       cerr << "Failed to open file: " << input << endl;
       return 1;
     }
-    tree.deserialize(fd);
-    close(fd);
+
+    FileInputStream fis(fd);
+    fis.SetCloseOnDelete(true);
+    tree.deserialize(&fis);
   } catch (InvalidTreeException& ex) {
     cerr << "Failed to parse tree: " << ex.what() << endl;
     return 1;
