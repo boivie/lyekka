@@ -4568,6 +4568,20 @@ fi
 
 done
 
+for ac_header in zlib.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "zlib.h" "ac_cv_header_zlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_zlib_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_ZLIB_H 1
+_ACEOF
+
+else
+  as_fn_error "zlib header (zlib.h) not found" "$LINENO" 5
+fi
+
+done
+
 
 for ac_header in sys/endian.h
 do :

@@ -96,6 +96,12 @@
 #endif
 #endif
 
+#if !defined(BYTE_ORDER) && defined(__BYTE_ORDER)
+# define BYTE_ORDER __BYTE_ORDER
+# define LITTLE_ENDIAN __LITTLE_ENDIAN
+# define BIG_ENDIAN __BIG_ENDIAN
+#endif
+
 #if !defined(BYTE_ORDER) || (BYTE_ORDER != LITTLE_ENDIAN && BYTE_ORDER != BIG_ENDIAN)
 #error Define BYTE_ORDER to be equal to either LITTLE_ENDIAN or BIG_ENDIAN
 #endif
