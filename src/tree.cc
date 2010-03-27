@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include "tree.h"
 #include "hash_stream.h"
