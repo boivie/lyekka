@@ -8,6 +8,8 @@
 #include "blob.h"
 #include <sys/stat.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <errno.h>
+#include <cstdio>
 
 using namespace std;
 using namespace Lyekka;
