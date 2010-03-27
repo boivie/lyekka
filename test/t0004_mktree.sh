@@ -11,7 +11,7 @@ cat >tree.xml <<EOF
 </tree>
 EOF
 
-echo "b94df087dce858b5eec9e5cc31a10a793c79a95d79cd43b25dd36438e197b6f0" > expected
+echo "e5f7d3b6f329907830b479aefd5ef41815a8ab6d41a12139e0e54eee79389fad" > expected
 
 test_expect_success 'generate simple tree' '
   (
@@ -31,7 +31,7 @@ cat >tree2.xml <<EOF
 </tree>
 EOF
 
-echo "8fb59ea99a3a384ad94ec04b13ef6c43b5d346726db8c5d49b9f8fe00b02bad3" > expected
+echo "e1593176d4c1b57ccfe29fcab28cf9da8c162e34b0f2b1d733e4383d3b6fd579" > expected
 
 test_expect_success 'generate more advanced tree' '
   (

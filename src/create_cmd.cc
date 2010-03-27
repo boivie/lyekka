@@ -24,7 +24,7 @@ int create(CommandLineParser& c)
     "parent INTEGER, "
     "name TEXT, "
     "mtime INTEGER, "
-    "chunk_id INTEGER)";
+    "object_id INTEGER)";
 
   db << "CREATE TABLE files (" 
     "id INTEGER PRIMARY KEY, "

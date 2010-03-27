@@ -1,6 +1,7 @@
 #include <iostream>
 #include "cmd_handler.h"
 #include "sdsqlite/sdsqlite.h"
+#include "lyekka.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -107,7 +108,7 @@ int Command::print_usage(CommandLineParser& c, const char* extra)
   cout << endl;
   cout << "Available Options:" << endl;
   cout << c.o << endl;
-  return 0;
+  return 2;
 }
 
 int Command::execute(int argc, char* argv[])
@@ -116,13 +117,12 @@ int Command::execute(int argc, char* argv[])
   try
   {
     return m_cmdh(c);
-  }
-  catch (boost::program_options::unknown_option& ex)
-  {
+  } catch (boost::program_options::unknown_option& ex) {
     return print_usage(c, ex.what());
-  }
-  catch (CommandUsageException& ex)
-  {
+  } catch (NoDbException& ex) {
+    cout << "error: This command requires a created database, as created by the 'create-db' command." << endl;
+    return 1;
+  } catch (CommandUsageException& ex) {
     return print_usage(c, ex.what());
   }
 }

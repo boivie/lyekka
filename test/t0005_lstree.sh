@@ -23,8 +23,8 @@ EOF
 
 test_expect_success 'listing simple tree' '
   (
-    lyekka mktree < tree.xml > actual &&
-    lyekka lstree -i b94df087dce858b5eec9e5cc31a10a793c79a95d79cd43b25dd36438e197b6f0 > actual &&
+    lyekka mktree < tree.xml > sha &&
+    lyekka lstree -i `cat sha` > actual &&
     test_cmp expected actual 
   )'
 
@@ -57,8 +57,8 @@ EOF
 
 test_expect_success 'listing more advanced tree' '
   (
-    lyekka mktree < tree2.xml > actual &&
-    lyekka lstree -i 8fb59ea99a3a384ad94ec04b13ef6c43b5d346726db8c5d49b9f8fe00b02bad3 > actual &&
+    lyekka mktree < tree2.xml > sha &&
+    lyekka lstree -i `cat sha` > actual &&
     test_cmp expected actual 
   )'
 

@@ -5,6 +5,7 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/coded_stream.h>
 #include "hash_stream.h"
+#include <google/protobuf/io/gzip_stream.h>
 
 using namespace Lyekka;
 using namespace std;
@@ -17,26 +18,18 @@ void Blob::init_from_mem(const void* mem_p, uint32_t size, ZeroCopyOutputStream*
   Sha256OutputStream hos(os_p);
   void* dest_p;
   int dest_size;
-  z_stream stream;
-  int ret;
 
-  hos.Next(&dest_p, &dest_size);
-  assert(dest_size >= 4);
-  memcpy(dest_p, "blob", 4);
-  hos.BackUp(dest_size - 4);
-    
-  memset(&stream, 0, sizeof(stream));
-  deflateInit(&stream, 6);
+  if (!write_to_stream(&hos, "blob", 4))
+    throw runtime_error("Failed to write to stream");
+  
+  GzipOutputStream::Options o;
+  o.format = GzipOutputStream::ZLIB;
+  GzipOutputStream gzos(&hos, o);
 
-  stream.next_in = (Bytef*)mem_p;
-  stream.avail_in = size;
-  do {
-    hos.Next((void**)&stream.next_out, (int*)&stream.avail_out);
-    ret = deflate(&stream, Z_FINISH);
-    // TODO: Check for errors
-    hos.BackUp(stream.avail_out);
-  } while (stream.avail_in);
-  ret = deflateEnd(&stream);
+  if (!write_to_stream(&gzos, mem_p, size))
+    throw runtime_error("Failed to write to stream");
+
+  gzos.Close();
   m_hash = hos.get_digest();
 }
 

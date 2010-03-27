@@ -3,6 +3,8 @@
 #include "hash_stream.h"
 #include <fcntl.h>
 #include "lyekka_impl.pb.h"
+#include "lyekka.h"
+#include <google/protobuf/io/gzip_stream.h>
 
 using namespace Lyekka;
 using namespace std;
@@ -79,9 +81,10 @@ void Tree::serialize(ZeroCopyOutputStream* os_p)
 {
   // Write to stream.
   Sha256OutputStream hos(os_p);
+  write_to_stream(&hos, "tree", 4);
+  
   {
     CodedOutputStream cos(&hos);
-    cos.WriteRaw("tree", 4);
     
     uint32_t refs_size = htonl(m_refs.size() * SHA_BITS/8);
     cos.WriteRaw(&refs_size, sizeof(refs_size));
@@ -89,41 +92,48 @@ void Tree::serialize(ZeroCopyOutputStream* os_p)
     for (int i = 0; i < m_refs.size(); i++) {
       cos.WriteRaw(m_refs[i].data(), SHA_BITS / 8);
     }
-    
+
     uint32_t pb_size = htonl(m_pb.ByteSize());
     cos.WriteRaw(&pb_size, sizeof(pb_size));
-    m_pb.SerializeToCodedStream(&cos);
   }
+  // The protocol buffer is gzip-compressed
+  GzipOutputStream::Options o;
+  o.format = GzipOutputStream::ZLIB;
+  GzipOutputStream gzos(&hos, o);
+  m_pb.SerializeToZeroCopyStream(&gzos);
+  gzos.Close();
+
   m_sha = hos.get_digest();
 }
 
 void Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p)
 {
-  CodedInputStream cis(is_p);
-  char header[4];
-  cis.ReadRaw(&header, sizeof(header));
-  if (memcmp(header, "tree", 4) != 0) 
-    throw InvalidTreeException("Invalid magic");
-
-  int32_t refs_size = -1;
-  cis.ReadRaw(&refs_size, sizeof(refs_size));
-  refs_size = ntohl(refs_size);
-  if (refs_size < 0 || (refs_size % (SHA_BITS/8)) != 0)
-    throw InvalidTreeException("Invalid refs size");
-  
-  m_refs.resize(refs_size / (SHA_BITS/8));
-  for (int i = 0; i < (refs_size / (SHA_BITS/8)); i++) {
-    cis.ReadRaw(m_refs[i].mutable_data(), SHA_BITS/8);
+  int32_t pb_size = -1;
+  {
+    CodedInputStream cis(is_p);
+    char header[4];
+    cis.ReadRaw(&header, sizeof(header));
+    if (memcmp(header, "tree", 4) != 0) 
+      throw InvalidTreeException("Invalid magic");
+    
+    int32_t refs_size = -1;
+    cis.ReadRaw(&refs_size, sizeof(refs_size));
+    refs_size = ntohl(refs_size);
+    if (refs_size < 0 || (refs_size % (SHA_BITS/8)) != 0)
+      throw InvalidTreeException("Invalid refs size");
+    
+    m_refs.resize(refs_size / (SHA_BITS/8));
+    for (int i = 0; i < (refs_size / (SHA_BITS/8)); i++) {
+      cis.ReadRaw(m_refs[i].mutable_data(), SHA_BITS/8);
+    }
+    
+    cis.ReadRaw(&pb_size, sizeof(pb_size));
+    pb_size = ntohl(pb_size);
+    if (pb_size < 0)
+      throw InvalidTreeException("Invalid pb size");
   }
   
-  int32_t pb_size = -1;
-  cis.ReadRaw(&pb_size, sizeof(pb_size));
-  pb_size = ntohl(pb_size);
-  if (pb_size < 0)
-    throw InvalidTreeException("Invalid pb size");
-  
-  size_t old = cis.PushLimit(pb_size);
-  if (!m_pb.ParseFromCodedStream(&cis))
+  GzipInputStream gzis(is_p);
+  if (!m_pb.ParseFromZeroCopyStream(&gzis))
     throw InvalidTreeException("Invalid protocol buffer");
-  cis.PopLimit(old);
 }
