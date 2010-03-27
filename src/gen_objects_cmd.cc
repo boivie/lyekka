@@ -60,7 +60,7 @@ static void walker(Folder& f)
     pb::Part* part_p = fe_p->add_parts();
     part_p->set_offset(offset);
     part_p->set_size(size);
-    part_p->SetExtension(pb::part_sha_ext, buf);
+    part_p->SetExtension(pb::part_sha_ext, blob.hash().mutable_string());
   }
   shared_ptr<Tree> tree_p = tb.build();
   

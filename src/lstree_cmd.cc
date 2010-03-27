@@ -35,9 +35,13 @@ const char* mode_str(int mode) {
 static int lstree(CommandLineParser& c)
 {
   string input;
+  bool verbose = false;
   c.po.add_options()
-    ("input,i", bpo::value<string>(&input), "input file");
+    ("input,i", bpo::value<string>(&input), "input file")
+    ("verbose,v", "print detailed information");
   c.parse_options();
+
+  verbose = (c.vm.count("verbose") > 0);
 
   Tree tree;
   try {
@@ -71,11 +75,17 @@ static int lstree(CommandLineParser& c)
   fileb16[SHA_BITS/4] = 0;
   for (int i = 0; i < tree.get_pb().subdirs_size(); i++) {
     const pb::TreeRef& tr = tree.get_pb().subdirs(i);
-    cout << mode_str(tr.mode()) << " " << refs[tr.sha_idx()].base16(b16) << " " << tr.name() << endl;
+    cout << mode_str(tr.mode()) << " " << refs[tr.sha_idx()].base16(b16) << " ";
+    if (verbose) 
+      cout << tr.mtime() << " ";
+    cout << tr.name() << endl;
   }
   for (int i = 0; i < tree.get_pb().files_size(); i++) {
     const pb::FileEntry& fe = tree.get_pb().files(i);
-    cout << mode_str(fe.mode()) << " " << fileb16 << " " << fe.name() << endl;
+    cout << mode_str(fe.mode()) << " " << fileb16 << " ";
+    if (verbose) 
+      cout << fe.size() << " " << fe.mtime() << " ";
+    cout << fe.name() << endl;
     for (int j = 0; j < fe.parts_size(); j++) {
       const pb::Part& pt = fe.parts(j);
       cout << mode_str(0) << " " << refs[pt.sha_idx()].base16(b16) << " [" << pt.offset() << "--" << pt.offset() + pt.size() << "]" << endl;
