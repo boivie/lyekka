@@ -22,6 +22,7 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/CMake/")
 
+find_package(Boost REQUIRED)
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 find_package(Protobuf)
 find_package(EXPAT)
