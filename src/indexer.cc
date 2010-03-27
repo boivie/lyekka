@@ -122,7 +122,7 @@ FileList Indexer::get_known_files(int path_db_id)
 static IndexedType get_type_from_itr(fs::directory_iterator& itr)
 {
   return fs::is_directory(itr->status()) ? INDEXED_TYPE_DIR :
-    fs::is_regular_file(itr->status()) ? INDEXED_TYPE_FILE :
+    fs::is_regular(itr->status()) ? INDEXED_TYPE_FILE :
     INDEXED_TYPE_OTHER;
 }
 
@@ -138,7 +138,7 @@ void Indexer::index_path(fs::path& path, int dir_db_id)
        dir_itr != end_iter;
        ++dir_itr )
   {
-    FileList::iterator known_i = known.find(dir_itr->path().filename());
+    FileList::iterator known_i = known.find(dir_itr->path().leaf());
     auto_ptr<IndexedBase> item_p;
     if (known_i != known.end()) 
     {
@@ -162,7 +162,7 @@ void Indexer::index_path(fs::path& path, int dir_db_id)
         subdirs.push_back(DirToVisit(dir_itr->path(), item_p->get_dbid()));
         visit_dir(dir_itr, *(IndexedDir*)item_p.get());
       }
-      else if (fs::is_regular_file(dir_itr->status()))
+      else if (fs::is_regular(dir_itr->status()))
       {
         if (!item_p.get())
         {
@@ -179,7 +179,7 @@ void Indexer::index_path(fs::path& path, int dir_db_id)
     }
     catch ( const std::exception & ex )
     {
-      std::cout << dir_itr->path().filename() << " " << ex.what() << std::endl;
+      std::cout << dir_itr->path().leaf() << " " << ex.what() << std::endl;
     }
   }
 
@@ -213,7 +213,7 @@ void Indexer::delete_files(FileList& deletemap)
 
 std::auto_ptr<IndexedFile> Indexer::create_file_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  string filename = itr->path().filename();
+  string filename = itr->path().leaf();
   sd::sql query(m_db);
   query << "INSERT INTO files (parent,name,mtime,size) VALUES (?, ?, 0, 0)";
   query << parent_id << filename;
@@ -224,7 +224,7 @@ std::auto_ptr<IndexedFile> Indexer::create_file_obj(boost::filesystem::directory
 
 std::auto_ptr<IndexedDir> Indexer::create_dir_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  string filename = itr->path().filename();
+  string filename = itr->path().leaf();
   sd::sql query(m_db);
   query << "INSERT INTO paths (parent,name,mtime) VALUES (?, ?, 0)";
   query << parent_id << filename;
