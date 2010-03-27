@@ -7,7 +7,7 @@ test_description='Test indexing'
 cat >expected <<EOF
 B 3cb6694588efb3ec8aea3e44e7f7dfe6853c5fd33a70e17cc43208d78d9ebccb
 B 0bf20f15f8f9c33c67ea486ee7cf2a28df0b50662c5d3684ab1f61a9fa71779a
-T 5b7df9304e6443cb777b7e29034304ada78bc4c12124e70b33c2f5def0d0e8e7
+T 63858e3186d778235ce383aa6719cd777828e3f464200e3a3a826953661c2564
 EOF
 
 test_expect_success 'simple tree' '

@@ -2,6 +2,10 @@ TEST_DIRECTORY=$(pwd)
 PATH=$TEST_DIRECTORY/../src:$PATH
 export PATH
 
+# Time zone must be forced for the 'touch' command to generate predictable time stamps
+TZ=UTC
+export TZ
+
 say_color () {
     (
 	case "$1" in
