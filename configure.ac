@@ -48,6 +48,7 @@ AC_CHECK_HEADER(google/protobuf/stubs/common.h,,
 
 AC_CHECK_HEADERS([sqlite3.h], , [AC_MSG_ERROR([sqlite3 header (sqlite3.h) not found])])
 AC_CHECK_HEADERS([zlib.h], , [AC_MSG_ERROR([zlib header (zlib.h) not found])])
+AC_CHECK_HEADERS([expat.h], , [AC_MSG_ERROR([expat header (expat.h) not found])])
 
 AC_CHECK_HEADERS(sys/endian.h)
 AC_CHECK_HEADERS(machine/endian.h)
