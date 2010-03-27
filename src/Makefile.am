@@ -16,7 +16,6 @@ lyekka_SOURCES = \
   remotes.cc  \
   formatter.cc  \
   foldermap.cc  \
-  chunkfactory.cc \
   sha2/sha2.c \
   hash_stream.cc \
   blob.cc  \

@@ -47,14 +47,13 @@ PROGRAMS = $(bin_PROGRAMS)
 am_lyekka_OBJECTS = main.$(OBJEXT) cmd_handler.$(OBJEXT) \
 	indexer.$(OBJEXT) db.$(OBJEXT) paths.$(OBJEXT) \
 	sdsqlite.$(OBJEXT) remotes.$(OBJEXT) formatter.$(OBJEXT) \
-	foldermap.$(OBJEXT) chunkfactory.$(OBJEXT) sha2.$(OBJEXT) \
-	hash_stream.$(OBJEXT) blob.$(OBJEXT) wrappers.$(OBJEXT) \
-	sha.$(OBJEXT) tree.$(OBJEXT) lyekka.pb.$(OBJEXT) \
-	lyekka_impl.pb.$(OBJEXT) index_cmd.$(OBJEXT) \
-	create_cmd.$(OBJEXT) path_cmd.$(OBJEXT) status_cmd.$(OBJEXT) \
-	remote_cmd.$(OBJEXT) push_cmd.$(OBJEXT) gc_cmd.$(OBJEXT) \
-	purge_cmd.$(OBJEXT) ls_files_cmd.$(OBJEXT) blob_cmd.$(OBJEXT) \
-	mktree_cmd.$(OBJEXT) lstree_cmd.$(OBJEXT) \
+	foldermap.$(OBJEXT) sha2.$(OBJEXT) hash_stream.$(OBJEXT) \
+	blob.$(OBJEXT) wrappers.$(OBJEXT) sha.$(OBJEXT) tree.$(OBJEXT) \
+	lyekka.pb.$(OBJEXT) lyekka_impl.pb.$(OBJEXT) \
+	index_cmd.$(OBJEXT) create_cmd.$(OBJEXT) path_cmd.$(OBJEXT) \
+	status_cmd.$(OBJEXT) remote_cmd.$(OBJEXT) push_cmd.$(OBJEXT) \
+	gc_cmd.$(OBJEXT) purge_cmd.$(OBJEXT) ls_files_cmd.$(OBJEXT) \
+	blob_cmd.$(OBJEXT) mktree_cmd.$(OBJEXT) lstree_cmd.$(OBJEXT) \
 	gen_objects_cmd.$(OBJEXT)
 lyekka_OBJECTS = $(am_lyekka_OBJECTS)
 lyekka_LDADD = $(LDADD)
@@ -181,7 +180,6 @@ lyekka_SOURCES = \
   remotes.cc  \
   formatter.cc  \
   foldermap.cc  \
-  chunkfactory.cc \
   sha2/sha2.c \
   hash_stream.cc \
   blob.cc  \
@@ -287,7 +285,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/blob.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/blob_cmd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chunkfactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/create_cmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db.Po@am__quote@

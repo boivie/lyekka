@@ -8,14 +8,13 @@
 #include "db.h"
 #include "foldermap.h"
 #include "remotes.h"
-#include "chunkfactory.h"
 #include <sys/time.h>
 
 using namespace std;
 using namespace Lyekka;
 namespace bpo = boost::program_options;
 namespace fs = boost::filesystem;
-
+#if 0
 static void print_vector(string name, vector<uint8_t>& vec)
 {
   cout << name << ": ";
@@ -106,9 +105,11 @@ static void get_count(sd::sqlite& db, int remote_id, size_t& count, uint64_t& su
   countq.step();
   countq >> count >> sum_size;
 }
+#endif
 
 static int push(CommandLineParser& c)
 {
+#if 0
   string remote;
   string destination_path;
   c.po.add_options()
@@ -196,7 +197,7 @@ static int push(CommandLineParser& c)
   {
     throw CommandUsageException("Remote site not found: '" + remote + "'");
   }
-
+#endif
   return 0;
 }
 
