@@ -4538,6 +4538,22 @@ fi
 
 LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3 -lbotan -lprotobuf -lz -lssl -lexpat"
 
+ac_fn_cxx_check_header_mongrel "$LINENO" "google/protobuf/stubs/common.h" "ac_cv_header_google_protobuf_stubs_common_h" "$ac_includes_default"
+if test "x$ac_cv_header_google_protobuf_stubs_common_h" = x""yes; then :
+  
+else
+  as_fn_error "
+  ERROR: protobuf headers are required.
+
+  You must either install protobuf from google,
+  or if you have it installed in a custom location
+  you must add '-Iincludedir' to CXXFLAGS
+  and '-Llibdir' to LDFLAGS.
+  " "$LINENO" 5
+fi
+
+
+
 # Checks for typedefs, structures, and compiler characteristics.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5
 $as_echo_n "checking for stdbool.h that conforms to C99... " >&6; }

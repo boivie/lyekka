@@ -36,6 +36,16 @@ fi
 AC_CHECK_HEADER(boost/filesystem.hpp, [], [AC_MSG_ERROR([header file <boost/filesystem.hpp> is required for boost filesystem])])
 LIBS="$LIBS -lboost_filesystem-mt -lboost_system-mt -lboost_program_options-mt -lsqlite3 -lbotan -lprotobuf -lz -lssl -lexpat"
 
+AC_CHECK_HEADER(google/protobuf/stubs/common.h,,
+		  [AC_MSG_ERROR([
+  ERROR: protobuf headers are required.
+
+  You must either install protobuf from google,
+  or if you have it installed in a custom location
+  you must add '-Iincludedir' to CXXFLAGS
+  and '-Llibdir' to LDFLAGS.
+  ])])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_CONST
