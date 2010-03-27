@@ -36,6 +36,7 @@
 #include <assert.h>	/* assert() */
 #include "sha2.h"
 
+
 /*
  * ASSERT NOTE:
  * Some sanity checking code is included using assert().  On my FreeBSD
@@ -85,6 +86,16 @@
  * <machine/endian.h> where the appropriate definitions are actually
  * made).
  */
+#ifndef BYTE_ORDER
+#ifdef HAVE_ENDIAN_H
+# include <endian.h>
+#elif HAVE_SYS_ENDIAN_H
+# include <sys/endian.h>
+#elif HAVE_MACHINE_ENDIAN_H
+# include <machine/endian.h>
+#endif
+#endif
+
 #if !defined(BYTE_ORDER) || (BYTE_ORDER != LITTLE_ENDIAN && BYTE_ORDER != BIG_ENDIAN)
 #error Define BYTE_ORDER to be equal to either LITTLE_ENDIAN or BIG_ENDIAN
 #endif

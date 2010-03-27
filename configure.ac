@@ -48,6 +48,10 @@ AC_CHECK_HEADER(google/protobuf/stubs/common.h,,
 
 AC_CHECK_HEADERS([sqlite3.h], , [AC_MSG_ERROR([sqlite3 header (sqlite3.h) not found])])
 
+AC_CHECK_HEADERS(sys/endian.h)
+AC_CHECK_HEADERS(machine/endian.h)
+AC_CHECK_HEADERS(endian.h)
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_CONST

@@ -4569,6 +4569,43 @@ fi
 done
 
 
+for ac_header in sys/endian.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "sys/endian.h" "ac_cv_header_sys_endian_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_endian_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_ENDIAN_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in machine/endian.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "machine/endian.h" "ac_cv_header_machine_endian_h" "$ac_includes_default"
+if test "x$ac_cv_header_machine_endian_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MACHINE_ENDIAN_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in endian.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "endian.h" "ac_cv_header_endian_h" "$ac_includes_default"
+if test "x$ac_cv_header_endian_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_ENDIAN_H 1
+_ACEOF
+
+fi
+
+done
+
+
 # Checks for typedefs, structures, and compiler characteristics.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5
 $as_echo_n "checking for stdbool.h that conforms to C99... " >&6; }
