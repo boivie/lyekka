@@ -12,6 +12,11 @@ using namespace std;
 using namespace boost;
 using namespace google::protobuf::io;
 
+bool TreeBuilder::compare_fileentry (const pb::FileEntry& first, const pb::FileEntry& second)
+{
+  return strcmp(first.name().c_str(), second.name().c_str()) < 0;
+}
+
 bool TreeBuilder::compare_treeref (const pb::TreeRef& first, const pb::TreeRef& second)
 {
   return strcmp(first.name().c_str(), second.name().c_str()) < 0;
@@ -33,6 +38,10 @@ shared_ptr<Tree> TreeBuilder::build(void)
   std::sort(m_tree->m_pb.mutable_subdirs()->begin(),
 	    m_tree->m_pb.mutable_subdirs()->end(),
 	    compare_treeref); 
+
+  std::sort(m_tree->m_pb.mutable_files()->begin(),
+	    m_tree->m_pb.mutable_files()->end(),
+	    compare_fileentry); 
 
   // The refs table have to be contain all SHAs, sorted by value.
   for (int i = 0; i < m_tree->m_pb.subdirs_size(); i++) {

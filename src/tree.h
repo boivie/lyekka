@@ -41,6 +41,7 @@ class TreeBuilder {
 public:
   TreeBuilder(void) : m_tree(new Tree()) {}
   static bool compare_treeref (const pb::TreeRef& first_p, const pb::TreeRef& second_p);
+  static bool compare_fileentry (const pb::FileEntry& first, const pb::FileEntry& second);
   Lyekka::pb::TreeRef* add_tree() { return m_tree->m_pb.add_subdirs(); }
   Lyekka::pb::FileEntry* add_file() { return m_tree->m_pb.add_files(); }
   boost::shared_ptr<Tree> build();
