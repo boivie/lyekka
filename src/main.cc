@@ -27,7 +27,7 @@ int main(int argc, char*argv[])
     string arg1(argv[1]);
     if (arg1 == "--version")
     {
-      cout << PACKAGE << " version " << PACKAGE_VERSION << endl;
+      cout << "lyekka version 0.1" << endl;
       return 0;
     }
     else if (arg1 != "--help")
