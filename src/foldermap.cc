@@ -6,6 +6,19 @@
 using namespace Lyekka;
 using namespace std;
 
+FMFolder::FMFolder()
+  : m_fm_p(0), parent_p(0), first_child_p(0), sibling_p(0), has_obj_ref(false) 
+{
+}
+
+const boost::filesystem::path FMFolder::get_path() const
+{
+  boost::filesystem::path path;
+  m_fm_p->build_path(id, path);
+  return path;
+}
+
+
 size_t get_count(sd::sqlite& db)
 {
   sd::sql countq(db);
@@ -16,7 +29,7 @@ size_t get_count(sd::sqlite& db)
   return count;
 }
 
-static Folder* get_folder(size_t id, Folder* list_p, size_t count)
+static FMFolder* get_folder(size_t id, FMFolder* list_p, size_t count)
 {
   size_t low = 0, high = count;
 
@@ -39,7 +52,7 @@ void FolderMap::load(void)
 {
   sd::sqlite& db = Db::get();
   m_count = get_count(db);
-  list_p = new Folder[m_count]();
+  list_p = new FMFolder[m_count]();
 
   sd::sql selq(db);
   selq << "SELECT id, name, parent FROM paths ORDER BY id";
@@ -47,7 +60,8 @@ void FolderMap::load(void)
 
   for (i = 0; i < m_count; i++)
   {
-    Folder& folder = list_p[i];
+    FMFolder& folder = list_p[i];
+    folder.m_fm_p = this;
     folder.parent_p = NULL;
     if (selq.step())
     {
@@ -58,21 +72,21 @@ void FolderMap::load(void)
   // Set the parent_p pointers
   for (i = 0; i < m_count; i++)
   {
-    Folder& folder = list_p[i];
+    FMFolder& folder = list_p[i];
     if (folder.parent_id == 0) 
       continue;
-    struct Folder* parent_p = get_folder(folder.parent_id, list_p, m_count);
+    struct FMFolder* parent_p = get_folder(folder.parent_id, list_p, m_count);
     folder.parent_p = parent_p;
     if (parent_p != NULL)
     {
-      struct Folder* prev_child_p = parent_p->first_child_p;
+      struct FMFolder* prev_child_p = parent_p->first_child_p;
       parent_p->first_child_p = &folder;
       folder.sibling_p = prev_child_p;
     }
   }
 }
 
-static void recurse_build(Folder* folder_p, boost::filesystem::path& path)
+static void recurse_build(FMFolder* folder_p, boost::filesystem::path& path)
 {
   if (folder_p->parent_p != NULL) 
     recurse_build(folder_p->parent_p, path);
@@ -81,14 +95,14 @@ static void recurse_build(Folder* folder_p, boost::filesystem::path& path)
 
 void FolderMap::build_path(int folder_id, boost::filesystem::path& path)
 {
-  Folder* folder_p = get_folder(folder_id, list_p, m_count);
+  FMFolder* folder_p = get_folder(folder_id, list_p, m_count);
   if (folder_p != NULL)
     recurse_build(folder_p, path);
 }
 
-void visit_folder(Folder& folder, WalkerFn walker)
+void visit_folder(FMFolder& folder, WalkerFn walker)
 {
-  Folder* child_p;
+  FMFolder* child_p;
   // Visit children first.
   for (child_p = folder.first_child_p; child_p != NULL; child_p = child_p->sibling_p)
   {
@@ -102,7 +116,7 @@ void FolderMap::walk_post_order(WalkerFn walker)
 {
   for (int i = 0; i < m_count; i++)
   {
-    Folder& folder = list_p[i]; 
+    FMFolder& folder = list_p[i]; 
     if (folder.parent_id == 0)
     {
       visit_folder(folder, walker);

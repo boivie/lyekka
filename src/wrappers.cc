@@ -2,6 +2,7 @@
 #include <sys/mman.h>
 #include <errno.h>
 #include <google/protobuf/io/zero_copy_stream.h>
+#include <fcntl.h>
 
 #include "lyekka.h"
 
@@ -20,7 +21,20 @@ void* Lyekka::xmmap(void *start, size_t length, int prot, int flags, int fd, off
   return ret;
 }
 
+int Lyekka::xopen(const char* fn_p, int oflag, int mode) {
+  int fd;
+  if (mode == 0) {
+    fd = open(fn_p, oflag);
+  } else {
+    fd = open(fn_p, oflag, mode);
+  }
 
+  if (fd == -1) {
+    cerr << "Failed to open " << fn_p << " : " << strerror(errno) << endl;
+    throw RuntimeError();
+  }
+  return fd;
+}
 
 bool Lyekka::write_to_stream(ZeroCopyOutputStream* os_p, const void* src_p, size_t size) 
 {

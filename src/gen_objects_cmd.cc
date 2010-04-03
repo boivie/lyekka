@@ -11,76 +11,78 @@
 #include "blob.h"
 #include "tree.h"
 #include "lyekka_impl.pb.h"
+#include "lyekka.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include "file_system_iterator.h"
 
 using namespace std;
 using namespace Lyekka;
 using namespace google::protobuf::io;
 namespace fs = boost::filesystem;
 using namespace boost;
+namespace bpo = boost::program_options;
 
-static void walker(Folder& f)
+
+static Sha visit_folder(FolderPtr f)
 {
-  // Get a list of files, and their chunks.
-  sd::sqlite& db = Db::get();
-  sd::sql query(db);  
-  query << "SELECT f.id, f.name, f.size, f.mtime, m.offset, c.size " 
-    "FROM files f, parts m, objects c " 
-    "WHERE m.file_id = f.id AND m.object_id = c.id AND f.parent = ? " 
-    "ORDER BY f.id, m.offset";
-  query << f.id;
+  char buf[256/4 + 1];
   TreeBuilder tb;
-  int64_t last_file_id = -1;
-  pb::FileEntry* fe_p = NULL;
-  while (query.step())
-  { 
-    string filename;
-    uint64_t offset;
-    uint32_t size;
-    uint64_t file_size;
-    int64_t file_id;
-    time_t mtime;
-    query >> file_id >> filename >> file_size >> mtime >> offset >> size;
-    fs::path p = fs::path(f.name) / fs::path(filename);
-    int in_fd = open(p.string().c_str(), O_RDONLY);
-    FileOutputStream fos(open("_blob.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0755));
-    fos.SetCloseOnDelete(true);
-    Blob blob = Blob::create_from_fd(in_fd, offset, size, &fos);
-    char buf[256/4 + 1];
-    cout << "B " << blob.hash().base16(buf) << endl;
-    rename("_blob.tmp", buf);
-    if (file_id != last_file_id) {
-      fe_p = tb.add_file();
-      last_file_id = file_id;
-      fe_p->set_name(filename);
-      fe_p->set_mode(0755);
-      fe_p->set_size(file_size);
-      fe_p->set_mtime(mtime);
-    }
-    pb::Part* part_p = fe_p->add_parts();
-    part_p->set_offset(offset);
-    part_p->set_size(size);
-    part_p->SetExtension(pb::part_sha_ext, blob.hash().mutable_string());
+  FolderList folders = f->get_sub_folders();
+  for (FolderList::iterator child_i = folders.begin(); 
+       child_i != folders.end();
+       ++child_i) {
+    pb::TreeRef* tr_p = tb.add_tree();
+    tr_p->MergeFrom((*child_i)->pb());
+    tr_p->SetExtension(pb::tree_sha_ext, visit_folder(*child_i).mutable_string());
   }
+
+  FileList files = f->get_files();
+  for (FileList::iterator child_i = files.begin();
+       child_i != files.end();
+       ++child_i) {
+    FilePtr file_p = *child_i;
+    pb::FileEntry* fe_p = tb.add_file();
+    fe_p->MergeFrom(file_p->pb());
+
+    int in_fd = xopen(file_p->path().string().c_str(), O_RDONLY);
+    PartList parts = file_p->get_parts();
+    for (PartList::iterator part_i = parts.begin();
+	 part_i != parts.end();
+	 ++part_i) {
+      PartPtr part_p = *part_i;
+      FileOutputStream fos(xopen("_blob.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644));
+      fos.SetCloseOnDelete(true);
+      Blob blob = Blob::create_from_fd(in_fd, part_p->offset(), part_p->size(), &fos);
+      cout << "B " << blob.hash().base16(buf) << endl;
+      pb::Part* pt_p = fe_p->add_parts();
+      pt_p->set_offset(part_p->offset());
+      pt_p->set_size(part_p->size());
+      pt_p->SetExtension(pb::part_sha_ext, blob.hash().mutable_string());
+      rename("_blob.tmp", buf);
+    }
+    close(in_fd);
+  }
+
   shared_ptr<Tree> tree_p = tb.build();
-  
-  int fd = open("_tree.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-  FileOutputStream fos(fd);
+  FileOutputStream fos(xopen("_tree.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644));
   fos.SetCloseOnDelete(true);
   tree_p->serialize(&fos);
-
-  char base16[256/4 + 1];
-  cout << "T " << tree_p->get_sha().base16(base16) << endl;
-  rename("_tree.tmp", base16);
+  cout << "T " << tree_p->get_sha().base16(buf) << endl;
+  rename("_tree.tmp", buf);
+  return tree_p->get_sha();
 }
-
 
 static int gen_objects(CommandLineParser& c)
 {
+  string input;
+  c.po.add_options()
+    ("input,i", bpo::value<string>(&input), "input file");
+  c.p.add("input", -1);
   c.parse_options();
-  FolderMap fm;
-  fm.load();
-  fm.walk_post_order(walker); 
+  
+  FolderPtr folder_p = FileSystemIterator().iterate(input);
+  visit_folder(folder_p);
+
   return 0;
 }
 

@@ -39,6 +39,7 @@ static int lstree(CommandLineParser& c)
   c.po.add_options()
     ("input,i", bpo::value<string>(&input), "input file")
     ("verbose,v", "print detailed information");
+  c.p.add("input", -1);
   c.parse_options();
 
   verbose = (c.vm.count("verbose") > 0);
@@ -75,14 +76,20 @@ static int lstree(CommandLineParser& c)
   fileb16[SHA_BITS/4] = 0;
   for (int i = 0; i < tree.get_pb().subdirs_size(); i++) {
     const pb::TreeRef& tr = tree.get_pb().subdirs(i);
-    cout << mode_str(tr.mode()) << " " << refs[tr.sha_idx()].base16(b16) << " ";
+    cout << mode_str(tr.mode());
+    if (verbose) 
+      cout << " (" << tr.mode() << ")";
+    cout << " " << refs[tr.sha_idx()].base16(b16) << " ";
     if (verbose) 
       cout << tr.mtime() << " ";
     cout << tr.name() << endl;
   }
   for (int i = 0; i < tree.get_pb().files_size(); i++) {
     const pb::FileEntry& fe = tree.get_pb().files(i);
-    cout << mode_str(fe.mode()) << " " << fileb16 << " ";
+    cout << mode_str(fe.mode());
+    if (verbose) 
+      cout << " (" << fe.mode() << ")";
+    cout << " " << fileb16 << " ";
     if (verbose) 
       cout << fe.size() << " " << fe.mtime() << " ";
     cout << fe.name() << endl;

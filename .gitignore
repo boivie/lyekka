@@ -1,6 +1,7 @@
 *.o
-/config.log
-/config.status
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
 Makefile
 .DS_Store
 **/*~

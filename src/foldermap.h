@@ -5,23 +5,28 @@
 #include "objref.h"
 
 namespace Lyekka {
-  class Folder {
+  class FolderMap;
+
+  class FMFolder {
   public:
-    Folder() : parent_p(0), first_child_p(0), sibling_p(0), has_obj_ref(false) {}
     int id;
     std::string name; 
-    Folder* parent_p;
-    Folder* first_child_p;
-    Folder* sibling_p;
+    FMFolder* parent_p;
+    FMFolder* first_child_p;
+    FMFolder* sibling_p;
     int parent_id;
     bool has_obj_ref;
     const ObjRef& obj_ref(void) { return m_obj_ref; }
     void set_obj_ref(const ObjRef& obj) { m_obj_ref = obj; }
+    const boost::filesystem::path get_path() const;
   private:
+    friend class FolderMap;
+    FMFolder();
     ObjRef m_obj_ref;
+    FolderMap* m_fm_p;
   };  
 
-  typedef void (*WalkerFn)(Folder& folder);
+  typedef void (*WalkerFn)(FMFolder& folder);
 
   class FolderMap {
   public:
@@ -31,7 +36,7 @@ namespace Lyekka {
     void build_path(int folder_id, boost::filesystem::path& path);
     void walk_post_order(WalkerFn fn);
   private:
-    Folder* list_p;
+    FMFolder* list_p;
     size_t m_count;
   };
 }
