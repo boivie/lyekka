@@ -14,6 +14,7 @@
 #include "lyekka.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include "file_system_iterator.h"
+#include "file_writer.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -23,7 +24,7 @@ using namespace boost;
 namespace bpo = boost::program_options;
 
 
-static Sha visit_folder(FolderPtr f)
+static Sha visit_folder(ObjectWriter& ow, FolderPtr f)
 {
   char buf[256/4 + 1];
   TreeBuilder tb;
@@ -33,7 +34,7 @@ static Sha visit_folder(FolderPtr f)
        ++child_i) {
     pb::TreeRef* tr_p = tb.add_tree();
     tr_p->MergeFrom((*child_i)->pb());
-    tr_p->SetExtension(pb::tree_sha_ext, visit_folder(*child_i).mutable_string());
+    tr_p->SetExtension(pb::tree_sha_ext, visit_folder(ow, *child_i).mutable_string());
   }
 
   FileList files = f->get_files();
@@ -50,25 +51,23 @@ static Sha visit_folder(FolderPtr f)
 	 part_i != parts.end();
 	 ++part_i) {
       PartPtr part_p = *part_i;
-      FileOutputStream fos(xopen("_blob.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644));
-      fos.SetCloseOnDelete(true);
-      Blob blob = Blob::create_from_fd(in_fd, part_p->offset(), part_p->size(), &fos);
+      ZeroCopyOutputStream& os = ow.get_writer();
+      Blob blob = Blob::create_from_fd(in_fd, part_p->offset(), part_p->size(), &os);
       cout << "B " << blob.hash().base16(buf) << endl;
       pb::Part* pt_p = fe_p->add_parts();
       pt_p->set_offset(part_p->offset());
       pt_p->set_size(part_p->size());
       pt_p->SetExtension(pb::part_sha_ext, blob.hash().mutable_string());
-      rename("_blob.tmp", buf);
+      ow.commit(blob.hash());
     }
     close(in_fd);
   }
 
   shared_ptr<Tree> tree_p = tb.build();
-  FileOutputStream fos(xopen("_tree.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644));
-  fos.SetCloseOnDelete(true);
-  tree_p->serialize(&fos);
+  ZeroCopyOutputStream& os = ow.get_writer();
+  tree_p->serialize(&os);
   cout << "T " << tree_p->get_sha().base16(buf) << endl;
-  rename("_tree.tmp", buf);
+  ow.commit(tree_p->get_sha());
   return tree_p->get_sha();
 }
 
@@ -80,8 +79,9 @@ static int gen_objects(CommandLineParser& c)
   c.p.add("input", -1);
   c.parse_options();
   
+  FileWriter fw;
   FolderPtr folder_p = FileSystemIterator().iterate(input);
-  visit_folder(folder_p);
+  visit_folder(fw, folder_p);
 
   return 0;
 }

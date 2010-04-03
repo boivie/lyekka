@@ -11,7 +11,8 @@ foldermap.cc		lyekka_impl.pb.cc	status_cmd.cc
 formatter.cc		main.cc			tree.cc
 gc_cmd.cc		mktree_cmd.cc		wrappers.cc
 gen_objects_cmd.cc	path_cmd.cc
-hash_stream.cc		paths.cc unpack_cmd.cc file_system_iterator.cc)
+hash_stream.cc		paths.cc unpack_cmd.cc file_system_iterator.cc
+file_writer.cc )
 
 set(sdsqlite_SOURCES sdsqlite/sdsqlite.cpp)
 set(sha2_SOURCES sha2/sha2.c)
