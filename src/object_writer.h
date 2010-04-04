@@ -8,6 +8,7 @@ namespace Lyekka {
 
   class ObjectWriter {
   public:
+    virtual ~ObjectWriter() {};
     virtual void commit(Sha sha) = 0;
     virtual google::protobuf::io::ZeroCopyOutputStream& get_writer() = 0;
   };

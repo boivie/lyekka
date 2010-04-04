@@ -15,6 +15,7 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include "file_system_iterator.h"
 #include "file_writer.h"
+#include "archive_writer.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -74,14 +75,21 @@ static Sha visit_folder(ObjectWriter& ow, FolderPtr f)
 static int gen_objects(CommandLineParser& c)
 {
   string input;
+  string archive = "";
   c.po.add_options()
-    ("input,i", bpo::value<string>(&input), "input file");
+    ("input,i", bpo::value<string>(&input), "input file")
+    ("archive-out,a", bpo::value<string>(&archive), "archive");
   c.p.add("input", -1);
   c.parse_options();
   
-  FileWriter fw;
   FolderPtr folder_p = FileSystemIterator().iterate(input);
-  visit_folder(fw, folder_p);
+  if (archive == "") {
+    FileWriter fw;
+    visit_folder(fw, folder_p);
+  } else {
+    ArchiveWriter aw(archive);
+    aw.set_entry_point(visit_folder(aw, folder_p));
+  }
 
   return 0;
 }
