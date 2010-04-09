@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <boost/filesystem.hpp>
 #include "lyekka.h"
+#include "mmap_stream.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
 using namespace std;
@@ -27,13 +28,9 @@ static void unpack_part(FileOutputStream& fos, const Tree& tree, const pb::Part&
 {
   char buf[SHA_BITS / 4 + 1];
   int fd = xopen(tree.get_ref(pt.sha_idx()).base16(buf), O_RDONLY);
+  MmapInputStream mmis(fd, 0, pt.size());
   cout << "Unpacking blob " << buf << " = " << fd << endl;
-  struct stat st;
-  if (fstat(fd, &st) == -1) {
-    cerr << "Failed to stat " << buf << " " << strerror(errno) << endl;
-    throw RuntimeError();
-  }
-  Blob::unpack_from_fd(fd, st.st_size, &fos);
+  Blob::unpack(&mmis, &fos);
   close(fd);
 }
 

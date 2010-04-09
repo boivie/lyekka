@@ -12,7 +12,8 @@ formatter.cc		main.cc			tree.cc
 gc_cmd.cc		mktree_cmd.cc		wrappers.cc
 gen_objects_cmd.cc	path_cmd.cc
 hash_stream.cc		paths.cc unpack_cmd.cc file_system_iterator.cc
-file_writer.cc archive_writer.cc)
+file.cc archive.cc archive_cmd.cc
+mmap_stream.cc)
 
 set(sdsqlite_SOURCES sdsqlite/sdsqlite.cpp)
 set(sha2_SOURCES sha2/sha2.c)

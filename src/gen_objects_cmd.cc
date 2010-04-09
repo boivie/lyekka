@@ -14,8 +14,8 @@
 #include "lyekka.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include "file_system_iterator.h"
-#include "file_writer.h"
-#include "archive_writer.h"
+#include "file.h"
+#include "archive.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -53,7 +53,8 @@ static Sha visit_folder(ObjectWriter& ow, FolderPtr f)
 	 ++part_i) {
       PartPtr part_p = *part_i;
       ZeroCopyOutputStream& os = ow.get_writer();
-      Blob blob = Blob::create_from_fd(in_fd, part_p->offset(), part_p->size(), &os);
+      MmapInputStream mmis(in_fd, part_p->offset(), part_p->size());
+      Blob blob = Blob::create(&mmis, &os);
       cout << "B " << blob.hash().base16(buf) << endl;
       pb::Part* pt_p = fe_p->add_parts();
       pt_p->set_offset(part_p->offset());

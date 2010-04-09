@@ -4,7 +4,6 @@
 
 using namespace Lyekka;
 
-
 char* Sha::base16(char* buf_p) const
 {
   static const char translate[] = "0123456789abcdef";
@@ -54,4 +53,13 @@ void Sha::base16_decode(unsigned char* dest_p, const char* src_p)
 void Sha::set_base16(const char* base16_p)
 {
   base16_decode(m_bytes, base16_p);
+}
+
+namespace Lyekka {
+std::ostream& operator<<(std::ostream& os, const Sha& sha)
+{
+  char buf[256 / 4 + 1];
+  os << sha.base16(buf);
+  return os;
+}
 }

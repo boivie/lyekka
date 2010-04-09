@@ -1,11 +1,26 @@
+#include <fcntl.h>
 #include <iostream>
-#include "file_writer.h"
+#include "file.h"
 #include "lyekka.h"
+#include <errno.h>
 #include <unistd.h>
 
 using namespace std;
 using namespace Lyekka;
 using namespace google::protobuf::io;
+
+boost::shared_ptr<ObjectInputStream> FileReader::find(const Sha& sha) const
+{
+  char buf[256/4 + 1];
+  sha.base16(buf);
+  int fd = open(buf, O_RDONLY);
+  if (fd == -1) {
+    cerr << "Failed to open file: " << strerror(errno);
+    throw RuntimeError();
+  }
+  boost::shared_ptr<FileObjectInputStream> fois_p(new FileObjectInputStream(fd, sha));
+  return fois_p;
+}
 
 void FileWriter::commit(Sha sha) {
   char buf[256/4 + 1];
@@ -33,3 +48,8 @@ google::protobuf::io::ZeroCopyOutputStream& FileWriter::get_writer()
   m_fos_p->SetCloseOnDelete(true);
   return *m_fos_p;
 }
+
+FileObjectInputStream::~FileObjectInputStream()
+{
+}
+
