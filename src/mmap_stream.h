@@ -7,8 +7,9 @@ namespace Lyekka {
 
   class MmapInputStream : public google::protobuf::io::ZeroCopyInputStream {
   public:
-    MmapInputStream(int fd, off_t offset, size_t size);
+    MmapInputStream(int fd, off_t offset, size_t size = 0);
     virtual ~MmapInputStream();
+    void SetCloseOnDelete(bool val) { m_close = val; }
     
     // implements ZeroCopyInputStream ---------------------------------
     virtual bool Next(const void** data, int* size);
@@ -24,6 +25,8 @@ namespace Lyekka {
     void* m_mmap_p;
     char* m_cur_p;
     size_t m_size_left;
+    bool m_close;
+    int m_fd;
   };
 
 }
