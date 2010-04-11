@@ -235,7 +235,7 @@ boost::shared_ptr<ObjectInputStream> ArchiveReader::find(const Sha& sha) const
   throw RuntimeError();
 }
 
-boost::shared_ptr<ObjectInputStream> ArchiveReader::find_by_idx(int idx) const 
+boost::shared_ptr<ArchiveObjectInputStream> ArchiveReader::find_by_idx(int idx) const 
 {
   Sha sha;
   off_t offset;

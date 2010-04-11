@@ -57,3 +57,17 @@ bool Lyekka::write_to_stream(ZeroCopyOutputStream* os_p, const void* src_p, size
   return true;
 }
 
+void Lyekka::copy_streams(google::protobuf::io::ZeroCopyOutputStream* os_p,
+			  google::protobuf::io::ZeroCopyInputStream* is_p) 
+{
+  for ( ;; ) {
+    int src_size;
+    const void* src_p;
+    if (!is_p->Next(&src_p, &src_size))
+      break;
+    
+    if (!write_to_stream(os_p, src_p, src_size)) {
+      throw RuntimeError();
+    }
+  }
+}

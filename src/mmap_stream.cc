@@ -48,16 +48,10 @@ MmapInputStream::~MmapInputStream()
 
 bool MmapInputStream::Next(const void** data, int* size) 
 {
-  // Return maximum 1 MB of data
   *data = m_cur_p;
-  if (m_size_left > 1024*1024) {
-    *size = 1024*1024;
-  } else {
-    *size = m_size_left;
-  }
-  m_cur_p = m_cur_p + *size;
-  m_size_left -= *size;
-  //  cout << "Next::size: " << *size << " left: " << m_size_left << endl;
+  *size = m_size_left;
+  m_cur_p = m_cur_p + m_size_left;
+  m_size_left = 0;
   return *size > 0;
 }
 
@@ -65,7 +59,6 @@ void MmapInputStream::BackUp(int count)
 {
   m_cur_p = m_cur_p - count;
   m_size_left += count;
-  //  cout << "Backup::count: " << count << " left: " << m_size_left << endl;
 }
 
 bool MmapInputStream::Skip(int count) 

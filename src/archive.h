@@ -34,7 +34,7 @@ public:
   ~ArchiveReader();
   int entry_count() const { return m_entries; }
   boost::shared_ptr<ObjectInputStream> find(const Sha& sha) const;
-  boost::shared_ptr<ObjectInputStream> find_by_idx(int idx) const;
+  boost::shared_ptr<ArchiveObjectInputStream> find_by_idx(int idx) const;
   Sha entry_point() const { return find_by_idx(m_entry_point)->sha(); }
   int entry_point_idx() const { return m_entry_point; }
 private:
