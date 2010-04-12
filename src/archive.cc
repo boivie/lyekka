@@ -109,7 +109,6 @@ void ArchiveWriter::write_entry_point_idx(CodedOutputStream& cos)
   cos.WriteRaw(&ep_idx, 4);
 }
  
-
 ArchiveWriter::~ArchiveWriter() {
   if (m_fd != -1) {
     off_t footer_start = align_by_four(m_fd);
@@ -216,8 +215,8 @@ boost::shared_ptr<ObjectInputStream> ArchiveReader::find(const Sha& sha) const
 {
   uint32_t* fanout_p = (uint32_t*)m_index_p;
   int fanout_idx = sha.data()[0];
-  int lo = (fanout_idx == 0) ? 0 : fanout_p[fanout_idx - 1];
-  int hi = fanout_p[fanout_idx];
+  int lo = (fanout_idx == 0) ? 0 : ntohl(fanout_p[fanout_idx - 1]);
+  int hi = ntohl(fanout_p[fanout_idx]);
   
   while (lo < hi) {
     int mid = lo + (hi - lo) / 2;
@@ -235,16 +234,22 @@ boost::shared_ptr<ObjectInputStream> ArchiveReader::find(const Sha& sha) const
   throw RuntimeError();
 }
 
-boost::shared_ptr<ArchiveObjectInputStream> ArchiveReader::find_by_idx(int idx) const 
+Sha ArchiveReader::sha_by_idx(uint32_t idx) const 
 {
-  Sha sha;
-  off_t offset;
   if (idx >= m_entries) {
     throw RuntimeError();
   }
 
+  Sha sha;
   memcpy(sha.mutable_data(), m_index_p + 1024 + idx * (256 / 8), 256/8);
-  offset = ntohl(*(uint32_t*)(m_index_p + 1024 + m_entries * (256 / 8) + idx * 4));
+  return sha;
+}
+
+boost::shared_ptr<ArchiveObjectInputStream> ArchiveReader::find_by_idx(int idx) const 
+{
+  Sha sha = sha_by_idx(idx);
+  off_t offset = ntohl(*(uint32_t*)(m_index_p + 1024 + m_entries * (256 / 8) 
+				    + idx * 4));
   uint32_t size;
   if (lseek(m_fd, offset, SEEK_SET) == -1) {
     throw RuntimeError();
@@ -252,7 +257,8 @@ boost::shared_ptr<ArchiveObjectInputStream> ArchiveReader::find_by_idx(int idx) 
   if (read(m_fd, &size, 4) != 4) {
     throw RuntimeError();
   }
-  boost::shared_ptr<ArchiveObjectInputStream> aois(new ArchiveObjectInputStream(m_fd, offset, ntohl(size), sha));
+
+  boost::shared_ptr<ArchiveObjectInputStream> aois(new ArchiveObjectInputStream(m_fd, offset + 4, ntohl(size), sha));
   return aois;
 }
 

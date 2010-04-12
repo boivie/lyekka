@@ -14,7 +14,16 @@ test_expect_success 'files' '
     mkdir path2 &&
     lyekka unpack -i $sha -o path2 &&
     diff -rq path1 path2 &&
-    rm -rf path1 path2 
+    rm -rf path2 [0-9]*
+  )'
+
+test_expect_success 'files in archive' ' 
+  (
+    lyekka gen-objects path1 -a archive.ly &&
+    mkdir -p path2 &&
+    lyekka unpack -a archive.ly -o path2 &&
+    diff -rq path1 path2 &&
+    rm -rf path1 path2 archive.ly
   )'
 
 test_expect_success 'files and directories' '
@@ -31,7 +40,20 @@ test_expect_success 'files and directories' '
     mkdir path2 &&
     lyekka unpack -i $sha -o path2 &&
     diff -rq path1 path2 && 
+    rm -rf path2 
+  )'
+
+
+test_expect_success 'files and directories in archive' '
+  (
+    lyekka gen-objects path1 -a archive.ly &&
+    mkdir path2 &&
+    lyekka unpack -a archive.ly -o path2 &&
+    diff -rq path1 path2 && 
+    cp archive.ly ..
     rm -rf path1 path2 
   )'
+
+
 
 test_done

@@ -14,8 +14,9 @@
 #include <sys/stat.h>
 #include <boost/filesystem.hpp>
 #include "lyekka.h"
-#include "mmap_stream.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include "archive.h"
+#include "file.h"
 
 using namespace std;
 using namespace Lyekka;
@@ -24,67 +25,74 @@ namespace fs = boost::filesystem;
 namespace bpo = boost::program_options;
 using namespace boost;
 
-static void unpack_part(FileOutputStream& fos, const Tree& tree, const pb::Part& pt) 
+static void unpack_file(const fs::path& cwd, const ObjectReader& rdr, 
+			const Tree& tree, const pb::FileEntry& fe) 
 {
-  char buf[SHA_BITS / 4 + 1];
-  int fd = xopen(tree.get_ref(pt.sha_idx()).base16(buf), O_RDONLY);
-  MmapInputStream mmis(fd, 0, pt.size());
-  cout << "Unpacking blob " << buf << " = " << fd << endl;
-  Blob::unpack(&mmis, &fos);
-  close(fd);
-}
-
-static void unpack_file(const fs::path& cwd, const Tree& tree, const pb::FileEntry& fe) 
-{
-  fs::path file = cwd / fs::path(fe.name());
+  const fs::path file = cwd / fs::path(fe.name());
   FileOutputStream fos(xopen(file.string().c_str(), O_WRONLY | O_CREAT | O_TRUNC, fe.mode()));
   fos.SetCloseOnDelete(true);
   // TODO: Verify that all parts are present.
   for (int i = 0; i < fe.parts_size(); i++) {
-    unpack_part(fos, tree, fe.parts(i));
+    const pb::Part& pt = fe.parts(i);
+    shared_ptr<ObjectInputStream> obj_p = rdr.find(tree.get_ref(pt.sha_idx()));
+    Blob::unpack(obj_p.get(), &fos);
   }
   fs::last_write_time(file, (time_t)fe.mtime());
   cout << file << " [OK]" << endl;
 }
 
-static void unpack_tree(const fs::path& cwd, const Sha& sha) 
+static void unpack_tree(const fs::path& cwd, const ObjectReader& rdr, 
+			const Sha& sha) 
 {
-  char base16[SHA_BITS/4+1];
-  FileInputStream fis(xopen(sha.base16(base16), O_RDONLY));
-  fis.SetCloseOnDelete(true);
+  shared_ptr<ObjectInputStream> obj_p = rdr.find(sha);
   Tree tree;
-  tree.deserialize(&fis);
+  try {
+    tree.deserialize(obj_p.get());
+  } catch (InvalidTreeException& e) {
+    cerr << e.what() << endl;
+    exit(1);
+  }
   const pb::Tree& pb = tree.get_pb();
   // Visit directories
   for (int i = 0; i < pb.subdirs_size(); i++) {
     const pb::TreeRef& tr = pb.subdirs(i);
-    fs::path dir_path = cwd / tr.name();
+    const fs::path dir_path = cwd / tr.name();
     if (!fs::create_directory(dir_path)) {
       cerr << "Failed to create " << dir_path << endl;
       throw RuntimeError();
     }
     cout << dir_path << endl;
-    unpack_tree(dir_path, tree.get_ref(tr.sha_idx()));
+    unpack_tree(dir_path, rdr, tree.get_ref(tr.sha_idx()));
     fs::last_write_time(dir_path, tr.mtime());
     // TODO: Set permission
   }
   // Visit files.
   for (int i = 0; i < pb.files_size(); i++) {
-    unpack_file(cwd, tree, pb.files(i));
+    unpack_file(cwd, rdr, tree, pb.files(i));
   }
 }
 
 static int unpack(CommandLineParser& c)
 {
   string input;
+  string archive;
   string output = ".";
   c.po.add_options()
-    ("input,i", bpo::value<string>(&input), "input file")
+    ("input-file,i", bpo::value<string>(&input), "input file")
+    ("input-archive,a", bpo::value<string>(&archive), "input archive")
     ("output,o", bpo::value<string>(&output), "output dir");
   c.parse_options();
-  Sha sha;
-  sha.set_base16(input.c_str());
-  unpack_tree(fs::path(output), sha);
+
+  if (archive != "") {
+    const fs::path p(archive);
+    ArchiveReader ar(p);
+    unpack_tree(fs::path(output), ar, ar.entry_point());
+  } else {
+    FileReader fr;
+    Sha sha;
+    sha.set_base16(input.c_str());
+    unpack_tree(fs::path(output), fr, sha);
+  }
 
   return 0;
 }
