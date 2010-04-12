@@ -7,6 +7,8 @@
 
 namespace Lyekka {
 
+typedef char ShaBase16Buf[SHA_BITS/4 + 1];
+
 class Sha {
 public:
   friend std::ostream& operator<<(std::ostream& os, const Sha& sha);

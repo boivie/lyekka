@@ -13,7 +13,7 @@ namespace Lyekka {
 		       google::protobuf::io::ZeroCopyOutputStream* os_p);
     static void unpack(google::protobuf::io::ZeroCopyInputStream* is_p, 
 		       google::protobuf::io::ZeroCopyOutputStream* os_p);
-    const Sha& hash() { return m_hash; }
+    const Sha& hash() const { return m_hash; }
   private:
     Sha m_hash;
     Blob() {};
