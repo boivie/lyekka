@@ -13,7 +13,7 @@ gc_cmd.cc		mktree_cmd.cc		wrappers.cc
 gen_objects_cmd.cc	path_cmd.cc
 hash_stream.cc		paths.cc unpack_cmd.cc file_system_iterator.cc
 file.cc archive.cc archive_cmd.cc
-mmap_stream.cc object_generator.cc)
+mmap_stream.cc object_generator.cc hash_cmd.cc enc_cmd.cc aes_stream.cc)
 
 set(sdsqlite_SOURCES sdsqlite/sdsqlite.cpp)
 set(sha2_SOURCES sha2/sha2.c)
@@ -30,6 +30,7 @@ find_package(Protobuf)
 find_package(EXPAT)
 find_package(Sqlite3)
 find_package(ZLIB)
+find_package(OpenSSL)
 
 MESSAGE("Boost information:") 
 MESSAGE("  Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}") 
@@ -45,5 +46,7 @@ target_link_libraries(lyekka
   ${EXPAT_LIBRARIES}
   ${SQLITE3_LIBRARIES}
   ${ZLIB_LIBRARIES}
+  ${ZLIB_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
 )
 

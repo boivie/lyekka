@@ -71,3 +71,35 @@ void Lyekka::copy_streams(google::protobuf::io::ZeroCopyOutputStream* os_p,
     }
   }
 }
+
+static char base16char(char in)
+{
+  switch(in) {
+  case '0': case '1': case '2': case '3': case '4':
+  case '5': case '6': case '7': case '8': case '9':
+    return in - '0';
+  case 'A': case 'B': case 'C':
+  case 'D': case 'E': case 'F':
+    return (in - 'A') + 10;
+  case 'a': case 'b': case 'c':
+  case 'd': case 'e': case 'f':
+    return in - 'a' + 10;
+  default:
+    // TODO: ERROR
+    return 0;
+  }
+}
+
+void Lyekka::base16_decode(unsigned char* dest_p, const char* src_p) 
+{
+  size_t length = strlen(src_p);
+  int i;
+
+  assert(length % 2 == 0);
+
+  for (i = 0; i < length / 2; i++) {
+    dest_p[i] = 
+      base16char(*(src_p + 2*i + 0)) << 4 |
+      base16char(*(src_p + 2*i + 1));
+  }
+}

@@ -22,6 +22,8 @@ namespace Lyekka {
   bool write_to_stream(google::protobuf::io::ZeroCopyOutputStream* os_p, const void* src_p, size_t size);
   void copy_streams(google::protobuf::io::ZeroCopyOutputStream* os_p,
 		    google::protobuf::io::ZeroCopyInputStream* is_p);
+
+  void base16_decode(unsigned char* dest_p, const char* src_p);
 }
 
 

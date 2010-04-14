@@ -6,6 +6,7 @@
 #include "indexer.h"
 #include "tree.h"
 #include "cmd_handler.h"
+#include "lyekka.h"
 #include "lyekka_impl.pb.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
@@ -37,7 +38,7 @@ static void handle_treeref(MkTree* self_p, const char** attr)
       Sha sha;
       string str;
       str.resize(SHA_BITS/8);
-      Sha::base16_decode((unsigned char*)str.c_str(), value_p);
+      base16_decode((unsigned char*)str.c_str(), value_p);
       tr_p->SetExtension(pb::tree_sha_ext, str);
     } else {
       cerr << "Invalid attribute: " << key_p << endl;
@@ -85,7 +86,7 @@ static void handle_part(MkTree* self_p, const char** attr)
       Sha sha;
       string str;
       str.resize(SHA_BITS/8);
-      Sha::base16_decode((unsigned char*)str.c_str(), value_p);
+      base16_decode((unsigned char*)str.c_str(), value_p);
       pt_p->SetExtension(pb::part_sha_ext, str);
     } else {
       cerr << "Invalid attribute: " << key_p << endl;

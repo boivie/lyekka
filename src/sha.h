@@ -12,7 +12,6 @@ typedef char ShaBase16Buf[SHA_BITS/4 + 1];
 class Sha {
 public:
   friend std::ostream& operator<<(std::ostream& os, const Sha& sha);
-  static void base16_decode(unsigned char* dest_p, const char* src_p);
   char* base16(char* buf_p) const;
   void set_base16(const char* base16_p);
   const unsigned char* data(void) const { return m_bytes; }
