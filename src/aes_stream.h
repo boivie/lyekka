@@ -45,6 +45,43 @@ namespace Lyekka {
 // 32 == 256 bit encryption.
 #define AES_OUTPUT_STREAM_MAX_BLOCK_SIZE 32
 
+  class AesInputStream : public google::protobuf::io::ZeroCopyInputStream {
+  public:
+    enum Mode {
+      CBC = 1,
+    };
+
+    explicit AesInputStream(ZeroCopyInputStream* sub_stream,
+			    Mode mode,
+			    const AesKey& key);
+    virtual ~AesInputStream() { }
+    
+    // implements ZeroCopyInputStream ----------------------------------
+    bool Next(const void** data, int* size);
+    void BackUp(int count);
+    bool Skip(int count);
+    google::protobuf::int64 ByteCount() const;
+  private:
+    class CopyingAesInputStream : public google::protobuf::io::CopyingInputStream {
+    public:
+      CopyingAesInputStream(ZeroCopyInputStream* substream, 
+			    AesEngine* m_engine_p);
+      ~CopyingAesInputStream() {};
+
+      // implements CopyingInputStream ---------------------------------
+      int Read(void* buffer, int size);
+    private:
+      std::auto_ptr<AesEngine> m_engine_p;
+      google::protobuf::io::ZeroCopyInputStream* m_substream;
+      uint8_t m_tempbuf[AES_OUTPUT_STREAM_BUFFER_SIZE
+			+ AES_OUTPUT_STREAM_MAX_BLOCK_SIZE];
+      bool m_eof;
+    };
+    
+    CopyingAesInputStream m_copying_input;
+    google::protobuf::io::CopyingInputStreamAdaptor m_impl;
+  };
+
   class AesOutputStream : public google::protobuf::io::ZeroCopyOutputStream {
   public:
     enum Mode {

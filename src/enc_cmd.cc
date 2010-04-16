@@ -20,7 +20,7 @@ static int enc_cmd(CommandLineParser& c)
     ("key,K", bpo::value<string>(&key), "key")
     ("iv", bpo::value<string>(&iv), "iv")
     ("in", bpo::value<string>(&in), "input file")
-    ("out", bpo::value<string>(&out), "output file");
+    ("out", bpo::value<string>(&out), "output file")
     ("decrypt,d", bpo::bool_switch(&decrypt), "decrypt");
   c.parse_options();
 
@@ -39,10 +39,17 @@ static int enc_cmd(CommandLineParser& c)
   base16_decode(key_buf, key.c_str());
   base16_decode(iv_buf, iv.c_str());
 
-  FileInputStream fis(open(in.c_str(), O_RDONLY));
-  FileOutputStream fos(open(out.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644));
-  AesOutputStream aos(&fos, AesOutputStream::CBC, Aes128Key(key_buf, iv_buf));
-  copy_streams(&aos, &fis);
+  if (!decrypt) {
+    FileInputStream fis(open(in.c_str(), O_RDONLY));
+    FileOutputStream fos(open(out.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644));
+    AesOutputStream aos(&fos, AesOutputStream::CBC, Aes128Key(key_buf, iv_buf));
+    copy_streams(&aos, &fis);
+  } else {
+    FileInputStream fis(open(in.c_str(), O_RDONLY));
+    FileOutputStream fos(open(out.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644));
+    AesInputStream ais(&fis, AesInputStream::CBC, Aes128Key(key_buf, iv_buf));
+    copy_streams(&fos, &ais);
+  }
   return 0;
 }
 
