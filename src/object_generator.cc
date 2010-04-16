@@ -2,6 +2,7 @@
 #include "lyekka.h"
 #include "object_generator.h"
 #include "lyekka_impl.pb.h"
+#include "blob.h"
 #include "mmap_stream.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
@@ -37,7 +38,7 @@ Sha ObjectGenerator::generate(FolderPtr f)
       PartPtr part_p = *part_i;
       ZeroCopyOutputStream& os = m_dest.get_writer();
       MmapInputStream mmis(in_fd, part_p->offset(), part_p->size());
-      Blob blob = Blob::create(&mmis, &os);
+      Blob blob = Blob::create(&mmis, &os, NULL);
       on_blob(blob);
       pb::Part* pt_p = fe_p->add_parts();
       pt_p->set_offset(part_p->offset());

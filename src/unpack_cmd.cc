@@ -35,7 +35,7 @@ static void unpack_file(const fs::path& cwd, const ObjectReader& rdr,
   for (int i = 0; i < fe.parts_size(); i++) {
     const pb::Part& pt = fe.parts(i);
     shared_ptr<ObjectInputStream> obj_p = rdr.find(tree.get_ref(pt.sha_idx()));
-    Blob::unpack(obj_p.get(), &fos);
+    Blob::unpack(obj_p.get(), &fos, NULL);
   }
   fs::last_write_time(file, (time_t)fe.mtime());
   cout << file << " [OK]" << endl;

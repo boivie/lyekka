@@ -7,15 +7,7 @@ using namespace Lyekka;
 
 char* Sha::base16(char* buf_p) const
 {
-  static const char translate[] = "0123456789abcdef";
-
-  for (int i = 0; i < SHA_BITS/8; i++)
-  {
-    buf_p[2 * i + 0] = translate[(m_bytes[i] & 0xF0) >> 4];
-    buf_p[2 * i + 1] = translate[(m_bytes[i] & 0x0F)];
-  }
-  buf_p[256/4] = 0;
-  return buf_p;
+  return base16_encode(buf_p, m_bytes, sizeof(m_bytes));
 }
 
 void Sha::set_base16(const char* base16_p)

@@ -25,10 +25,12 @@ static int create_blob(CommandLineParser& c)
   string output;
   uint64_t offset = 0;
   uint32_t length = 0;
+  bool encrypt = false;
   c.po.add_options()
     ("input,i", bpo::value<string>(&input), "input file")
     ("offset", bpo::value<uint64_t>(&offset), "offset")
-    ("length", bpo::value<uint32_t>(&length), "length");
+    ("length", bpo::value<uint32_t>(&length), "length")
+    ("encrypt,e", bpo::bool_switch(&encrypt), "encrypt");
   c.p.add("input", 1);
   c.parse_options();
   int in_fd = open(input.c_str(), O_RDONLY);
@@ -40,18 +42,34 @@ static int create_blob(CommandLineParser& c)
   }
 
   MmapInputStream mmis(in_fd, offset, length);
-  Blob blob = Blob::create(&mmis, &fw.get_writer());
-  fw.commit(blob.hash());
-  char buf[256/4 + 1];
-  cout << blob.hash().base16(buf) << endl;
+  if (encrypt) {
+    int size = mmis.ByteCount();
+    boost::shared_ptr<AesKey> key_p = Blob::generate_key(&mmis);
+    mmis.BackUp(size - mmis.ByteCount());
+    Blob blob = Blob::create(&mmis, &fw.get_writer(), key_p.get());
+    fw.commit(blob.hash());
+    char sha_buf[256/4 + 1];
+    char key_buf[128/4 + 1];
+    char iv_buf[128/4 + 1];
+    cout << blob.hash().base16(sha_buf) << " " 
+	 << base16_encode(key_buf, key_p->key(), 128 / 8) 
+	 << base16_encode(iv_buf, key_p->iv(), 128 / 8) << endl;
+  } else {
+    Blob blob = Blob::create(&mmis, &fw.get_writer(), NULL);
+    fw.commit(blob.hash());
+    char buf[256/4 + 1];
+    cout << blob.hash().base16(buf) << endl;
+  }
   return 0;
 }
 
 static int cat_blob(CommandLineParser& c)
 {
   string input;
+  string key = "";
   c.po.add_options()
-    ("input,i", bpo::value<string>(&input), "input file");
+    ("input,i", bpo::value<string>(&input), "input file")
+    ("key,K", bpo::value<string>(&key), "key");
   c.p.add("input", 1);
   c.parse_options();
   FileReader fr;
@@ -60,7 +78,15 @@ static int cat_blob(CommandLineParser& c)
   boost::shared_ptr<ObjectInputStream> is_p = fr.find(sha);
   FileOutputStream fos(STDOUT_FILENO);
 
-  Blob::unpack(is_p.get(), &fos);
+  if (key == "") {
+    Blob::unpack(is_p.get(), &fos, NULL);
+  } else {
+    uint8_t key_buf[128/8];
+    uint8_t iv_buf[128/8];
+    Aes128Key akey(base16_decode(key_buf, key.c_str(), 128/4),
+		   base16_decode(iv_buf, key.c_str() + 128/4, 128/4));
+    Blob::unpack(is_p.get(), &fos, &akey);
+  }
   return 0;
 }
 

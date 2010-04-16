@@ -120,16 +120,31 @@ static char base16char(char in)
   }
 }
 
-void Lyekka::base16_decode(unsigned char* dest_p, const char* src_p) 
+unsigned char* Lyekka::base16_decode(unsigned char* dest_p, const char* src_p, int len) 
 {
-  size_t length = strlen(src_p);
+  if (len == -1) 
+    len = strlen(src_p);
   int i;
 
-  assert(length % 2 == 0);
+  assert(len % 2 == 0);
 
-  for (i = 0; i < length / 2; i++) {
+  for (i = 0; i < len / 2; i++) {
     dest_p[i] = 
       base16char(*(src_p + 2*i + 0)) << 4 |
       base16char(*(src_p + 2*i + 1));
   }
+  return dest_p;
+}
+
+char* Lyekka::base16_encode(char* dest_p, const unsigned char* src_p, size_t len)
+{
+  static const char translate[] = "0123456789abcdef";
+
+  for (int i = 0; i < len; i++)
+  {
+    dest_p[2 * i + 0] = translate[(src_p[i] & 0xF0) >> 4];
+    dest_p[2 * i + 1] = translate[(src_p[i] & 0x0F)];
+  }
+  dest_p[2*len] = 0;
+  return dest_p;
 }
