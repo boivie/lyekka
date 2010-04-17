@@ -61,27 +61,28 @@ size_t Lyekka::read_from_stream(void* dest_p,
 				google::protobuf::io::ZeroCopyInputStream* is_p, 
 				size_t size) 
 {
+  char* cur_p = (char*)dest_p;
   const void* src_p;
   int src_size;
   int actual = 0;
   
-  if (!is_p->Next(&src_p, &src_size))
+  if (!is_p->Next(&src_p, &src_size)) {
     return actual;
+  }
 
   actual += src_size;
 
-  //  cerr << "read_stream1" << src_size << endl;
-
   while (src_size < size) {
-    memcpy(dest_p, src_p, src_size);
+    memcpy(cur_p, src_p, src_size);
     size -= src_size;
-    dest_p = (char*)(dest_p) + src_size;
-    if (!is_p->Next(&src_p, &src_size))
+    cur_p += src_size;
+    if (!is_p->Next(&src_p, &src_size)) {
       return actual;
+    }
     actual += src_size;
   }
 
-  memcpy(dest_p, src_p, size);
+  memcpy(cur_p, src_p, size);
   is_p->BackUp(src_size - size);
   actual -= (src_size - size);
   return actual;

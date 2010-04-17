@@ -74,7 +74,7 @@ namespace Lyekka {
       std::auto_ptr<AesEngine> m_engine_p;
       google::protobuf::io::ZeroCopyInputStream* m_substream;
       uint8_t m_tempbuf[AES_OUTPUT_STREAM_BUFFER_SIZE
-			+ AES_OUTPUT_STREAM_MAX_BLOCK_SIZE];
+			- AES_OUTPUT_STREAM_MAX_BLOCK_SIZE];
       bool m_eof;
     };
     

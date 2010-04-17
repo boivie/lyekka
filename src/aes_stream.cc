@@ -174,12 +174,13 @@ int AesInputStream::CopyingAesInputStream
   if (m_eof) return 0;
 
   assert(size <= AES_OUTPUT_STREAM_BUFFER_SIZE);
-  int actual = read_from_stream(m_tempbuf, m_substream, size);
+
+  int actual = read_from_stream(m_tempbuf, m_substream, size - AES_OUTPUT_STREAM_MAX_BLOCK_SIZE);
   // cerr << "read " << size << " -> " << actual << endl;
   if (actual > 0) {
     actual = m_engine_p->update((uint8_t*)buffer, m_tempbuf, actual);
   } 
-  
+
   // cerr << "update -> " << actual << endl;
 
   if (actual == 0) {

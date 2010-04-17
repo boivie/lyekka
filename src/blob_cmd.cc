@@ -44,7 +44,9 @@ static int create_blob(CommandLineParser& c)
   MmapInputStream mmis(in_fd, offset, length);
   if (encrypt) {
     int size = mmis.ByteCount();
+    cerr << "Generating key" << endl;
     boost::shared_ptr<AesKey> key_p = Blob::generate_key(&mmis);
+    cerr << "Generating blob " << size << endl;
     mmis.BackUp(size - mmis.ByteCount());
     Blob blob = Blob::create(&mmis, &fw.get_writer(), key_p.get());
     fw.commit(blob.hash());
@@ -90,6 +92,31 @@ static int cat_blob(CommandLineParser& c)
   return 0;
 }
 
+static int strip_blob(CommandLineParser& c)
+{
+  const void* mem_p;
+  int size;
+  string input;
+  c.po.add_options()
+    ("input,i", bpo::value<string>(&input), "input file");
+  c.p.add("input", 1);
+  c.parse_options();
+  FileInputStream fis(open(input.c_str(), O_RDONLY));
+  fis.SetCloseOnDelete(true);
+
+  if (!fis.Next(&mem_p, &size) ||
+      size < 4 ||
+      memcmp(mem_p, "blob", 4) != 0) {
+    cerr << "Invalid blob header" << endl;
+    return 1;
+  }
+
+  fis.BackUp(size - 4);
+  FileOutputStream fos(STDOUT_FILENO);
+  copy_streams(&fos, &fis);
+  return 0;
+}
 
 LYEKKA_COMMAND(create_blob, "create-blob", "-i <input_file> -o <output_file>", "Creates a blob");
 LYEKKA_COMMAND(cat_blob, "cat-blob", "-i <input_file>", "Extracts a blob");
+LYEKKA_COMMAND(strip_blob, "strip-blob", "-i <input_file>", "Strips a blob from its header");

@@ -9,8 +9,8 @@ using namespace Lyekka;
 using namespace std;
 using namespace google::protobuf::io;
 
-Blob Blob::create(google::protobuf::io::ZeroCopyInputStream* is_p, 
-		  google::protobuf::io::ZeroCopyOutputStream* os_p,
+Blob Blob::create(ZeroCopyInputStream* is_p, 
+		  ZeroCopyOutputStream* os_p,
 		  const AesKey* key_p)
 {
   Blob ret;
@@ -38,8 +38,8 @@ Blob Blob::create(google::protobuf::io::ZeroCopyInputStream* is_p,
   return ret;
 }
 
-void Blob::unpack(google::protobuf::io::ZeroCopyInputStream* is_p, 
-		  google::protobuf::io::ZeroCopyOutputStream* os_p,
+void Blob::unpack(ZeroCopyInputStream* is_p, 
+		  ZeroCopyOutputStream* os_p,
 		  const AesKey* key_p)
 {
   const void* mem_p;
@@ -62,7 +62,7 @@ void Blob::unpack(google::protobuf::io::ZeroCopyInputStream* is_p,
   }
 }
 
-boost::shared_ptr<AesKey> Blob::generate_key(google::protobuf::io::ZeroCopyInputStream* is_p) {
+boost::shared_ptr<AesKey> Blob::generate_key(ZeroCopyInputStream* is_p) {
   FileOutputStream fos(open("/dev/null", O_WRONLY));
   fos.SetCloseOnDelete(true);
   Sha256OutputStream hos(&fos);
