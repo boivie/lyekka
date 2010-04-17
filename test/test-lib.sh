@@ -6,6 +6,20 @@ export PATH
 TZ=UTC
 export TZ
 
+verbose=f
+slow=f
+while test "$#" -ne 0
+do
+	case "$1" in
+	-v|--v|--ve|--ver|--verb|--verbo|--verbos|--verbose)
+		verbose=t; shift ;;
+	-s|--s|--sl|--slo|--slow)
+		slow=t; shift ;;
+	*)
+		echo "error: unknown test option '$1'" >&2; exit 1 ;;
+	esac
+done
+
 say_color () {
     (
 	case "$1" in
@@ -62,6 +76,25 @@ test_expect_success () {
     fi
     echo >&3 ""
 }
+
+slow_test_expect_success () {
+    test_count=$(($test_count+1))
+    say >&3 "expecting success: $2"
+    if test "$slow" = "f"
+    then
+	say_color skip "SKIP $test_count: $1"
+    else
+	test_run_ "$2"
+	if [ "$?" = 0 -a "$eval_ret" = 0 ]
+	then
+	    test_ok_ "$1"
+	else
+	    test_failure_ "$@"
+	fi
+	echo >&3 ""
+    fi
+}
+
 
 test "${test_description}" != "" ||
 error "Test script did not set test_description."

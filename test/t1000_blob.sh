@@ -42,7 +42,7 @@ cat > expected <<EOF
 $SHA
 EOF
 
-test_expect_success 'large blob' '
+slow_test_expect_success 'large blob' '
   (
     dd if=/dev/zero of=input_file bs=3145728 count=10 &&
     lyekka create-blob input_file > actual &&

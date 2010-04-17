@@ -35,7 +35,7 @@ test_expect_success 'large blob' '
     encrypt_decrypt
   )'
 
-test_expect_success 'very large blob' '
+slow_test_expect_success 'very large blob' '
   (
     dd if=/dev/zero of=input_file bs=3145728 count=10 &&
     encrypt_decrypt

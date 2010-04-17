@@ -50,7 +50,6 @@ test_expect_success 'files and directories in archive' '
     mkdir path2 &&
     lyekka unpack -a archive.ly -o path2 &&
     diff -rq path1 path2 && 
-    cp archive.ly ..
     rm -rf path1 path2 
   )'
 

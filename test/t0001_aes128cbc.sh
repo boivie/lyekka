@@ -83,7 +83,7 @@ test_expect_success 'AES128CBC: Decrypt very long string' '
   )'
 
 
-test_expect_success 'AES128CBC: Encrypt extremely long string' '
+slow_test_expect_success 'AES128CBC: Encrypt extremely long string' '
   (
     dd if=/dev/zero of=file.txt bs=3145728 count=10 &&
     openssl enc -aes-128-cbc -in file.txt -out file.enc1 \
@@ -94,12 +94,11 @@ test_expect_success 'AES128CBC: Encrypt extremely long string' '
     test_cmp expected actual
   )'
 
-test_expect_success 'AES128CBC: Decrypt extremely long string' '
+slow_test_expect_success 'AES128CBC: Decrypt extremely long string' '
   (
     lyekka enc -d -c aes-128-cbc -K $KEY --iv $IV --in file.enc1 --out file.dec &&
     test_cmp file.txt file.dec &&
     rm file.txt file.enc? file.dec
   )'
-
 
 test_done

@@ -2,8 +2,11 @@ T = $(wildcard t[0-9][0-9][0-9][0-9]*.sh)
 
 test: $(T)
 
+slow:
+	LYEKKA_TEST_OPTS=--slow $(MAKE)
+
 $(T):
-	@echo "*** $@ ***"; ./$@ 
+	@echo "*** $@ ***"; ./$@ $(LYEKKA_TEST_OPTS)
 
 pre-clean:
 	$(RM) -r test-results

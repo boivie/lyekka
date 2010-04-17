@@ -42,7 +42,7 @@ test_expect_success 'Very long string' '
     compress_decompress
   )'
 
-test_expect_success 'Extremely long string' '
+slow_test_expect_success 'Extremely long string' '
   (
     dd if=/dev/zero of=input bs=3145728 count=10 &&
     compress_decompress
