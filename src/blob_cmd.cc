@@ -51,11 +51,8 @@ static int create_blob(CommandLineParser& c)
     Blob blob = Blob::create(&mmis, &fw.get_writer(), key_p.get());
     fw.commit(blob.hash());
     char sha_buf[256/4 + 1];
-    char key_buf[128/4 + 1];
-    char iv_buf[128/4 + 1];
-    cout << blob.hash().base16(sha_buf) << " " 
-	 << base16_encode(key_buf, key_p->key(), 128 / 8) 
-	 << base16_encode(iv_buf, key_p->iv(), 128 / 8) << endl;
+    cout << blob.hash().base16(sha_buf) 
+	 << " " << key_p->base16() << endl;
   } else {
     Blob blob = Blob::create(&mmis, &fw.get_writer(), NULL);
     fw.commit(blob.hash());
@@ -83,11 +80,8 @@ static int cat_blob(CommandLineParser& c)
   if (key == "") {
     Blob::unpack(is_p.get(), &fos, NULL);
   } else {
-    uint8_t key_buf[128/8];
-    uint8_t iv_buf[128/8];
-    Aes128Key akey(base16_decode(key_buf, key.c_str(), 128/4),
-		   base16_decode(iv_buf, key.c_str() + 128/4, 128/4));
-    Blob::unpack(is_p.get(), &fos, &akey);
+    auto_ptr<AesKey> key_p = AesKey::create(key);
+    Blob::unpack(is_p.get(), &fos, key_p.get());
   }
   return 0;
 }

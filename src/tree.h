@@ -8,6 +8,7 @@
 #include "sha.h"
 #include "lyekka.pb.h"
 #include <boost/shared_ptr.hpp>
+#include "aes_stream.h"
 
 namespace Lyekka {
 
@@ -25,16 +26,20 @@ class TreeBuilder;
 class Tree {
 public:
   friend class TreeBuilder;
-  void serialize(google::protobuf::io::ZeroCopyOutputStream* os_p);
-  void deserialize(google::protobuf::io::ZeroCopyInputStream* is_p);
+  void serialize(google::protobuf::io::ZeroCopyOutputStream* os_p, bool encrypt = false);
+  static std::auto_ptr<Tree> deserialize(google::protobuf::io::ZeroCopyInputStream* is_p, const AesKey* key_p = NULL);
+
   const Sha& get_sha(void) const { return m_sha; }
+  std::auto_ptr<AesKey> get_key(void) const;
   const std::vector<Sha>& get_refs() const { return m_refs; }
   const Sha& get_ref(int idx) const { return m_refs[idx]; }
   const Lyekka::pb::Tree& get_pb() const { return m_pb; }
 private:
+  void create_key();
   Lyekka::pb::Tree m_pb;
   std::vector<Sha> m_refs;
   Sha m_sha;
+  Aes128Key m_key;
 };
 
 
@@ -45,10 +50,10 @@ public:
   static bool compare_fileentry (const pb::FileEntry& first, const pb::FileEntry& second);
   Lyekka::pb::TreeRef* add_tree() { return m_tree->m_pb.add_subdirs(); }
   Lyekka::pb::FileEntry* add_file() { return m_tree->m_pb.add_files(); }
-  boost::shared_ptr<Tree> build();
+  std::auto_ptr<Tree> build();
 private:
   int find_idx(const std::string& str);
-  boost::shared_ptr<Tree> m_tree;
+  std::auto_ptr<Tree> m_tree;
 };
 
 

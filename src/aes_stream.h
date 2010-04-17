@@ -11,20 +11,23 @@ namespace Lyekka {
 
   class AesKey {
   public:
+    static std::auto_ptr<AesKey> create(const std::string& b16);
     virtual const uint8_t* key() const = 0;
     virtual const uint8_t* iv() const = 0;
     virtual size_t length() const = 0;
+    virtual std::string base16() const = 0;
   };
 
   class Aes128Key : public AesKey {
   public:
-    Aes128Key(const uint8_t* key_p, const uint8_t* iv_p) 
-    {
-      memcpy(m_key, key_p, sizeof(m_key));
-      memcpy(m_iv, iv_p, sizeof(m_iv));
-    }
+    Aes128Key() {}
+    Aes128Key(const uint8_t* key_p, const uint8_t* iv_p) : AesKey()
+    { set_key(key_p); set_iv(iv_p); }
     virtual const uint8_t* key() const { return m_key; }
     virtual const uint8_t* iv() const { return m_iv; }
+    void set_key(const uint8_t* key_p) { memcpy(m_key, key_p, sizeof(m_key)); }
+    void set_iv(const uint8_t* iv_p) { memcpy(m_iv, iv_p, sizeof(m_iv)); }
+    virtual std::string base16() const;
     virtual size_t length() const { return 128; }
   protected:
     uint8_t m_key[128/8];

@@ -9,6 +9,7 @@
 using namespace google::protobuf::io;
 using namespace Lyekka;
 using namespace boost;
+using namespace std;
 
 Sha ObjectGenerator::generate(FolderPtr f)
 {
@@ -49,7 +50,7 @@ Sha ObjectGenerator::generate(FolderPtr f)
     close(in_fd);
   }
 
-  shared_ptr<Tree> tree_p = tb.build();
+  auto_ptr<Tree> tree_p = tb.build();
   ZeroCopyOutputStream& os = m_dest.get_writer();
   tree_p->serialize(&os);
   on_folder(*tree_p);

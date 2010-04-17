@@ -6,6 +6,27 @@
 using namespace Lyekka;
 using namespace std;
 
+auto_ptr<AesKey> AesKey::create(const std::string& b16) 
+{
+  if (b16.length() == (256/4)) {
+    uint8_t key_buf[128/8];
+    uint8_t iv_buf[128/8];
+    base16_decode(key_buf, b16.c_str(), 128/4);
+    base16_decode(iv_buf, b16.c_str() + 128/4, 128/4);
+    return auto_ptr<AesKey>(new Aes128Key(key_buf, iv_buf));
+  } else {
+    throw RuntimeError();
+  }
+}
+
+std::string Aes128Key::base16() const 
+{
+  char buf[256/4 + 1];
+  base16_encode(&buf[0], m_key, sizeof(m_key));
+  base16_encode(&buf[128/4], m_iv, sizeof(m_iv));
+  return string(buf);
+}
+
 class OpenSslAes128CbcEncEngine : public AesEngine {
 public:
   OpenSslAes128CbcEncEngine(const AesKey& key) : AesEngine(key) 

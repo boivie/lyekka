@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <vector>
 #include "tree.h"
+#include "lyekka.h"
 #include "cmd_handler.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
@@ -32,74 +33,104 @@ const char* mode_str(int mode) {
   return buf;
 }
 
-static int lstree(CommandLineParser& c)
+static void show_refs(const Tree& tree)
 {
-  string input;
-  bool verbose = false;
-  c.po.add_options()
-    ("input,i", bpo::value<string>(&input), "input file")
-    ("verbose,v", "print detailed information");
-  c.p.add("input", -1);
-  c.parse_options();
-
-  verbose = (c.vm.count("verbose") > 0);
-
-  Tree tree;
-  try {
-    int fd = open(input.c_str(), O_RDONLY);
-    if (fd == -1) {
-      cerr << "Failed to open file: " << input << endl;
-      return 1;
-    }
-
-    FileInputStream fis(fd);
-    fis.SetCloseOnDelete(true);
-    tree.deserialize(&fis);
-  } catch (InvalidTreeException& ex) {
-    cerr << "Failed to parse tree: " << ex.what() << endl;
-    return 1;
-  }
-
-  cout << "References:" << endl;
+  char b16[SHA_BITS/4 + 1];
   const vector<Sha>& refs = tree.get_refs();
-  for (int i = 0; i < refs.size(); i++) {
-    char b16[SHA_BITS/4 + 1];
-    refs[i].base16(b16);
-    cout.width(8);
-    cout << right << i << ": " << b16 << endl;
-  }
-  cout << endl;
-  cout << "Contents:" << endl;
+  for (int i = 0; i < refs.size(); i++) 
+    cout << refs[i].base16(b16) << endl;
+}
+
+static void show_full(const Tree& tree)
+{
   char b16[SHA_BITS/4 + 1];
   char fileb16[SHA_BITS/4 + 1];
+  
+  cout << "References:" << endl;
+  const vector<Sha>& refs = tree.get_refs();
+  for (int i = 0; i < refs.size(); i++) 
+    cout << "  " << i << ": " << refs[i].base16(b16) << endl;
+  
+  cout << endl << "Contents:" << endl;
   memset(fileb16, '-', sizeof(fileb16));
   fileb16[SHA_BITS/4] = 0;
   for (int i = 0; i < tree.get_pb().subdirs_size(); i++) {
     const pb::TreeRef& tr = tree.get_pb().subdirs(i);
-    cout << mode_str(tr.mode());
-    if (verbose) 
-      cout << " (" << tr.mode() << ")";
-    cout << " " << refs[tr.sha_idx()].base16(b16) << " ";
-    if (verbose) 
-      cout << tr.mtime() << " ";
-    cout << tr.name() << endl;
+    cout << mode_str(tr.mode())
+	 << " " << refs[tr.sha_idx()].base16(b16) << " "
+	 << tr.name() << endl;
   }
   for (int i = 0; i < tree.get_pb().files_size(); i++) {
     const pb::FileEntry& fe = tree.get_pb().files(i);
-    cout << mode_str(fe.mode());
-    if (verbose) 
-      cout << " (" << fe.mode() << ")";
-    cout << " " << fileb16 << " ";
-    if (verbose) 
-      cout << fe.size() << " " << fe.mtime() << " ";
-    cout << fe.name() << endl;
+    cout << mode_str(fe.mode())
+	 << " " << fileb16 << " " << fe.name() << endl;
     for (int j = 0; j < fe.parts_size(); j++) {
       const pb::Part& pt = fe.parts(j);
-      cout << mode_str(0) << " " << refs[pt.sha_idx()].base16(b16) << " [" << pt.offset() << "--" << pt.offset() + pt.size() << "]" << endl;
+      cout << mode_str(0) << " " << refs[pt.sha_idx()].base16(b16) << " ["
+	   << pt.offset() << "--" << pt.offset() + pt.size() << "]" << endl;
     }
   }
+}
 
-  return 0;
+static void show_raw(const Tree& tree)
+{
+  char b16[SHA_BITS/4 + 1];
+  const vector<Sha>& refs = tree.get_refs();
+  for (int i = 0; i < refs.size(); i++) 
+    cout << "ref:" << refs[i].base16(b16) << endl;
+  for (int i = 0; i < tree.get_pb().subdirs_size(); i++) {
+    const pb::TreeRef& tr = tree.get_pb().subdirs(i);
+    cout << "tree:" << refs[tr.sha_idx()].base16(b16) 
+         << " " << tr.mode() << " " << tr.mtime() 
+	 << " " << tr.name() << endl;
+  }
+  for (int i = 0; i < tree.get_pb().files_size(); i++) {
+    const pb::FileEntry& fe = tree.get_pb().files(i);
+    cout << "file:" << fe.mode()
+	 << " " << fe.size() << " " << fe.mtime()
+	 << " " << fe.name() << endl;
+    for (int j = 0; j < fe.parts_size(); j++) {
+      const pb::Part& pt = fe.parts(j);
+      cout << "part:" << refs[pt.sha_idx()].base16(b16) 
+	   << " " << pt.offset() << " " << pt.size() << endl;
+    }
+  }
+}
+
+static int lstree(CommandLineParser& c)
+{
+  string input;
+  string show = "full";
+  string key = "";
+  c.po.add_options()
+    ("input,i", bpo::value<string>(&input), "input file")
+    ("key,K", bpo::value<string>(&key), "encryption key")
+    ("show,s", bpo::value<string>(&show), "what to show");
+  c.p.add("input", 1);
+  c.parse_options();
+
+  try {
+    FileInputStream fis(xopen(input.c_str(), O_RDONLY));
+    fis.SetCloseOnDelete(true);
+    auto_ptr<AesKey> key_p;
+    
+    if (key != "") {
+      key_p = AesKey::create(key);
+    }
+    
+    auto_ptr<Tree> tree_p = Tree::deserialize(&fis, key_p.get());
+
+    if (show == "refs")
+      show_refs(*tree_p);
+    else if (show == "full")
+      show_full(*tree_p);
+    else if (show == "raw")
+      show_raw(*tree_p);
+    return 0;
+  } catch (InvalidTreeException& ex) {
+    cerr << "Failed to parse tree: " << ex.what() << endl;
+    return 1;
+  }
 }
 
 LYEKKA_LL_COMMAND(lstree, "lstree", "", "Lists a tree's contents");

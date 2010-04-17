@@ -45,14 +45,14 @@ static void unpack_tree(const fs::path& cwd, const ObjectReader& rdr,
 			const Sha& sha) 
 {
   shared_ptr<ObjectInputStream> obj_p = rdr.find(sha);
-  Tree tree;
+  auto_ptr<Tree> tree_p;
   try {
-    tree.deserialize(obj_p.get());
+    tree_p = Tree::deserialize(obj_p.get());
   } catch (InvalidTreeException& e) {
     cerr << e.what() << endl;
     exit(1);
   }
-  const pb::Tree& pb = tree.get_pb();
+  const pb::Tree& pb = tree_p->get_pb();
   // Visit directories
   for (int i = 0; i < pb.subdirs_size(); i++) {
     const pb::TreeRef& tr = pb.subdirs(i);
@@ -62,13 +62,13 @@ static void unpack_tree(const fs::path& cwd, const ObjectReader& rdr,
       throw RuntimeError();
     }
     cout << dir_path << endl;
-    unpack_tree(dir_path, rdr, tree.get_ref(tr.sha_idx()));
+    unpack_tree(dir_path, rdr, tree_p->get_ref(tr.sha_idx()));
     fs::last_write_time(dir_path, tr.mtime());
     // TODO: Set permission
   }
   // Visit files.
   for (int i = 0; i < pb.files_size(); i++) {
-    unpack_file(cwd, rdr, tree, pb.files(i));
+    unpack_file(cwd, rdr, *tree_p, pb.files(i));
   }
 }
 

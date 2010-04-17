@@ -9,10 +9,12 @@
 #include "lyekka.h"
 #include "lyekka_impl.pb.h"
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include "file.h"
 
 using namespace std;
 using namespace Lyekka;
 using namespace boost;
+namespace bpo = boost::program_options;
 using namespace google::protobuf::io;
 
 struct MkTree {
@@ -40,6 +42,10 @@ static void handle_treeref(MkTree* self_p, const char** attr)
       str.resize(SHA_BITS/8);
       base16_decode((unsigned char*)str.c_str(), value_p);
       tr_p->SetExtension(pb::tree_sha_ext, str);
+    } else if (!strcmp(key_p, "key")) {
+      unsigned char b16[SHA_BITS/8];
+      base16_decode(b16, value_p, SHA_BITS/4);
+      tr_p->set_key(b16, sizeof(b16));
     } else {
       cerr << "Invalid attribute: " << key_p << endl;
       throw BadSyntaxException("Bad Input");
@@ -70,7 +76,6 @@ static void handle_fileref(MkTree* self_p, const char** attr)
   }
 }
 
-
 static void handle_part(MkTree* self_p, const char** attr)
 {
   pb::Part* pt_p = self_p->last_file_p->add_parts();
@@ -88,6 +93,10 @@ static void handle_part(MkTree* self_p, const char** attr)
       str.resize(SHA_BITS/8);
       base16_decode((unsigned char*)str.c_str(), value_p);
       pt_p->SetExtension(pb::part_sha_ext, str);
+    } else if (!strcmp(key_p, "key")) {
+      unsigned char b16[SHA_BITS/8];
+      base16_decode(b16, value_p, SHA_BITS/4);
+      pt_p->set_key(b16, sizeof(b16));
     } else {
       cerr << "Invalid attribute: " << key_p << endl;
       throw BadSyntaxException("Bad Input");
@@ -129,39 +138,50 @@ static void endElement(void *ud, const char *name)
   }
 }
 
-static int mktree(CommandLineParser& c)
+static int mktree_cmd(CommandLineParser& c)
 {
+  string input;
+  bool encrypt = false;
   bool done;
   char data[2048];
   MkTree self;
   XML_Parser parser = XML_ParserCreate(NULL);
+  c.po.add_options()
+    ("input,i", bpo::value<string>(&input), "input file")
+    ("encrypt,e", bpo::bool_switch(&encrypt), "encrypt");
+  c.p.add("input", 1);
+  c.parse_options();
 
   self.state = MkTree::ROOT;
   XML_SetUserData(parser, &self);
   XML_SetElementHandler(parser, startElement, endElement);
+
+  fstream fis(input.c_str(), ios_base::in);
   do {
-    cin.read(data, sizeof(data));
-    done = cin.gcount() < sizeof(data);
-    if (!XML_Parse(parser, data, cin.gcount(), done)) {
-      
-      cerr << "Failed to parse data: " << XML_ErrorString(XML_GetErrorCode(parser)) << endl;
+    fis.read(data, sizeof(data));
+    done = fis.gcount() < sizeof(data);
+    if (!XML_Parse(parser, data, fis.gcount(), done)) {
+      cerr << "Failed to parse data: " 
+	   << XML_ErrorString(XML_GetErrorCode(parser)) << endl;
       return 1;
     }
   } while (!done);
+  fis.close();
   XML_ParserFree(parser);
 
-  int fd = open("_tree.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-  FileOutputStream fos(fd);
-  fos.SetCloseOnDelete(true);
-  shared_ptr<Tree> tree_p = self.tb.build();
-  tree_p->serialize(&fos);
-
+  FileWriter fw;
+  auto_ptr<Tree> tree_p = self.tb.build();
+  tree_p->serialize(&fw.get_writer(), encrypt);
   char base16[256/4 + 1];
-  cout << tree_p->get_sha().base16(base16) << endl;
-  rename("_tree.tmp", base16);
-
+  if (encrypt) {
+    cout << tree_p->get_sha().base16(base16) 
+	 << " " << tree_p->get_key()->base16() << endl;
+  } else {
+    cout << tree_p->get_sha().base16(base16) << endl;
+  }
+  fw.commit(tree_p->get_sha());
   return 0;
 }
 
-LYEKKA_COMMAND(mktree, "mktree", "", "Creates a tree object from formatted input");
+LYEKKA_COMMAND(mktree_cmd, "mktree", "", "Creates a tree object from formatted input");
 

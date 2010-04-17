@@ -32,7 +32,7 @@ int TreeBuilder::find_idx(const string& str)
 		     sha) - m_tree->m_refs.begin();
 }
 
-shared_ptr<Tree> TreeBuilder::build(void)
+auto_ptr<Tree> TreeBuilder::build(void)
 {
   // Files and subdirs are sorted by name
   std::sort(m_tree->m_pb.mutable_subdirs()->begin(),
@@ -82,17 +82,26 @@ shared_ptr<Tree> TreeBuilder::build(void)
   }
 
   // Return the 'validated' tree and clear our instance data
-  shared_ptr<Tree> old_p = m_tree;
+  auto_ptr<Tree> old_p = m_tree;
   m_tree.reset(new Tree());
   return old_p;
 }
 
-void Tree::serialize(ZeroCopyOutputStream* os_p)
+void Tree::create_key() 
 {
-  // Write to stream.
+  FileOutputStream fos(open("/dev/null", O_WRONLY));
+  fos.SetCloseOnDelete(true);
+  Sha256OutputStream hos(&fos);
+  m_pb.SerializeToZeroCopyStream(&hos);
+  const Sha sha = hos.get_digest();
+  m_key.set_key(sha.data());
+  m_key.set_iv(sha.data() + SHA_BITS/8/2);
+}
+
+void Tree::serialize(ZeroCopyOutputStream* os_p, bool encrypt)
+{
   Sha256OutputStream hos(os_p);
-  write_to_stream(&hos, "tree", 4);
-  
+  write_to_stream(&hos, encrypt ? "TREE" : "tree", 4);
   {
     CodedOutputStream cos(&hos);
     
@@ -106,25 +115,42 @@ void Tree::serialize(ZeroCopyOutputStream* os_p)
     uint32_t pb_size = htonl(m_pb.ByteSize());
     cos.WriteRaw(&pb_size, sizeof(pb_size));
   }
-  // The protocol buffer is gzip-compressed
+  // The protocol buffer is gzip-compressed and optionally encrypted.
   GzipOutputStream::Options o;
   o.format = GzipOutputStream::ZLIB;
-  GzipOutputStream gzos(&hos, o);
-  m_pb.SerializeToZeroCopyStream(&gzos);
-  gzos.Close();
+  if (encrypt) {
+    create_key();
+    AesOutputStream aos(&hos, AesOutputStream::CBC, m_key);
+    GzipOutputStream gzos(&aos, o);
+    m_pb.SerializeToZeroCopyStream(&gzos);
+    gzos.Close();
+    aos.Close();
+  } else {
+    GzipOutputStream gzos(&hos, o);
+    m_pb.SerializeToZeroCopyStream(&gzos);
+    gzos.Close();
+  }
 
   m_sha = hos.get_digest();
 }
 
-void Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p)
+auto_ptr<Tree> Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p, 
+				 const AesKey* key_p)
 {
+  auto_ptr<Tree> tree_p(new Tree());
   int32_t pb_size = -1;
+  bool is_encrypted = false;
   {
     CodedInputStream cis(is_p);
     char header[4];
     cis.ReadRaw(&header, sizeof(header));
-    if (memcmp(header, "tree", 4) != 0) 
+
+    if (memcmp(header, "tree", 4) == 0) {
+    } else if (memcmp(header, "TREE", 4) == 0) {
+      is_encrypted = true;
+    } else {
       throw InvalidTreeException("Invalid magic");
+    }
     
     int32_t refs_size = -1;
     cis.ReadRaw(&refs_size, sizeof(refs_size));
@@ -132,9 +158,9 @@ void Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p)
     if (refs_size < 0 || (refs_size % (SHA_BITS/8)) != 0)
       throw InvalidTreeException("Invalid refs size");
     
-    m_refs.resize(refs_size / (SHA_BITS/8));
+    tree_p->m_refs.resize(refs_size / (SHA_BITS/8));
     for (int i = 0; i < (refs_size / (SHA_BITS/8)); i++) {
-      cis.ReadRaw(m_refs[i].mutable_data(), SHA_BITS/8);
+      cis.ReadRaw(tree_p->m_refs[i].mutable_data(), SHA_BITS/8);
     }
     
     cis.ReadRaw(&pb_size, sizeof(pb_size));
@@ -143,7 +169,20 @@ void Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p)
       throw InvalidTreeException("Invalid pb size");
   }
   
-  GzipInputStream gzis(is_p);
-  if (!m_pb.ParseFromZeroCopyStream(&gzis))
-    throw InvalidTreeException("Invalid protocol buffer");
+  if (!is_encrypted) {
+    GzipInputStream gzis(is_p, GzipInputStream::ZLIB);
+    if (!tree_p->m_pb.ParseFromZeroCopyStream(&gzis))
+      throw InvalidTreeException("Invalid protocol buffer");
+  } else if (is_encrypted && key_p != NULL) {
+    AesInputStream ais(is_p, AesInputStream::CBC, *key_p);
+    GzipInputStream gzis(&ais, GzipInputStream::ZLIB);
+    if (!tree_p->m_pb.ParseFromZeroCopyStream(&gzis))
+      throw InvalidTreeException("Invalid protocol buffer");
+  }
+  return tree_p;
+}
+
+auto_ptr<AesKey> Tree::get_key(void) const 
+{
+  return auto_ptr<AesKey>(new Aes128Key(m_key.key(), m_key.iv()));
 }
