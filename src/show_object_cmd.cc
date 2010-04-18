@@ -38,6 +38,8 @@ static int show_object_cmd(CommandLineParser& c)
       cout << "tree" << endl;
     } else if (memcmp(mem_p, "TREE", 4) == 0) {
       cout << "encrypted tree" << endl;
+    } else if (memcmp(mem_p, "mfst", 4) == 0) {
+      cout << "manifest" << endl;
     } else {
       cerr << "invalid object magic - probably not a valid object." << endl;
       return 1;

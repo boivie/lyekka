@@ -36,12 +36,22 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* SecureProperties_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   SecureProperties_reflection_ = NULL;
-const ::google::protobuf::Descriptor* Signature_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* Pbkdf2Key_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  Signature_reflection_ = NULL;
+  Pbkdf2Key_reflection_ = NULL;
+const ::google::protobuf::Descriptor* PgpKey_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  PgpKey_reflection_ = NULL;
+const ::google::protobuf::Descriptor* EncryptedProperties_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  EncryptedProperties_reflection_ = NULL;
 const ::google::protobuf::Descriptor* Manifest_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Manifest_reflection_ = NULL;
+const ::google::protobuf::Descriptor* Signature_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  Signature_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* Encryption_descriptor_ = NULL;
 const ::google::protobuf::EnumDescriptor* Compression_descriptor_ = NULL;
 
 }  // namespace
@@ -162,7 +172,7 @@ void protobuf_AssignDesc_lyekka_2eproto() {
   SecureProperties_descriptor_ = file->message_type(6);
   static const int SecureProperties_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SecureProperties, properties_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SecureProperties, tree_key_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SecureProperties, entry_point_key_),
   };
   SecureProperties_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -175,7 +185,76 @@ void protobuf_AssignDesc_lyekka_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SecureProperties));
-  Signature_descriptor_ = file->message_type(7);
+  Pbkdf2Key_descriptor_ = file->message_type(7);
+  static const int Pbkdf2Key_offsets_[4] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Pbkdf2Key, salt_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Pbkdf2Key, iterations_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Pbkdf2Key, iv_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Pbkdf2Key, key_),
+  };
+  Pbkdf2Key_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      Pbkdf2Key_descriptor_,
+      Pbkdf2Key::default_instance_,
+      Pbkdf2Key_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Pbkdf2Key, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Pbkdf2Key, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(Pbkdf2Key));
+  PgpKey_descriptor_ = file->message_type(8);
+  static const int PgpKey_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PgpKey, key_id_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PgpKey, encrypted_key_),
+  };
+  PgpKey_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      PgpKey_descriptor_,
+      PgpKey::default_instance_,
+      PgpKey_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PgpKey, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PgpKey, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(PgpKey));
+  EncryptedProperties_descriptor_ = file->message_type(9);
+  static const int EncryptedProperties_offsets_[5] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EncryptedProperties, encrypted_data_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EncryptedProperties, iv_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EncryptedProperties, algorithm_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EncryptedProperties, password_key_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EncryptedProperties, pgp_encrypted_key_),
+  };
+  EncryptedProperties_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      EncryptedProperties_descriptor_,
+      EncryptedProperties::default_instance_,
+      EncryptedProperties_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EncryptedProperties, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EncryptedProperties, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(EncryptedProperties));
+  Manifest_descriptor_ = file->message_type(10);
+  static const int Manifest_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, properties_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, secure_properties_),
+  };
+  Manifest_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      Manifest_descriptor_,
+      Manifest::default_instance_,
+      Manifest_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(Manifest));
+  Signature_descriptor_ = file->message_type(11);
   static const int Signature_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Signature, signature_),
   };
@@ -190,26 +269,8 @@ void protobuf_AssignDesc_lyekka_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Signature));
-  Manifest_descriptor_ = file->message_type(8);
-  static const int Manifest_offsets_[5] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, tree_sha_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, is_tree_encrypted_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, properties_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, secure_properties_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, pgp_encrypted_key_),
-  };
-  Manifest_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
-      Manifest_descriptor_,
-      Manifest::default_instance_,
-      Manifest_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Manifest, _unknown_fields_),
-      -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(Manifest));
-  Compression_descriptor_ = file->enum_type(0);
+  Encryption_descriptor_ = file->enum_type(0);
+  Compression_descriptor_ = file->enum_type(1);
 }
 
 namespace {
@@ -237,9 +298,15 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     SecureProperties_descriptor_, &SecureProperties::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    Signature_descriptor_, &Signature::default_instance());
+    Pbkdf2Key_descriptor_, &Pbkdf2Key::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    PgpKey_descriptor_, &PgpKey::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    EncryptedProperties_descriptor_, &EncryptedProperties::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Manifest_descriptor_, &Manifest::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    Signature_descriptor_, &Signature::default_instance());
 }
 
 }  // namespace
@@ -259,10 +326,16 @@ void protobuf_ShutdownFile_lyekka_2eproto() {
   delete Properties_reflection_;
   delete SecureProperties::default_instance_;
   delete SecureProperties_reflection_;
-  delete Signature::default_instance_;
-  delete Signature_reflection_;
+  delete Pbkdf2Key::default_instance_;
+  delete Pbkdf2Key_reflection_;
+  delete PgpKey::default_instance_;
+  delete PgpKey_reflection_;
+  delete EncryptedProperties::default_instance_;
+  delete EncryptedProperties_reflection_;
   delete Manifest::default_instance_;
   delete Manifest_reflection_;
+  delete Signature::default_instance_;
+  delete Signature_reflection_;
 }
 
 void protobuf_AddDesc_lyekka_2eproto() {
@@ -278,7 +351,7 @@ void protobuf_AddDesc_lyekka_2eproto() {
     "y\030\006 \001(\014*\006\010\350\007\020\320\017\"}\n\004Part\022\016\n\006offset\030\001 \001(\004\022"
     "\014\n\004size\030\002 \002(\r\022\017\n\007sha_idx\030\003 \002(\005\022\013\n\003key\030\004 "
     "\001(\014\0221\n\013compression\030\005 \001(\0162\026.Lyekka.pb.Com"
-    "pression:\004GZIP*\006\010\350\007\020\320\017\"v\n\tFileEntry\022\014\n\004n"
+    "pression:\004ZLIB*\006\010\350\007\020\320\017\"v\n\tFileEntry\022\014\n\004n"
     "ame\030\001 \002(\t\022\014\n\004mode\030\002 \002(\005\022\014\n\004size\030\003 \002(\004\022\r\n"
     "\005mtime\030\004 \002(\003\022\020\n\010mtime_ns\030\005 \001(\005\022\036\n\005parts\030"
     "\006 \003(\0132\017.Lyekka.pb.Part\"P\n\004Tree\022#\n\007subdir"
@@ -286,14 +359,22 @@ void protobuf_AddDesc_lyekka_2eproto() {
     "(\0132\024.Lyekka.pb.FileEntry\"(\n\010Property\022\013\n\003"
     "key\030\001 \002(\t\022\017\n\007str_val\030\002 \001(\t\"5\n\nProperties"
     "\022\'\n\nproperties\030\001 \003(\0132\023.Lyekka.pb.Propert"
-    "y\"M\n\020SecureProperties\022\'\n\nproperties\030\001 \003("
-    "\0132\023.Lyekka.pb.Property\022\020\n\010tree_key\030\002 \001(\014"
-    "\"\036\n\tSignature\022\021\n\tsignature\030\001 \001(\014\"\230\001\n\010Man"
-    "ifest\022\020\n\010tree_sha\030\001 \001(\014\022\031\n\021is_tree_encry"
-    "pted\030\002 \001(\010\022)\n\nproperties\030\003 \001(\0132\025.Lyekka."
-    "pb.Properties\022\031\n\021secure_properties\030\004 \001(\014"
-    "\022\031\n\021pgp_encrypted_key\030\005 \003(\014*!\n\013Compressi"
-    "on\022\010\n\004GZIP\020\000\022\010\n\004NONE\020\001B\002H\001", 866);
+    "y\"T\n\020SecureProperties\022\'\n\nproperties\030\001 \003("
+    "\0132\023.Lyekka.pb.Property\022\027\n\017entry_point_ke"
+    "y\030\002 \001(\014\"L\n\tPbkdf2Key\022\014\n\004salt\030\001 \002(\014\022\030\n\nit"
+    "erations\030\002 \001(\005:\0044096\022\n\n\002iv\030\003 \002(\014\022\013\n\003key\030"
+    "\004 \002(\014\"/\n\006PgpKey\022\016\n\006key_id\030\001 \001(\t\022\025\n\rencry"
+    "pted_key\030\002 \002(\014\"\312\001\n\023EncryptedProperties\022\026"
+    "\n\016encrypted_data\030\001 \002(\014\022\n\n\002iv\030\002 \002(\014\0225\n\tal"
+    "gorithm\030\003 \001(\0162\025.Lyekka.pb.Encryption:\013AE"
+    "S_128_CBC\022*\n\014password_key\030\004 \001(\0132\024.Lyekka"
+    ".pb.Pbkdf2Key\022,\n\021pgp_encrypted_key\030\005 \001(\013"
+    "2\021.Lyekka.pb.PgpKey\"p\n\010Manifest\022)\n\nprope"
+    "rties\030\001 \001(\0132\025.Lyekka.pb.Properties\0229\n\021se"
+    "cure_properties\030\002 \001(\0132\036.Lyekka.pb.Encryp"
+    "tedProperties\"\036\n\tSignature\022\021\n\tsignature\030"
+    "\001 \001(\014*\035\n\nEncryption\022\017\n\013AES_128_CBC\020\001*!\n\013"
+    "Compression\022\010\n\004ZLIB\020\000\022\010\n\004NONE\020\001B\002H\001", 1195);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "lyekka.proto", &protobuf_RegisterTypes);
   TreeRef::default_instance_ = new TreeRef();
@@ -303,8 +384,11 @@ void protobuf_AddDesc_lyekka_2eproto() {
   Property::default_instance_ = new Property();
   Properties::default_instance_ = new Properties();
   SecureProperties::default_instance_ = new SecureProperties();
-  Signature::default_instance_ = new Signature();
+  Pbkdf2Key::default_instance_ = new Pbkdf2Key();
+  PgpKey::default_instance_ = new PgpKey();
+  EncryptedProperties::default_instance_ = new EncryptedProperties();
   Manifest::default_instance_ = new Manifest();
+  Signature::default_instance_ = new Signature();
   TreeRef::default_instance_->InitAsDefaultInstance();
   Part::default_instance_->InitAsDefaultInstance();
   FileEntry::default_instance_->InitAsDefaultInstance();
@@ -312,8 +396,11 @@ void protobuf_AddDesc_lyekka_2eproto() {
   Property::default_instance_->InitAsDefaultInstance();
   Properties::default_instance_->InitAsDefaultInstance();
   SecureProperties::default_instance_->InitAsDefaultInstance();
-  Signature::default_instance_->InitAsDefaultInstance();
+  Pbkdf2Key::default_instance_->InitAsDefaultInstance();
+  PgpKey::default_instance_->InitAsDefaultInstance();
+  EncryptedProperties::default_instance_->InitAsDefaultInstance();
   Manifest::default_instance_->InitAsDefaultInstance();
+  Signature::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_lyekka_2eproto);
 }
 
@@ -323,6 +410,19 @@ struct StaticDescriptorInitializer_lyekka_2eproto {
     protobuf_AddDesc_lyekka_2eproto();
   }
 } static_descriptor_initializer_lyekka_2eproto_;
+
+const ::google::protobuf::EnumDescriptor* Encryption_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Encryption_descriptor_;
+}
+bool Encryption_IsValid(int value) {
+  switch(value) {
+    case 1:
+      return true;
+    default:
+      return false;
+  }
+}
 
 const ::google::protobuf::EnumDescriptor* Compression_descriptor() {
   protobuf_AssignDescriptorsOnce();
@@ -944,7 +1044,7 @@ bool Part::MergePartialFromCodedStream(
         break;
       }
       
-      // optional .Lyekka.pb.Compression compression = 5 [default = GZIP];
+      // optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
       case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -1009,7 +1109,7 @@ void Part::SerializeWithCachedSizes(
       4, this->key(), output);
   }
   
-  // optional .Lyekka.pb.Compression compression = 5 [default = GZIP];
+  // optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
   if (_has_bit(4)) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       5, this->compression(), output);
@@ -1049,7 +1149,7 @@ void Part::SerializeWithCachedSizes(
         4, this->key(), target);
   }
   
-  // optional .Lyekka.pb.Compression compression = 5 [default = GZIP];
+  // optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
   if (_has_bit(4)) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       5, this->compression(), target);
@@ -1098,7 +1198,7 @@ int Part::ByteSize() const {
           this->key());
     }
     
-    // optional .Lyekka.pb.Compression compression = 5 [default = GZIP];
+    // optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
     if (has_compression()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->compression());
@@ -2363,10 +2463,10 @@ void Properties::Swap(Properties* other) {
 
 // ===================================================================
 
-const ::std::string SecureProperties::_default_tree_key_;
+const ::std::string SecureProperties::_default_entry_point_key_;
 #ifndef _MSC_VER
 const int SecureProperties::kPropertiesFieldNumber;
-const int SecureProperties::kTreeKeyFieldNumber;
+const int SecureProperties::kEntryPointKeyFieldNumber;
 #endif  // !_MSC_VER
 
 SecureProperties::SecureProperties()
@@ -2385,7 +2485,7 @@ SecureProperties::SecureProperties(const SecureProperties& from)
 
 void SecureProperties::SharedCtor() {
   _cached_size_ = 0;
-  tree_key_ = const_cast< ::std::string*>(&_default_tree_key_);
+  entry_point_key_ = const_cast< ::std::string*>(&_default_entry_point_key_);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2394,8 +2494,8 @@ SecureProperties::~SecureProperties() {
 }
 
 void SecureProperties::SharedDtor() {
-  if (tree_key_ != &_default_tree_key_) {
-    delete tree_key_;
+  if (entry_point_key_ != &_default_entry_point_key_) {
+    delete entry_point_key_;
   }
   if (this != default_instance_) {
   }
@@ -2424,8 +2524,8 @@ SecureProperties* SecureProperties::New() const {
 void SecureProperties::Clear() {
   if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
     if (_has_bit(1)) {
-      if (tree_key_ != &_default_tree_key_) {
-        tree_key_->clear();
+      if (entry_point_key_ != &_default_entry_point_key_) {
+        entry_point_key_->clear();
       }
     }
   }
@@ -2451,17 +2551,17 @@ bool SecureProperties::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(10)) goto parse_properties;
-        if (input->ExpectTag(18)) goto parse_tree_key;
+        if (input->ExpectTag(18)) goto parse_entry_point_key;
         break;
       }
       
-      // optional bytes tree_key = 2;
+      // optional bytes entry_point_key = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_tree_key:
+         parse_entry_point_key:
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_tree_key()));
+                input, this->mutable_entry_point_key()));
         } else {
           goto handle_uninterpreted;
         }
@@ -2493,10 +2593,10 @@ void SecureProperties::SerializeWithCachedSizes(
       1, this->properties(i), output);
   }
   
-  // optional bytes tree_key = 2;
+  // optional bytes entry_point_key = 2;
   if (_has_bit(1)) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      2, this->tree_key(), output);
+      2, this->entry_point_key(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -2514,11 +2614,11 @@ void SecureProperties::SerializeWithCachedSizes(
         1, this->properties(i), target);
   }
   
-  // optional bytes tree_key = 2;
+  // optional bytes entry_point_key = 2;
   if (_has_bit(1)) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        2, this->tree_key(), target);
+        2, this->entry_point_key(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -2532,11 +2632,11 @@ int SecureProperties::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
-    // optional bytes tree_key = 2;
-    if (has_tree_key()) {
+    // optional bytes entry_point_key = 2;
+    if (has_entry_point_key()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::BytesSize(
-          this->tree_key());
+          this->entry_point_key());
     }
     
   }
@@ -2576,7 +2676,7 @@ void SecureProperties::MergeFrom(const SecureProperties& from) {
   properties_.MergeFrom(from.properties_);
   if (from._has_bits_[1 / 32] & (0xffu << (1 % 32))) {
     if (from._has_bit(1)) {
-      set_tree_key(from.tree_key());
+      set_entry_point_key(from.entry_point_key());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -2605,7 +2705,7 @@ bool SecureProperties::IsInitialized() const {
 void SecureProperties::Swap(SecureProperties* other) {
   if (other != this) {
     properties_.Swap(&other->properties_);
-    std::swap(tree_key_, other->tree_key_);
+    std::swap(entry_point_key_, other->entry_point_key_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -2617,6 +2717,1307 @@ void SecureProperties::Swap(SecureProperties* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = SecureProperties_descriptor_;
   metadata.reflection = SecureProperties_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+const ::std::string Pbkdf2Key::_default_salt_;
+const ::std::string Pbkdf2Key::_default_iv_;
+const ::std::string Pbkdf2Key::_default_key_;
+#ifndef _MSC_VER
+const int Pbkdf2Key::kSaltFieldNumber;
+const int Pbkdf2Key::kIterationsFieldNumber;
+const int Pbkdf2Key::kIvFieldNumber;
+const int Pbkdf2Key::kKeyFieldNumber;
+#endif  // !_MSC_VER
+
+Pbkdf2Key::Pbkdf2Key()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void Pbkdf2Key::InitAsDefaultInstance() {
+}
+
+Pbkdf2Key::Pbkdf2Key(const Pbkdf2Key& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void Pbkdf2Key::SharedCtor() {
+  _cached_size_ = 0;
+  salt_ = const_cast< ::std::string*>(&_default_salt_);
+  iterations_ = 4096;
+  iv_ = const_cast< ::std::string*>(&_default_iv_);
+  key_ = const_cast< ::std::string*>(&_default_key_);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+Pbkdf2Key::~Pbkdf2Key() {
+  SharedDtor();
+}
+
+void Pbkdf2Key::SharedDtor() {
+  if (salt_ != &_default_salt_) {
+    delete salt_;
+  }
+  if (iv_ != &_default_iv_) {
+    delete iv_;
+  }
+  if (key_ != &_default_key_) {
+    delete key_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void Pbkdf2Key::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* Pbkdf2Key::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Pbkdf2Key_descriptor_;
+}
+
+const Pbkdf2Key& Pbkdf2Key::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lyekka_2eproto();  return *default_instance_;
+}
+
+Pbkdf2Key* Pbkdf2Key::default_instance_ = NULL;
+
+Pbkdf2Key* Pbkdf2Key::New() const {
+  return new Pbkdf2Key;
+}
+
+void Pbkdf2Key::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (_has_bit(0)) {
+      if (salt_ != &_default_salt_) {
+        salt_->clear();
+      }
+    }
+    iterations_ = 4096;
+    if (_has_bit(2)) {
+      if (iv_ != &_default_iv_) {
+        iv_->clear();
+      }
+    }
+    if (_has_bit(3)) {
+      if (key_ != &_default_key_) {
+        key_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool Pbkdf2Key::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required bytes salt = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_salt()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_iterations;
+        break;
+      }
+      
+      // optional int32 iterations = 2 [default = 4096];
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_iterations:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &iterations_)));
+          _set_bit(1);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(26)) goto parse_iv;
+        break;
+      }
+      
+      // required bytes iv = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_iv:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_iv()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(34)) goto parse_key;
+        break;
+      }
+      
+      // required bytes key = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_key:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_key()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void Pbkdf2Key::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required bytes salt = 1;
+  if (_has_bit(0)) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      1, this->salt(), output);
+  }
+  
+  // optional int32 iterations = 2 [default = 4096];
+  if (_has_bit(1)) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->iterations(), output);
+  }
+  
+  // required bytes iv = 3;
+  if (_has_bit(2)) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      3, this->iv(), output);
+  }
+  
+  // required bytes key = 4;
+  if (_has_bit(3)) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      4, this->key(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* Pbkdf2Key::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required bytes salt = 1;
+  if (_has_bit(0)) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        1, this->salt(), target);
+  }
+  
+  // optional int32 iterations = 2 [default = 4096];
+  if (_has_bit(1)) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->iterations(), target);
+  }
+  
+  // required bytes iv = 3;
+  if (_has_bit(2)) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        3, this->iv(), target);
+  }
+  
+  // required bytes key = 4;
+  if (_has_bit(3)) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        4, this->key(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int Pbkdf2Key::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required bytes salt = 1;
+    if (has_salt()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->salt());
+    }
+    
+    // optional int32 iterations = 2 [default = 4096];
+    if (has_iterations()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->iterations());
+    }
+    
+    // required bytes iv = 3;
+    if (has_iv()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->iv());
+    }
+    
+    // required bytes key = 4;
+    if (has_key()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->key());
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void Pbkdf2Key::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const Pbkdf2Key* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const Pbkdf2Key*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void Pbkdf2Key::MergeFrom(const Pbkdf2Key& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from._has_bit(0)) {
+      set_salt(from.salt());
+    }
+    if (from._has_bit(1)) {
+      set_iterations(from.iterations());
+    }
+    if (from._has_bit(2)) {
+      set_iv(from.iv());
+    }
+    if (from._has_bit(3)) {
+      set_key(from.key());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void Pbkdf2Key::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Pbkdf2Key::CopyFrom(const Pbkdf2Key& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Pbkdf2Key::IsInitialized() const {
+  if ((_has_bits_[0] & 0x0000000d) != 0x0000000d) return false;
+  
+  return true;
+}
+
+void Pbkdf2Key::Swap(Pbkdf2Key* other) {
+  if (other != this) {
+    std::swap(salt_, other->salt_);
+    std::swap(iterations_, other->iterations_);
+    std::swap(iv_, other->iv_);
+    std::swap(key_, other->key_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata Pbkdf2Key::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = Pbkdf2Key_descriptor_;
+  metadata.reflection = Pbkdf2Key_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+const ::std::string PgpKey::_default_key_id_;
+const ::std::string PgpKey::_default_encrypted_key_;
+#ifndef _MSC_VER
+const int PgpKey::kKeyIdFieldNumber;
+const int PgpKey::kEncryptedKeyFieldNumber;
+#endif  // !_MSC_VER
+
+PgpKey::PgpKey()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void PgpKey::InitAsDefaultInstance() {
+}
+
+PgpKey::PgpKey(const PgpKey& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void PgpKey::SharedCtor() {
+  _cached_size_ = 0;
+  key_id_ = const_cast< ::std::string*>(&_default_key_id_);
+  encrypted_key_ = const_cast< ::std::string*>(&_default_encrypted_key_);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+PgpKey::~PgpKey() {
+  SharedDtor();
+}
+
+void PgpKey::SharedDtor() {
+  if (key_id_ != &_default_key_id_) {
+    delete key_id_;
+  }
+  if (encrypted_key_ != &_default_encrypted_key_) {
+    delete encrypted_key_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void PgpKey::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* PgpKey::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return PgpKey_descriptor_;
+}
+
+const PgpKey& PgpKey::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lyekka_2eproto();  return *default_instance_;
+}
+
+PgpKey* PgpKey::default_instance_ = NULL;
+
+PgpKey* PgpKey::New() const {
+  return new PgpKey;
+}
+
+void PgpKey::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (_has_bit(0)) {
+      if (key_id_ != &_default_key_id_) {
+        key_id_->clear();
+      }
+    }
+    if (_has_bit(1)) {
+      if (encrypted_key_ != &_default_encrypted_key_) {
+        encrypted_key_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool PgpKey::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional string key_id = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_key_id()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->key_id().data(), this->key_id().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_encrypted_key;
+        break;
+      }
+      
+      // required bytes encrypted_key = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_encrypted_key:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_encrypted_key()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void PgpKey::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional string key_id = 1;
+  if (_has_bit(0)) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->key_id().data(), this->key_id().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->key_id(), output);
+  }
+  
+  // required bytes encrypted_key = 2;
+  if (_has_bit(1)) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      2, this->encrypted_key(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* PgpKey::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional string key_id = 1;
+  if (_has_bit(0)) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->key_id().data(), this->key_id().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->key_id(), target);
+  }
+  
+  // required bytes encrypted_key = 2;
+  if (_has_bit(1)) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        2, this->encrypted_key(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int PgpKey::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional string key_id = 1;
+    if (has_key_id()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->key_id());
+    }
+    
+    // required bytes encrypted_key = 2;
+    if (has_encrypted_key()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->encrypted_key());
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void PgpKey::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const PgpKey* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const PgpKey*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void PgpKey::MergeFrom(const PgpKey& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from._has_bit(0)) {
+      set_key_id(from.key_id());
+    }
+    if (from._has_bit(1)) {
+      set_encrypted_key(from.encrypted_key());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void PgpKey::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PgpKey::CopyFrom(const PgpKey& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PgpKey::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000002) != 0x00000002) return false;
+  
+  return true;
+}
+
+void PgpKey::Swap(PgpKey* other) {
+  if (other != this) {
+    std::swap(key_id_, other->key_id_);
+    std::swap(encrypted_key_, other->encrypted_key_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata PgpKey::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = PgpKey_descriptor_;
+  metadata.reflection = PgpKey_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+const ::std::string EncryptedProperties::_default_encrypted_data_;
+const ::std::string EncryptedProperties::_default_iv_;
+#ifndef _MSC_VER
+const int EncryptedProperties::kEncryptedDataFieldNumber;
+const int EncryptedProperties::kIvFieldNumber;
+const int EncryptedProperties::kAlgorithmFieldNumber;
+const int EncryptedProperties::kPasswordKeyFieldNumber;
+const int EncryptedProperties::kPgpEncryptedKeyFieldNumber;
+#endif  // !_MSC_VER
+
+EncryptedProperties::EncryptedProperties()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void EncryptedProperties::InitAsDefaultInstance() {
+  password_key_ = const_cast< ::Lyekka::pb::Pbkdf2Key*>(&::Lyekka::pb::Pbkdf2Key::default_instance());
+  pgp_encrypted_key_ = const_cast< ::Lyekka::pb::PgpKey*>(&::Lyekka::pb::PgpKey::default_instance());
+}
+
+EncryptedProperties::EncryptedProperties(const EncryptedProperties& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void EncryptedProperties::SharedCtor() {
+  _cached_size_ = 0;
+  encrypted_data_ = const_cast< ::std::string*>(&_default_encrypted_data_);
+  iv_ = const_cast< ::std::string*>(&_default_iv_);
+  algorithm_ = 1;
+  password_key_ = NULL;
+  pgp_encrypted_key_ = NULL;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+EncryptedProperties::~EncryptedProperties() {
+  SharedDtor();
+}
+
+void EncryptedProperties::SharedDtor() {
+  if (encrypted_data_ != &_default_encrypted_data_) {
+    delete encrypted_data_;
+  }
+  if (iv_ != &_default_iv_) {
+    delete iv_;
+  }
+  if (this != default_instance_) {
+    delete password_key_;
+    delete pgp_encrypted_key_;
+  }
+}
+
+void EncryptedProperties::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* EncryptedProperties::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return EncryptedProperties_descriptor_;
+}
+
+const EncryptedProperties& EncryptedProperties::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lyekka_2eproto();  return *default_instance_;
+}
+
+EncryptedProperties* EncryptedProperties::default_instance_ = NULL;
+
+EncryptedProperties* EncryptedProperties::New() const {
+  return new EncryptedProperties;
+}
+
+void EncryptedProperties::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (_has_bit(0)) {
+      if (encrypted_data_ != &_default_encrypted_data_) {
+        encrypted_data_->clear();
+      }
+    }
+    if (_has_bit(1)) {
+      if (iv_ != &_default_iv_) {
+        iv_->clear();
+      }
+    }
+    algorithm_ = 1;
+    if (_has_bit(3)) {
+      if (password_key_ != NULL) password_key_->::Lyekka::pb::Pbkdf2Key::Clear();
+    }
+    if (_has_bit(4)) {
+      if (pgp_encrypted_key_ != NULL) pgp_encrypted_key_->::Lyekka::pb::PgpKey::Clear();
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool EncryptedProperties::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required bytes encrypted_data = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_encrypted_data()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_iv;
+        break;
+      }
+      
+      // required bytes iv = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_iv:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_iv()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_algorithm;
+        break;
+      }
+      
+      // optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_algorithm:
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (Lyekka::pb::Encryption_IsValid(value)) {
+            set_algorithm(static_cast< Lyekka::pb::Encryption >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(3, value);
+          }
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(34)) goto parse_password_key;
+        break;
+      }
+      
+      // optional .Lyekka.pb.Pbkdf2Key password_key = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_password_key:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_password_key()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(42)) goto parse_pgp_encrypted_key;
+        break;
+      }
+      
+      // optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_pgp_encrypted_key:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_pgp_encrypted_key()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void EncryptedProperties::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required bytes encrypted_data = 1;
+  if (_has_bit(0)) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      1, this->encrypted_data(), output);
+  }
+  
+  // required bytes iv = 2;
+  if (_has_bit(1)) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
+      2, this->iv(), output);
+  }
+  
+  // optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
+  if (_has_bit(2)) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      3, this->algorithm(), output);
+  }
+  
+  // optional .Lyekka.pb.Pbkdf2Key password_key = 4;
+  if (_has_bit(3)) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, this->password_key(), output);
+  }
+  
+  // optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
+  if (_has_bit(4)) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, this->pgp_encrypted_key(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* EncryptedProperties::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required bytes encrypted_data = 1;
+  if (_has_bit(0)) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        1, this->encrypted_data(), target);
+  }
+  
+  // required bytes iv = 2;
+  if (_has_bit(1)) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        2, this->iv(), target);
+  }
+  
+  // optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
+  if (_has_bit(2)) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      3, this->algorithm(), target);
+  }
+  
+  // optional .Lyekka.pb.Pbkdf2Key password_key = 4;
+  if (_has_bit(3)) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        4, this->password_key(), target);
+  }
+  
+  // optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
+  if (_has_bit(4)) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        5, this->pgp_encrypted_key(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int EncryptedProperties::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required bytes encrypted_data = 1;
+    if (has_encrypted_data()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->encrypted_data());
+    }
+    
+    // required bytes iv = 2;
+    if (has_iv()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->iv());
+    }
+    
+    // optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
+    if (has_algorithm()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->algorithm());
+    }
+    
+    // optional .Lyekka.pb.Pbkdf2Key password_key = 4;
+    if (has_password_key()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->password_key());
+    }
+    
+    // optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
+    if (has_pgp_encrypted_key()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->pgp_encrypted_key());
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void EncryptedProperties::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const EncryptedProperties* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const EncryptedProperties*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void EncryptedProperties::MergeFrom(const EncryptedProperties& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from._has_bit(0)) {
+      set_encrypted_data(from.encrypted_data());
+    }
+    if (from._has_bit(1)) {
+      set_iv(from.iv());
+    }
+    if (from._has_bit(2)) {
+      set_algorithm(from.algorithm());
+    }
+    if (from._has_bit(3)) {
+      mutable_password_key()->::Lyekka::pb::Pbkdf2Key::MergeFrom(from.password_key());
+    }
+    if (from._has_bit(4)) {
+      mutable_pgp_encrypted_key()->::Lyekka::pb::PgpKey::MergeFrom(from.pgp_encrypted_key());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void EncryptedProperties::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void EncryptedProperties::CopyFrom(const EncryptedProperties& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool EncryptedProperties::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  
+  if (has_password_key()) {
+    if (!this->password_key().IsInitialized()) return false;
+  }
+  if (has_pgp_encrypted_key()) {
+    if (!this->pgp_encrypted_key().IsInitialized()) return false;
+  }
+  return true;
+}
+
+void EncryptedProperties::Swap(EncryptedProperties* other) {
+  if (other != this) {
+    std::swap(encrypted_data_, other->encrypted_data_);
+    std::swap(iv_, other->iv_);
+    std::swap(algorithm_, other->algorithm_);
+    std::swap(password_key_, other->password_key_);
+    std::swap(pgp_encrypted_key_, other->pgp_encrypted_key_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata EncryptedProperties::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = EncryptedProperties_descriptor_;
+  metadata.reflection = EncryptedProperties_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int Manifest::kPropertiesFieldNumber;
+const int Manifest::kSecurePropertiesFieldNumber;
+#endif  // !_MSC_VER
+
+Manifest::Manifest()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void Manifest::InitAsDefaultInstance() {
+  properties_ = const_cast< ::Lyekka::pb::Properties*>(&::Lyekka::pb::Properties::default_instance());
+  secure_properties_ = const_cast< ::Lyekka::pb::EncryptedProperties*>(&::Lyekka::pb::EncryptedProperties::default_instance());
+}
+
+Manifest::Manifest(const Manifest& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void Manifest::SharedCtor() {
+  _cached_size_ = 0;
+  properties_ = NULL;
+  secure_properties_ = NULL;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+Manifest::~Manifest() {
+  SharedDtor();
+}
+
+void Manifest::SharedDtor() {
+  if (this != default_instance_) {
+    delete properties_;
+    delete secure_properties_;
+  }
+}
+
+void Manifest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* Manifest::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Manifest_descriptor_;
+}
+
+const Manifest& Manifest::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_lyekka_2eproto();  return *default_instance_;
+}
+
+Manifest* Manifest::default_instance_ = NULL;
+
+Manifest* Manifest::New() const {
+  return new Manifest;
+}
+
+void Manifest::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (_has_bit(0)) {
+      if (properties_ != NULL) properties_->::Lyekka::pb::Properties::Clear();
+    }
+    if (_has_bit(1)) {
+      if (secure_properties_ != NULL) secure_properties_->::Lyekka::pb::EncryptedProperties::Clear();
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool Manifest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional .Lyekka.pb.Properties properties = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_properties()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_secure_properties;
+        break;
+      }
+      
+      // optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_secure_properties:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_secure_properties()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void Manifest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional .Lyekka.pb.Properties properties = 1;
+  if (_has_bit(0)) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->properties(), output);
+  }
+  
+  // optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
+  if (_has_bit(1)) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, this->secure_properties(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* Manifest::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional .Lyekka.pb.Properties properties = 1;
+  if (_has_bit(0)) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        1, this->properties(), target);
+  }
+  
+  // optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
+  if (_has_bit(1)) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        2, this->secure_properties(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int Manifest::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional .Lyekka.pb.Properties properties = 1;
+    if (has_properties()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->properties());
+    }
+    
+    // optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
+    if (has_secure_properties()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->secure_properties());
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void Manifest::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const Manifest* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const Manifest*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void Manifest::MergeFrom(const Manifest& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from._has_bit(0)) {
+      mutable_properties()->::Lyekka::pb::Properties::MergeFrom(from.properties());
+    }
+    if (from._has_bit(1)) {
+      mutable_secure_properties()->::Lyekka::pb::EncryptedProperties::MergeFrom(from.secure_properties());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void Manifest::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Manifest::CopyFrom(const Manifest& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Manifest::IsInitialized() const {
+  
+  if (has_properties()) {
+    if (!this->properties().IsInitialized()) return false;
+  }
+  if (has_secure_properties()) {
+    if (!this->secure_properties().IsInitialized()) return false;
+  }
+  return true;
+}
+
+void Manifest::Swap(Manifest* other) {
+  if (other != this) {
+    std::swap(properties_, other->properties_);
+    std::swap(secure_properties_, other->secure_properties_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata Manifest::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = Manifest_descriptor_;
+  metadata.reflection = Manifest_reflection_;
   return metadata;
 }
 
@@ -2833,395 +4234,6 @@ void Signature::Swap(Signature* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = Signature_descriptor_;
   metadata.reflection = Signature_reflection_;
-  return metadata;
-}
-
-
-// ===================================================================
-
-const ::std::string Manifest::_default_tree_sha_;
-const ::std::string Manifest::_default_secure_properties_;
-#ifndef _MSC_VER
-const int Manifest::kTreeShaFieldNumber;
-const int Manifest::kIsTreeEncryptedFieldNumber;
-const int Manifest::kPropertiesFieldNumber;
-const int Manifest::kSecurePropertiesFieldNumber;
-const int Manifest::kPgpEncryptedKeyFieldNumber;
-#endif  // !_MSC_VER
-
-Manifest::Manifest()
-  : ::google::protobuf::Message() {
-  SharedCtor();
-}
-
-void Manifest::InitAsDefaultInstance() {
-  properties_ = const_cast< ::Lyekka::pb::Properties*>(&::Lyekka::pb::Properties::default_instance());
-}
-
-Manifest::Manifest(const Manifest& from)
-  : ::google::protobuf::Message() {
-  SharedCtor();
-  MergeFrom(from);
-}
-
-void Manifest::SharedCtor() {
-  _cached_size_ = 0;
-  tree_sha_ = const_cast< ::std::string*>(&_default_tree_sha_);
-  is_tree_encrypted_ = false;
-  properties_ = NULL;
-  secure_properties_ = const_cast< ::std::string*>(&_default_secure_properties_);
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
-}
-
-Manifest::~Manifest() {
-  SharedDtor();
-}
-
-void Manifest::SharedDtor() {
-  if (tree_sha_ != &_default_tree_sha_) {
-    delete tree_sha_;
-  }
-  if (secure_properties_ != &_default_secure_properties_) {
-    delete secure_properties_;
-  }
-  if (this != default_instance_) {
-    delete properties_;
-  }
-}
-
-void Manifest::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* Manifest::descriptor() {
-  protobuf_AssignDescriptorsOnce();
-  return Manifest_descriptor_;
-}
-
-const Manifest& Manifest::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_lyekka_2eproto();  return *default_instance_;
-}
-
-Manifest* Manifest::default_instance_ = NULL;
-
-Manifest* Manifest::New() const {
-  return new Manifest;
-}
-
-void Manifest::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (tree_sha_ != &_default_tree_sha_) {
-        tree_sha_->clear();
-      }
-    }
-    is_tree_encrypted_ = false;
-    if (_has_bit(2)) {
-      if (properties_ != NULL) properties_->::Lyekka::pb::Properties::Clear();
-    }
-    if (_has_bit(3)) {
-      if (secure_properties_ != &_default_secure_properties_) {
-        secure_properties_->clear();
-      }
-    }
-  }
-  pgp_encrypted_key_.Clear();
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
-  mutable_unknown_fields()->Clear();
-}
-
-bool Manifest::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
-  ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional bytes tree_sha = 1;
-      case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_tree_sha()));
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(16)) goto parse_is_tree_encrypted;
-        break;
-      }
-      
-      // optional bool is_tree_encrypted = 2;
-      case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_is_tree_encrypted:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &is_tree_encrypted_)));
-          _set_bit(1);
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(26)) goto parse_properties;
-        break;
-      }
-      
-      // optional .Lyekka.pb.Properties properties = 3;
-      case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_properties:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_properties()));
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(34)) goto parse_secure_properties;
-        break;
-      }
-      
-      // optional bytes secure_properties = 4;
-      case 4: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_secure_properties:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_secure_properties()));
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(42)) goto parse_pgp_encrypted_key;
-        break;
-      }
-      
-      // repeated bytes pgp_encrypted_key = 5;
-      case 5: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_pgp_encrypted_key:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->add_pgp_encrypted_key()));
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(42)) goto parse_pgp_encrypted_key;
-        if (input->ExpectAtEnd()) return true;
-        break;
-      }
-      
-      default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-  return true;
-#undef DO_
-}
-
-void Manifest::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // optional bytes tree_sha = 1;
-  if (_has_bit(0)) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      1, this->tree_sha(), output);
-  }
-  
-  // optional bool is_tree_encrypted = 2;
-  if (_has_bit(1)) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(2, this->is_tree_encrypted(), output);
-  }
-  
-  // optional .Lyekka.pb.Properties properties = 3;
-  if (_has_bit(2)) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->properties(), output);
-  }
-  
-  // optional bytes secure_properties = 4;
-  if (_has_bit(3)) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      4, this->secure_properties(), output);
-  }
-  
-  // repeated bytes pgp_encrypted_key = 5;
-  for (int i = 0; i < this->pgp_encrypted_key_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      5, this->pgp_encrypted_key(i), output);
-  }
-  
-  if (!unknown_fields().empty()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        unknown_fields(), output);
-  }
-}
-
-::google::protobuf::uint8* Manifest::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // optional bytes tree_sha = 1;
-  if (_has_bit(0)) {
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        1, this->tree_sha(), target);
-  }
-  
-  // optional bool is_tree_encrypted = 2;
-  if (_has_bit(1)) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(2, this->is_tree_encrypted(), target);
-  }
-  
-  // optional .Lyekka.pb.Properties properties = 3;
-  if (_has_bit(2)) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        3, this->properties(), target);
-  }
-  
-  // optional bytes secure_properties = 4;
-  if (_has_bit(3)) {
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        4, this->secure_properties(), target);
-  }
-  
-  // repeated bytes pgp_encrypted_key = 5;
-  for (int i = 0; i < this->pgp_encrypted_key_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteBytesToArray(5, this->pgp_encrypted_key(i), target);
-  }
-  
-  if (!unknown_fields().empty()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        unknown_fields(), target);
-  }
-  return target;
-}
-
-int Manifest::ByteSize() const {
-  int total_size = 0;
-  
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional bytes tree_sha = 1;
-    if (has_tree_sha()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::BytesSize(
-          this->tree_sha());
-    }
-    
-    // optional bool is_tree_encrypted = 2;
-    if (has_is_tree_encrypted()) {
-      total_size += 1 + 1;
-    }
-    
-    // optional .Lyekka.pb.Properties properties = 3;
-    if (has_properties()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->properties());
-    }
-    
-    // optional bytes secure_properties = 4;
-    if (has_secure_properties()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::BytesSize(
-          this->secure_properties());
-    }
-    
-  }
-  // repeated bytes pgp_encrypted_key = 5;
-  total_size += 1 * this->pgp_encrypted_key_size();
-  for (int i = 0; i < this->pgp_encrypted_key_size(); i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::BytesSize(
-      this->pgp_encrypted_key(i));
-  }
-  
-  if (!unknown_fields().empty()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        unknown_fields());
-  }
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-  return total_size;
-}
-
-void Manifest::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const Manifest* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const Manifest*>(
-      &from);
-  if (source == NULL) {
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-    MergeFrom(*source);
-  }
-}
-
-void Manifest::MergeFrom(const Manifest& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  pgp_encrypted_key_.MergeFrom(from.pgp_encrypted_key_);
-  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
-      set_tree_sha(from.tree_sha());
-    }
-    if (from._has_bit(1)) {
-      set_is_tree_encrypted(from.is_tree_encrypted());
-    }
-    if (from._has_bit(2)) {
-      mutable_properties()->::Lyekka::pb::Properties::MergeFrom(from.properties());
-    }
-    if (from._has_bit(3)) {
-      set_secure_properties(from.secure_properties());
-    }
-  }
-  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
-}
-
-void Manifest::CopyFrom(const ::google::protobuf::Message& from) {
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void Manifest::CopyFrom(const Manifest& from) {
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool Manifest::IsInitialized() const {
-  
-  if (has_properties()) {
-    if (!this->properties().IsInitialized()) return false;
-  }
-  return true;
-}
-
-void Manifest::Swap(Manifest* other) {
-  if (other != this) {
-    std::swap(tree_sha_, other->tree_sha_);
-    std::swap(is_tree_encrypted_, other->is_tree_encrypted_);
-    std::swap(properties_, other->properties_);
-    std::swap(secure_properties_, other->secure_properties_);
-    pgp_encrypted_key_.Swap(&other->pgp_encrypted_key_);
-    std::swap(_has_bits_[0], other->_has_bits_[0]);
-    _unknown_fields_.Swap(&other->_unknown_fields_);
-    std::swap(_cached_size_, other->_cached_size_);
-  }
-}
-
-::google::protobuf::Metadata Manifest::GetMetadata() const {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::Metadata metadata;
-  metadata.descriptor = Manifest_descriptor_;
-  metadata.reflection = Manifest_reflection_;
   return metadata;
 }
 
