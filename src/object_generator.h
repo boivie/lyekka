@@ -14,8 +14,8 @@ public:
   ObjectGenerator(ObjectWriter& dest)
     : m_dest(dest) {}
   virtual ~ObjectGenerator() {}
-  Sha generate(FolderPtr src_p);
-  virtual void on_folder(const Tree& tree) = 0;
+  std::auto_ptr<ObjectIdentifier> generate(FolderPtr src_p);
+  virtual void on_folder(const ObjectIdentifier& oi, const Tree& tree) = 0;
   virtual void on_blob(const Blob& blob) = 0;
 private:
   ObjectWriter& m_dest;

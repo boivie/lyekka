@@ -22,7 +22,7 @@ boost::shared_ptr<ObjectInputStream> FileReader::find(const Sha& sha) const
   return fois_p;
 }
 
-void FileWriter::commit(Sha sha) {
+void FileWriter::commit(const Sha& sha) {
   char buf[256/4 + 1];
   sha.base16(buf);
   m_fos_p->Close();

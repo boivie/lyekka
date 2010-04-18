@@ -170,16 +170,16 @@ static int mktree_cmd(CommandLineParser& c)
   XML_ParserFree(parser);
 
   FileWriter fw;
-  auto_ptr<Tree> tree_p = self.tb.build();
-  tree_p->serialize(&fw.get_writer(), encrypt);
+  auto_ptr<const Tree> tree_p = self.tb.build();
+  auto_ptr<ObjectIdentifier> oi_p = tree_p->serialize(&fw.get_writer(), encrypt);
   char base16[256/4 + 1];
   if (encrypt) {
-    cout << tree_p->get_sha().base16(base16) 
-	 << " " << tree_p->get_key()->base16() << endl;
+    cout << oi_p->sha().base16(base16) 
+	 << " " << oi_p->key().base16() << endl;
   } else {
-    cout << tree_p->get_sha().base16(base16) << endl;
+    cout << oi_p->sha().base16(base16) << endl;
   }
-  fw.commit(tree_p->get_sha());
+  fw.commit(oi_p->sha());
   return 0;
 }
 

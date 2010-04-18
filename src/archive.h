@@ -51,7 +51,7 @@ class ArchiveWriter : public ObjectWriter {
 public:
   ArchiveWriter(const boost::filesystem::path& fname);
   ~ArchiveWriter();
-  void commit(Sha sha);
+  void commit(const Sha& sha);
   google::protobuf::io::ZeroCopyOutputStream& get_writer();
   void set_entry_point(const Sha& sha) { m_entry_point = sha; }
 private:

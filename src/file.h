@@ -30,7 +30,7 @@ namespace Lyekka {
   class FileWriter : public ObjectWriter {
   public:
     FileWriter() : m_fos_p(NULL) {}
-    void commit(Sha sha);
+    void commit(const Sha& sha);
     google::protobuf::io::ZeroCopyOutputStream& get_writer();
   private:
     std::auto_ptr<google::protobuf::io::FileOutputStream> m_fos_p;

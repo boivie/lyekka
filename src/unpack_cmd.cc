@@ -45,7 +45,7 @@ static void unpack_tree(const fs::path& cwd, const ObjectReader& rdr,
 			const Sha& sha) 
 {
   shared_ptr<ObjectInputStream> obj_p = rdr.find(sha);
-  auto_ptr<Tree> tree_p;
+  auto_ptr<const Tree> tree_p;
   try {
     tree_p = Tree::deserialize(obj_p.get());
   } catch (InvalidTreeException& e) {

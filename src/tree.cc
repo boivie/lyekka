@@ -32,7 +32,7 @@ int TreeBuilder::find_idx(const string& str)
 		     sha) - m_tree->m_refs.begin();
 }
 
-auto_ptr<Tree> TreeBuilder::build(void)
+auto_ptr<const Tree> TreeBuilder::build(void)
 {
   // Files and subdirs are sorted by name
   std::sort(m_tree->m_pb.mutable_subdirs()->begin(),
@@ -82,23 +82,26 @@ auto_ptr<Tree> TreeBuilder::build(void)
   }
 
   // Return the 'validated' tree and clear our instance data
-  auto_ptr<Tree> old_p = m_tree;
+  auto_ptr<const Tree> old_p(m_tree.release());
   m_tree.reset(new Tree());
   return old_p;
 }
 
-void Tree::create_key() 
+static Aes128Key create_key(const Lyekka::pb::Tree& pb) 
 {
   FileOutputStream fos(open("/dev/null", O_WRONLY));
   fos.SetCloseOnDelete(true);
   Sha256OutputStream hos(&fos);
-  m_pb.SerializeToZeroCopyStream(&hos);
+  pb.SerializeToZeroCopyStream(&hos);
   const Sha sha = hos.get_digest();
-  m_key.set_key(sha.data());
-  m_key.set_iv(sha.data() + SHA_BITS/8/2);
+  Aes128Key key;
+  key.set_key(sha.data());
+  key.set_iv(sha.data() + SHA_BITS/8/2);
+  return key;
 }
 
-void Tree::serialize(ZeroCopyOutputStream* os_p, bool encrypt)
+auto_ptr<ObjectIdentifier> Tree::serialize(ZeroCopyOutputStream* os_p, 
+					   bool encrypt) const
 {
   Sha256OutputStream hos(os_p);
   write_to_stream(&hos, encrypt ? "TREE" : "tree", 4);
@@ -119,23 +122,26 @@ void Tree::serialize(ZeroCopyOutputStream* os_p, bool encrypt)
   GzipOutputStream::Options o;
   o.format = GzipOutputStream::ZLIB;
   if (encrypt) {
-    create_key();
-    AesOutputStream aos(&hos, AesOutputStream::CBC, m_key);
+    Aes128Key key = create_key(m_pb);
+    AesOutputStream aos(&hos, AesOutputStream::CBC, key);
     GzipOutputStream gzos(&aos, o);
     m_pb.SerializeToZeroCopyStream(&gzos);
     gzos.Close();
     aos.Close();
+    return std::auto_ptr<ObjectIdentifier>(new Aes128ObjectIdentifier(hos.get_digest(),
+								      key));
+
   } else {
     GzipOutputStream gzos(&hos, o);
     m_pb.SerializeToZeroCopyStream(&gzos);
     gzos.Close();
+    return std::auto_ptr<ObjectIdentifier>(new ObjectIdentifier(hos.get_digest()));
   }
 
-  m_sha = hos.get_digest();
 }
 
-auto_ptr<Tree> Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p, 
-				 const AesKey* key_p)
+auto_ptr<const Tree> Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p, 
+				       const AesKey* key_p)
 {
   auto_ptr<Tree> tree_p(new Tree());
   int32_t pb_size = -1;
@@ -179,10 +185,5 @@ auto_ptr<Tree> Tree::deserialize(google::protobuf::io::ZeroCopyInputStream* is_p
     if (!tree_p->m_pb.ParseFromZeroCopyStream(&gzis))
       throw InvalidTreeException("Invalid protocol buffer");
   }
-  return tree_p;
-}
-
-auto_ptr<AesKey> Tree::get_key(void) const 
-{
-  return auto_ptr<AesKey>(new Aes128Key(m_key.key(), m_key.iv()));
+  return auto_ptr<const Tree>(tree_p.release());
 }

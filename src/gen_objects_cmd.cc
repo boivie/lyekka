@@ -15,9 +15,9 @@ public:
   GenObjectCmdGenerator(ObjectWriter& dest) : 
     ObjectGenerator(dest) {}
 
-  virtual void on_folder(const Tree& tree) {
+  virtual void on_folder(const ObjectIdentifier& oi, const Tree& tree) {
     ShaBase16Buf buf;
-    cout << "T " << tree.get_sha().base16(buf) << endl;
+    cout << "T " << oi.sha().base16(buf) << endl;
   }
 
   virtual void on_blob(const Blob& blob) {
@@ -44,7 +44,8 @@ static int gen_objects(CommandLineParser& c)
   } else {
     ArchiveWriter aw(archive);
     GenObjectCmdGenerator og(aw);
-    aw.set_entry_point(og.generate(folder_p));
+    auto_ptr<ObjectIdentifier> oi_p = og.generate(folder_p);
+    aw.set_entry_point(oi_p->sha());
   }
 
   return 0;

@@ -11,7 +11,7 @@ using namespace Lyekka;
 using namespace boost;
 using namespace std;
 
-Sha ObjectGenerator::generate(FolderPtr f)
+auto_ptr<ObjectIdentifier> ObjectGenerator::generate(FolderPtr f)
 {
   TreeBuilder tb;
   FolderList folders = f->get_sub_folders();
@@ -20,7 +20,8 @@ Sha ObjectGenerator::generate(FolderPtr f)
        ++child_i) {
     pb::TreeRef* tr_p = tb.add_tree();
     tr_p->MergeFrom((*child_i)->pb());
-    tr_p->SetExtension(pb::tree_sha_ext, generate(*child_i).mutable_string());
+    auto_ptr<ObjectIdentifier> child_oi_p = generate(*child_i);
+    tr_p->SetExtension(pb::tree_sha_ext, child_oi_p->sha().mutable_string());
   }
 
   FileList files = f->get_files();
@@ -50,10 +51,10 @@ Sha ObjectGenerator::generate(FolderPtr f)
     close(in_fd);
   }
 
-  auto_ptr<Tree> tree_p = tb.build();
+  auto_ptr<const Tree> tree_p = tb.build();
   ZeroCopyOutputStream& os = m_dest.get_writer();
-  tree_p->serialize(&os);
-  on_folder(*tree_p);
-  m_dest.commit(tree_p->get_sha());
-  return tree_p->get_sha();
+  auto_ptr<ObjectIdentifier> oi_p = tree_p->serialize(&os);
+  on_folder(*oi_p, *tree_p);
+  m_dest.commit(oi_p->sha());
+  return oi_p;
 }

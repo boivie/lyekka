@@ -9,7 +9,7 @@ using namespace std;
 using namespace Lyekka;
 using namespace google::protobuf::io;
 
-void ArchiveWriter::commit(Sha sha) 
+void ArchiveWriter::commit(const Sha& sha) 
 {
   m_fos_p->Flush();
   m_fos_p.release();

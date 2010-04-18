@@ -118,7 +118,7 @@ static int lstree(CommandLineParser& c)
       key_p = AesKey::create(key);
     }
     
-    auto_ptr<Tree> tree_p = Tree::deserialize(&fis, key_p.get());
+    auto_ptr<const Tree> tree_p = Tree::deserialize(&fis, key_p.get());
 
     if (show == "refs")
       show_refs(*tree_p);
