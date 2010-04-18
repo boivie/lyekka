@@ -182,7 +182,9 @@ auto_ptr<const Tree> Tree::deserialize(google::protobuf::io::ZeroCopyInputStream
   } else if (is_encrypted && key_p != NULL) {
     AesInputStream ais(is_p, AesInputStream::CBC, *key_p);
     GzipInputStream gzis(&ais, GzipInputStream::ZLIB);
-    if (!tree_p->m_pb.ParseFromZeroCopyStream(&gzis))
+    CodedInputStream decoder(&gzis);
+    decoder.PushLimit(pb_size);
+    if (!tree_p->m_pb.ParseFromCodedStream(&decoder))
       throw InvalidTreeException("Invalid protocol buffer");
   }
   return auto_ptr<const Tree>(tree_p.release());

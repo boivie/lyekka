@@ -9,11 +9,10 @@ using namespace Lyekka;
 using namespace std;
 using namespace google::protobuf::io;
 
-Blob Blob::create(ZeroCopyInputStream* is_p, 
-		  ZeroCopyOutputStream* os_p,
-		  const AesKey* key_p)
+auto_ptr<ObjectIdentifier> Blob::create(ZeroCopyInputStream* is_p, 
+					ZeroCopyOutputStream* os_p,
+					const AesKey* key_p)
 {
-  Blob ret;
   Sha256OutputStream hos(os_p);
 
   if (!write_to_stream(&hos, "blob", 4))
@@ -26,16 +25,19 @@ Blob Blob::create(ZeroCopyInputStream* is_p,
     GzipOutputStream gzos(&hos, o);
     copy_streams(&gzos, is_p);
     gzos.Close();
+    return auto_ptr<ObjectIdentifier>(new ObjectIdentifier(hos.get_digest()));
   } else {
     AesOutputStream aos(&hos, AesOutputStream::CBC, *key_p);
     GzipOutputStream gzos(&aos, o);
     copy_streams(&gzos, is_p);
     gzos.Close();
     aos.Close();
-  }
 
-  ret.m_hash = hos.get_digest();
-  return ret;
+    // TODO: Only support AES128 right now.
+    Aes128Key key(key_p->key(), key_p->iv());
+    return auto_ptr<ObjectIdentifier>(new Aes128ObjectIdentifier(hos.get_digest(),
+								 key));
+  }
 }
 
 void Blob::unpack(ZeroCopyInputStream* is_p, 
@@ -62,12 +64,12 @@ void Blob::unpack(ZeroCopyInputStream* is_p,
   }
 }
 
-boost::shared_ptr<AesKey> Blob::generate_key(ZeroCopyInputStream* is_p) {
+auto_ptr<AesKey> Blob::generate_key(ZeroCopyInputStream* is_p) {
   FileOutputStream fos(open("/dev/null", O_WRONLY));
   fos.SetCloseOnDelete(true);
   Sha256OutputStream hos(&fos);
   copy_streams(&hos, is_p);
   Sha sha = hos.get_digest();
-  boost::shared_ptr<AesKey> key_p(new Aes128Key(sha.data(), sha.data() + SHA_BITS/8/2));
+  auto_ptr<AesKey> key_p(new Aes128Key(sha.data(), sha.data() + SHA_BITS/8/2));
   return key_p;
 }

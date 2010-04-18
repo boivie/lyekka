@@ -45,19 +45,19 @@ static int create_blob(CommandLineParser& c)
   if (encrypt) {
     int size = mmis.ByteCount();
     cerr << "Generating key" << endl;
-    boost::shared_ptr<AesKey> key_p = Blob::generate_key(&mmis);
+    auto_ptr<AesKey> key_p = Blob::generate_key(&mmis);
     cerr << "Generating blob " << size << endl;
     mmis.BackUp(size - mmis.ByteCount());
-    Blob blob = Blob::create(&mmis, &fw.get_writer(), key_p.get());
-    fw.commit(blob.hash());
+    auto_ptr<ObjectIdentifier> oi_p = Blob::create(&mmis, &fw.get_writer(), key_p.get());
+    fw.commit(oi_p->sha());
     char sha_buf[256/4 + 1];
-    cout << blob.hash().base16(sha_buf) 
-	 << " " << key_p->base16() << endl;
+    cout << oi_p->sha().base16(sha_buf) 
+	 << " " << oi_p->key().base16() << endl;
   } else {
-    Blob blob = Blob::create(&mmis, &fw.get_writer(), NULL);
-    fw.commit(blob.hash());
+    auto_ptr<ObjectIdentifier> oi_p = Blob::create(&mmis, &fw.get_writer(), NULL);
+    fw.commit(oi_p->sha());
     char buf[256/4 + 1];
-    cout << blob.hash().base16(buf) << endl;
+    cout << oi_p->sha().base16(buf) << endl;
   }
   return 0;
 }

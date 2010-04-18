@@ -217,20 +217,21 @@ boost::shared_ptr<ObjectInputStream> ArchiveReader::find(const Sha& sha) const
   int fanout_idx = sha.data()[0];
   int lo = (fanout_idx == 0) ? 0 : ntohl(fanout_p[fanout_idx - 1]);
   int hi = ntohl(fanout_p[fanout_idx]);
-  
+  //  cerr << "lo: " << lo << ", hi: " << hi << endl;
   while (lo < hi) {
     int mid = lo + (hi - lo) / 2;
     int c = memcmp(sha.data(), m_index_p + 1024 + mid * (256/8), 256/8);
-    if (c < 0) {
-      lo = mid + 1;
-    } else if (c > 0) {
-      hi = mid;
-    } else {
+    if (c == 0) {
       return find_by_idx(mid);
+    } else if (c > 0) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
     }
   }
 
-  cerr << "Not found" << endl;
+  char b16[256/4 + 1];
+  cerr << "Object not found in archive: " << sha.base16(b16) << endl;
   throw RuntimeError();
 }
 

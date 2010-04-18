@@ -35,19 +35,30 @@ static void unpack_file(const fs::path& cwd, const ObjectReader& rdr,
   for (int i = 0; i < fe.parts_size(); i++) {
     const pb::Part& pt = fe.parts(i);
     shared_ptr<ObjectInputStream> obj_p = rdr.find(tree.get_ref(pt.sha_idx()));
-    Blob::unpack(obj_p.get(), &fos, NULL);
+    if (pt.has_key()) {
+      const uint8_t* key_buf = (const uint8_t*)pt.key().c_str();
+      Aes128Key key(key_buf, key_buf + 128/8);
+      Blob::unpack(obj_p.get(), &fos, &key);
+    } else {
+      Blob::unpack(obj_p.get(), &fos, NULL);
+    }
   }
   fs::last_write_time(file, (time_t)fe.mtime());
   cout << file << " [OK]" << endl;
 }
 
 static void unpack_tree(const fs::path& cwd, const ObjectReader& rdr, 
-			const Sha& sha) 
+			const ObjectIdentifier& oi) 
 {
-  shared_ptr<ObjectInputStream> obj_p = rdr.find(sha);
+  shared_ptr<ObjectInputStream> obj_p = rdr.find(oi.sha());
   auto_ptr<const Tree> tree_p;
   try {
-    tree_p = Tree::deserialize(obj_p.get());
+    if (oi.has_key()) {
+      cerr << "unpacking " << oi.sha() << " using " << oi.key().base16() << endl;
+      tree_p = Tree::deserialize(obj_p.get(), &oi.key());
+    } else {
+      tree_p = Tree::deserialize(obj_p.get());
+    }
   } catch (InvalidTreeException& e) {
     cerr << e.what() << endl;
     exit(1);
@@ -62,7 +73,16 @@ static void unpack_tree(const fs::path& cwd, const ObjectReader& rdr,
       throw RuntimeError();
     }
     cout << dir_path << endl;
-    unpack_tree(dir_path, rdr, tree_p->get_ref(tr.sha_idx()));
+    Sha sha = tree_p->get_ref(tr.sha_idx());
+    if (tr.has_key()) {
+      const uint8_t* key_buf = (const uint8_t*)tr.key().c_str();
+      Aes128Key key(key_buf, key_buf + 128/8);
+      auto_ptr<ObjectIdentifier> oi_p(new Aes128ObjectIdentifier(sha, key));
+      unpack_tree(dir_path, rdr, *oi_p);
+    } else {
+      auto_ptr<ObjectIdentifier> oi_p(new ObjectIdentifier(sha));
+      unpack_tree(dir_path, rdr, *oi_p);
+    }
     fs::last_write_time(dir_path, tr.mtime());
     // TODO: Set permission
   }
@@ -74,25 +94,41 @@ static void unpack_tree(const fs::path& cwd, const ObjectReader& rdr,
 
 static int unpack(CommandLineParser& c)
 {
-  string input;
+  string input = "";
   string archive;
   string output = ".";
+  string key = "";
   c.po.add_options()
     ("input-file,i", bpo::value<string>(&input), "input file")
     ("input-archive,a", bpo::value<string>(&archive), "input archive")
-    ("output,o", bpo::value<string>(&output), "output dir");
+    ("output,o", bpo::value<string>(&output), "output dir")
+    ("key,K", bpo::value<string>(&key), "encryption key");
   c.parse_options();
 
+  auto_ptr<ObjectReader> or_p;
+  Sha sha;
   if (archive != "") {
-    const fs::path p(archive);
-    ArchiveReader ar(p);
-    unpack_tree(fs::path(output), ar, ar.entry_point());
+    ArchiveReader* ar_p = new ArchiveReader(fs::path(archive));
+    sha = ar_p->entry_point();
+    or_p.reset(ar_p);
   } else {
-    FileReader fr;
-    Sha sha;
+    or_p.reset(new FileReader());
     sha.set_base16(input.c_str());
-    unpack_tree(fs::path(output), fr, sha);
   }
+
+  auto_ptr<ObjectIdentifier> oi_p;
+  if (key == "") {
+    oi_p.reset(new ObjectIdentifier(sha));
+  } else {
+    uint8_t key_buf[128/8];
+    uint8_t iv_buf[128/8];
+    base16_decode(key_buf, key.c_str(), 128/4);
+    base16_decode(iv_buf, key.c_str() + 128/4, 128/4);
+    Aes128Key a_key(key_buf, iv_buf);
+    oi_p.reset(new Aes128ObjectIdentifier(sha, a_key));
+  }
+
+  unpack_tree(fs::path(output), *or_p, *oi_p);
 
   return 0;
 }
