@@ -40,15 +40,36 @@ class Tree;
 class Property;
 class Properties;
 class SecureProperties;
-class Signature;
+class Pbkdf2Key;
+class PgpKey;
+class EncryptedProperties;
 class Manifest;
+class Signature;
 
+enum Encryption {
+  AES_128_CBC = 1
+};
+bool Encryption_IsValid(int value);
+const Encryption Encryption_MIN = AES_128_CBC;
+const Encryption Encryption_MAX = AES_128_CBC;
+const int Encryption_ARRAYSIZE = Encryption_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Encryption_descriptor();
+inline const ::std::string& Encryption_Name(Encryption value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Encryption_descriptor(), value);
+}
+inline bool Encryption_Parse(
+    const ::std::string& name, Encryption* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Encryption>(
+    Encryption_descriptor(), name, value);
+}
 enum Compression {
-  GZIP = 0,
+  ZLIB = 0,
   NONE = 1
 };
 bool Compression_IsValid(int value);
-const Compression Compression_MIN = GZIP;
+const Compression Compression_MIN = ZLIB;
 const Compression Compression_MAX = NONE;
 const int Compression_ARRAYSIZE = Compression_MAX + 1;
 
@@ -288,7 +309,7 @@ class Part : public ::google::protobuf::Message {
   inline void set_key(const void* value, size_t size);
   inline ::std::string* mutable_key();
   
-  // optional .Lyekka.pb.Compression compression = 5 [default = GZIP];
+  // optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
   inline bool has_compression() const;
   inline void clear_compression();
   static const int kCompressionFieldNumber = 5;
@@ -840,15 +861,15 @@ class SecureProperties : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::Lyekka::pb::Property >*
       mutable_properties();
   
-  // optional bytes tree_key = 2;
-  inline bool has_tree_key() const;
-  inline void clear_tree_key();
-  static const int kTreeKeyFieldNumber = 2;
-  inline const ::std::string& tree_key() const;
-  inline void set_tree_key(const ::std::string& value);
-  inline void set_tree_key(const char* value);
-  inline void set_tree_key(const void* value, size_t size);
-  inline ::std::string* mutable_tree_key();
+  // optional bytes entry_point_key = 2;
+  inline bool has_entry_point_key() const;
+  inline void clear_entry_point_key();
+  static const int kEntryPointKeyFieldNumber = 2;
+  inline const ::std::string& entry_point_key() const;
+  inline void set_entry_point_key(const ::std::string& value);
+  inline void set_entry_point_key(const char* value);
+  inline void set_entry_point_key(const void* value, size_t size);
+  inline ::std::string* mutable_entry_point_key();
   
   // @@protoc_insertion_point(class_scope:Lyekka.pb.SecureProperties)
  private:
@@ -856,8 +877,8 @@ class SecureProperties : public ::google::protobuf::Message {
   mutable int _cached_size_;
   
   ::google::protobuf::RepeatedPtrField< ::Lyekka::pb::Property > properties_;
-  ::std::string* tree_key_;
-  static const ::std::string _default_tree_key_;
+  ::std::string* entry_point_key_;
+  static const ::std::string _default_entry_point_key_;
   friend void  protobuf_AddDesc_lyekka_2eproto();
   friend void protobuf_AssignDesc_lyekka_2eproto();
   friend void protobuf_ShutdownFile_lyekka_2eproto();
@@ -877,6 +898,462 @@ class SecureProperties : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static SecureProperties* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Pbkdf2Key : public ::google::protobuf::Message {
+ public:
+  Pbkdf2Key();
+  virtual ~Pbkdf2Key();
+  
+  Pbkdf2Key(const Pbkdf2Key& from);
+  
+  inline Pbkdf2Key& operator=(const Pbkdf2Key& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Pbkdf2Key& default_instance();
+  
+  void Swap(Pbkdf2Key* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Pbkdf2Key* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Pbkdf2Key& from);
+  void MergeFrom(const Pbkdf2Key& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // required bytes salt = 1;
+  inline bool has_salt() const;
+  inline void clear_salt();
+  static const int kSaltFieldNumber = 1;
+  inline const ::std::string& salt() const;
+  inline void set_salt(const ::std::string& value);
+  inline void set_salt(const char* value);
+  inline void set_salt(const void* value, size_t size);
+  inline ::std::string* mutable_salt();
+  
+  // optional int32 iterations = 2 [default = 4096];
+  inline bool has_iterations() const;
+  inline void clear_iterations();
+  static const int kIterationsFieldNumber = 2;
+  inline ::google::protobuf::int32 iterations() const;
+  inline void set_iterations(::google::protobuf::int32 value);
+  
+  // required bytes iv = 3;
+  inline bool has_iv() const;
+  inline void clear_iv();
+  static const int kIvFieldNumber = 3;
+  inline const ::std::string& iv() const;
+  inline void set_iv(const ::std::string& value);
+  inline void set_iv(const char* value);
+  inline void set_iv(const void* value, size_t size);
+  inline ::std::string* mutable_iv();
+  
+  // required bytes key = 4;
+  inline bool has_key() const;
+  inline void clear_key();
+  static const int kKeyFieldNumber = 4;
+  inline const ::std::string& key() const;
+  inline void set_key(const ::std::string& value);
+  inline void set_key(const char* value);
+  inline void set_key(const void* value, size_t size);
+  inline ::std::string* mutable_key();
+  
+  // @@protoc_insertion_point(class_scope:Lyekka.pb.Pbkdf2Key)
+ private:
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  mutable int _cached_size_;
+  
+  ::std::string* salt_;
+  static const ::std::string _default_salt_;
+  ::google::protobuf::int32 iterations_;
+  ::std::string* iv_;
+  static const ::std::string _default_iv_;
+  ::std::string* key_;
+  static const ::std::string _default_key_;
+  friend void  protobuf_AddDesc_lyekka_2eproto();
+  friend void protobuf_AssignDesc_lyekka_2eproto();
+  friend void protobuf_ShutdownFile_lyekka_2eproto();
+  
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  
+  // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
+  inline bool _has_bit(int index) const {
+    return (_has_bits_[index / 32] & (1u << (index % 32))) != 0;
+  }
+  inline void _set_bit(int index) {
+    _has_bits_[index / 32] |= (1u << (index % 32));
+  }
+  inline void _clear_bit(int index) {
+    _has_bits_[index / 32] &= ~(1u << (index % 32));
+  }
+  
+  void InitAsDefaultInstance();
+  static Pbkdf2Key* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PgpKey : public ::google::protobuf::Message {
+ public:
+  PgpKey();
+  virtual ~PgpKey();
+  
+  PgpKey(const PgpKey& from);
+  
+  inline PgpKey& operator=(const PgpKey& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PgpKey& default_instance();
+  
+  void Swap(PgpKey* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PgpKey* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PgpKey& from);
+  void MergeFrom(const PgpKey& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional string key_id = 1;
+  inline bool has_key_id() const;
+  inline void clear_key_id();
+  static const int kKeyIdFieldNumber = 1;
+  inline const ::std::string& key_id() const;
+  inline void set_key_id(const ::std::string& value);
+  inline void set_key_id(const char* value);
+  inline void set_key_id(const char* value, size_t size);
+  inline ::std::string* mutable_key_id();
+  
+  // required bytes encrypted_key = 2;
+  inline bool has_encrypted_key() const;
+  inline void clear_encrypted_key();
+  static const int kEncryptedKeyFieldNumber = 2;
+  inline const ::std::string& encrypted_key() const;
+  inline void set_encrypted_key(const ::std::string& value);
+  inline void set_encrypted_key(const char* value);
+  inline void set_encrypted_key(const void* value, size_t size);
+  inline ::std::string* mutable_encrypted_key();
+  
+  // @@protoc_insertion_point(class_scope:Lyekka.pb.PgpKey)
+ private:
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  mutable int _cached_size_;
+  
+  ::std::string* key_id_;
+  static const ::std::string _default_key_id_;
+  ::std::string* encrypted_key_;
+  static const ::std::string _default_encrypted_key_;
+  friend void  protobuf_AddDesc_lyekka_2eproto();
+  friend void protobuf_AssignDesc_lyekka_2eproto();
+  friend void protobuf_ShutdownFile_lyekka_2eproto();
+  
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
+  inline bool _has_bit(int index) const {
+    return (_has_bits_[index / 32] & (1u << (index % 32))) != 0;
+  }
+  inline void _set_bit(int index) {
+    _has_bits_[index / 32] |= (1u << (index % 32));
+  }
+  inline void _clear_bit(int index) {
+    _has_bits_[index / 32] &= ~(1u << (index % 32));
+  }
+  
+  void InitAsDefaultInstance();
+  static PgpKey* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class EncryptedProperties : public ::google::protobuf::Message {
+ public:
+  EncryptedProperties();
+  virtual ~EncryptedProperties();
+  
+  EncryptedProperties(const EncryptedProperties& from);
+  
+  inline EncryptedProperties& operator=(const EncryptedProperties& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const EncryptedProperties& default_instance();
+  
+  void Swap(EncryptedProperties* other);
+  
+  // implements Message ----------------------------------------------
+  
+  EncryptedProperties* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const EncryptedProperties& from);
+  void MergeFrom(const EncryptedProperties& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // required bytes encrypted_data = 1;
+  inline bool has_encrypted_data() const;
+  inline void clear_encrypted_data();
+  static const int kEncryptedDataFieldNumber = 1;
+  inline const ::std::string& encrypted_data() const;
+  inline void set_encrypted_data(const ::std::string& value);
+  inline void set_encrypted_data(const char* value);
+  inline void set_encrypted_data(const void* value, size_t size);
+  inline ::std::string* mutable_encrypted_data();
+  
+  // required bytes iv = 2;
+  inline bool has_iv() const;
+  inline void clear_iv();
+  static const int kIvFieldNumber = 2;
+  inline const ::std::string& iv() const;
+  inline void set_iv(const ::std::string& value);
+  inline void set_iv(const char* value);
+  inline void set_iv(const void* value, size_t size);
+  inline ::std::string* mutable_iv();
+  
+  // optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
+  inline bool has_algorithm() const;
+  inline void clear_algorithm();
+  static const int kAlgorithmFieldNumber = 3;
+  inline Lyekka::pb::Encryption algorithm() const;
+  inline void set_algorithm(Lyekka::pb::Encryption value);
+  
+  // optional .Lyekka.pb.Pbkdf2Key password_key = 4;
+  inline bool has_password_key() const;
+  inline void clear_password_key();
+  static const int kPasswordKeyFieldNumber = 4;
+  inline const ::Lyekka::pb::Pbkdf2Key& password_key() const;
+  inline ::Lyekka::pb::Pbkdf2Key* mutable_password_key();
+  
+  // optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
+  inline bool has_pgp_encrypted_key() const;
+  inline void clear_pgp_encrypted_key();
+  static const int kPgpEncryptedKeyFieldNumber = 5;
+  inline const ::Lyekka::pb::PgpKey& pgp_encrypted_key() const;
+  inline ::Lyekka::pb::PgpKey* mutable_pgp_encrypted_key();
+  
+  // @@protoc_insertion_point(class_scope:Lyekka.pb.EncryptedProperties)
+ private:
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  mutable int _cached_size_;
+  
+  ::std::string* encrypted_data_;
+  static const ::std::string _default_encrypted_data_;
+  ::std::string* iv_;
+  static const ::std::string _default_iv_;
+  int algorithm_;
+  ::Lyekka::pb::Pbkdf2Key* password_key_;
+  ::Lyekka::pb::PgpKey* pgp_encrypted_key_;
+  friend void  protobuf_AddDesc_lyekka_2eproto();
+  friend void protobuf_AssignDesc_lyekka_2eproto();
+  friend void protobuf_ShutdownFile_lyekka_2eproto();
+  
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  
+  // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
+  inline bool _has_bit(int index) const {
+    return (_has_bits_[index / 32] & (1u << (index % 32))) != 0;
+  }
+  inline void _set_bit(int index) {
+    _has_bits_[index / 32] |= (1u << (index % 32));
+  }
+  inline void _clear_bit(int index) {
+    _has_bits_[index / 32] &= ~(1u << (index % 32));
+  }
+  
+  void InitAsDefaultInstance();
+  static EncryptedProperties* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Manifest : public ::google::protobuf::Message {
+ public:
+  Manifest();
+  virtual ~Manifest();
+  
+  Manifest(const Manifest& from);
+  
+  inline Manifest& operator=(const Manifest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Manifest& default_instance();
+  
+  void Swap(Manifest* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Manifest* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Manifest& from);
+  void MergeFrom(const Manifest& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional .Lyekka.pb.Properties properties = 1;
+  inline bool has_properties() const;
+  inline void clear_properties();
+  static const int kPropertiesFieldNumber = 1;
+  inline const ::Lyekka::pb::Properties& properties() const;
+  inline ::Lyekka::pb::Properties* mutable_properties();
+  
+  // optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
+  inline bool has_secure_properties() const;
+  inline void clear_secure_properties();
+  static const int kSecurePropertiesFieldNumber = 2;
+  inline const ::Lyekka::pb::EncryptedProperties& secure_properties() const;
+  inline ::Lyekka::pb::EncryptedProperties* mutable_secure_properties();
+  
+  // @@protoc_insertion_point(class_scope:Lyekka.pb.Manifest)
+ private:
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  mutable int _cached_size_;
+  
+  ::Lyekka::pb::Properties* properties_;
+  ::Lyekka::pb::EncryptedProperties* secure_properties_;
+  friend void  protobuf_AddDesc_lyekka_2eproto();
+  friend void protobuf_AssignDesc_lyekka_2eproto();
+  friend void protobuf_ShutdownFile_lyekka_2eproto();
+  
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
+  inline bool _has_bit(int index) const {
+    return (_has_bits_[index / 32] & (1u << (index % 32))) != 0;
+  }
+  inline void _set_bit(int index) {
+    _has_bits_[index / 32] |= (1u << (index % 32));
+  }
+  inline void _clear_bit(int index) {
+    _has_bits_[index / 32] &= ~(1u << (index % 32));
+  }
+  
+  void InitAsDefaultInstance();
+  static Manifest* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -970,144 +1447,6 @@ class Signature : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static Signature* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class Manifest : public ::google::protobuf::Message {
- public:
-  Manifest();
-  virtual ~Manifest();
-  
-  Manifest(const Manifest& from);
-  
-  inline Manifest& operator=(const Manifest& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Manifest& default_instance();
-  
-  void Swap(Manifest* other);
-  
-  // implements Message ----------------------------------------------
-  
-  Manifest* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Manifest& from);
-  void MergeFrom(const Manifest& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional bytes tree_sha = 1;
-  inline bool has_tree_sha() const;
-  inline void clear_tree_sha();
-  static const int kTreeShaFieldNumber = 1;
-  inline const ::std::string& tree_sha() const;
-  inline void set_tree_sha(const ::std::string& value);
-  inline void set_tree_sha(const char* value);
-  inline void set_tree_sha(const void* value, size_t size);
-  inline ::std::string* mutable_tree_sha();
-  
-  // optional bool is_tree_encrypted = 2;
-  inline bool has_is_tree_encrypted() const;
-  inline void clear_is_tree_encrypted();
-  static const int kIsTreeEncryptedFieldNumber = 2;
-  inline bool is_tree_encrypted() const;
-  inline void set_is_tree_encrypted(bool value);
-  
-  // optional .Lyekka.pb.Properties properties = 3;
-  inline bool has_properties() const;
-  inline void clear_properties();
-  static const int kPropertiesFieldNumber = 3;
-  inline const ::Lyekka::pb::Properties& properties() const;
-  inline ::Lyekka::pb::Properties* mutable_properties();
-  
-  // optional bytes secure_properties = 4;
-  inline bool has_secure_properties() const;
-  inline void clear_secure_properties();
-  static const int kSecurePropertiesFieldNumber = 4;
-  inline const ::std::string& secure_properties() const;
-  inline void set_secure_properties(const ::std::string& value);
-  inline void set_secure_properties(const char* value);
-  inline void set_secure_properties(const void* value, size_t size);
-  inline ::std::string* mutable_secure_properties();
-  
-  // repeated bytes pgp_encrypted_key = 5;
-  inline int pgp_encrypted_key_size() const;
-  inline void clear_pgp_encrypted_key();
-  static const int kPgpEncryptedKeyFieldNumber = 5;
-  inline const ::std::string& pgp_encrypted_key(int index) const;
-  inline ::std::string* mutable_pgp_encrypted_key(int index);
-  inline void set_pgp_encrypted_key(int index, const ::std::string& value);
-  inline void set_pgp_encrypted_key(int index, const char* value);
-  inline void set_pgp_encrypted_key(int index, const void* value, size_t size);
-  inline ::std::string* add_pgp_encrypted_key();
-  inline void add_pgp_encrypted_key(const ::std::string& value);
-  inline void add_pgp_encrypted_key(const char* value);
-  inline void add_pgp_encrypted_key(const void* value, size_t size);
-  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& pgp_encrypted_key() const;
-  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_pgp_encrypted_key();
-  
-  // @@protoc_insertion_point(class_scope:Lyekka.pb.Manifest)
- private:
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  mutable int _cached_size_;
-  
-  ::std::string* tree_sha_;
-  static const ::std::string _default_tree_sha_;
-  bool is_tree_encrypted_;
-  ::Lyekka::pb::Properties* properties_;
-  ::std::string* secure_properties_;
-  static const ::std::string _default_secure_properties_;
-  ::google::protobuf::RepeatedPtrField< ::std::string> pgp_encrypted_key_;
-  friend void  protobuf_AddDesc_lyekka_2eproto();
-  friend void protobuf_AssignDesc_lyekka_2eproto();
-  friend void protobuf_ShutdownFile_lyekka_2eproto();
-  
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
-  
-  // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
-  inline bool _has_bit(int index) const {
-    return (_has_bits_[index / 32] & (1u << (index % 32))) != 0;
-  }
-  inline void _set_bit(int index) {
-    _has_bits_[index / 32] |= (1u << (index % 32));
-  }
-  inline void _clear_bit(int index) {
-    _has_bits_[index / 32] &= ~(1u << (index % 32));
-  }
-  
-  void InitAsDefaultInstance();
-  static Manifest* default_instance_;
 };
 // ===================================================================
 
@@ -1358,7 +1697,7 @@ inline ::std::string* Part::mutable_key() {
   return key_;
 }
 
-// optional .Lyekka.pb.Compression compression = 5 [default = GZIP];
+// optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
 inline bool Part::has_compression() const {
   return _has_bit(4);
 }
@@ -1710,46 +2049,457 @@ SecureProperties::mutable_properties() {
   return &properties_;
 }
 
-// optional bytes tree_key = 2;
-inline bool SecureProperties::has_tree_key() const {
+// optional bytes entry_point_key = 2;
+inline bool SecureProperties::has_entry_point_key() const {
   return _has_bit(1);
 }
-inline void SecureProperties::clear_tree_key() {
-  if (tree_key_ != &_default_tree_key_) {
-    tree_key_->clear();
+inline void SecureProperties::clear_entry_point_key() {
+  if (entry_point_key_ != &_default_entry_point_key_) {
+    entry_point_key_->clear();
   }
   _clear_bit(1);
 }
-inline const ::std::string& SecureProperties::tree_key() const {
-  return *tree_key_;
+inline const ::std::string& SecureProperties::entry_point_key() const {
+  return *entry_point_key_;
 }
-inline void SecureProperties::set_tree_key(const ::std::string& value) {
+inline void SecureProperties::set_entry_point_key(const ::std::string& value) {
   _set_bit(1);
-  if (tree_key_ == &_default_tree_key_) {
-    tree_key_ = new ::std::string;
+  if (entry_point_key_ == &_default_entry_point_key_) {
+    entry_point_key_ = new ::std::string;
   }
-  tree_key_->assign(value);
+  entry_point_key_->assign(value);
 }
-inline void SecureProperties::set_tree_key(const char* value) {
+inline void SecureProperties::set_entry_point_key(const char* value) {
   _set_bit(1);
-  if (tree_key_ == &_default_tree_key_) {
-    tree_key_ = new ::std::string;
+  if (entry_point_key_ == &_default_entry_point_key_) {
+    entry_point_key_ = new ::std::string;
   }
-  tree_key_->assign(value);
+  entry_point_key_->assign(value);
 }
-inline void SecureProperties::set_tree_key(const void* value, size_t size) {
+inline void SecureProperties::set_entry_point_key(const void* value, size_t size) {
   _set_bit(1);
-  if (tree_key_ == &_default_tree_key_) {
-    tree_key_ = new ::std::string;
+  if (entry_point_key_ == &_default_entry_point_key_) {
+    entry_point_key_ = new ::std::string;
   }
-  tree_key_->assign(reinterpret_cast<const char*>(value), size);
+  entry_point_key_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* SecureProperties::mutable_tree_key() {
+inline ::std::string* SecureProperties::mutable_entry_point_key() {
   _set_bit(1);
-  if (tree_key_ == &_default_tree_key_) {
-    tree_key_ = new ::std::string;
+  if (entry_point_key_ == &_default_entry_point_key_) {
+    entry_point_key_ = new ::std::string;
   }
-  return tree_key_;
+  return entry_point_key_;
+}
+
+// -------------------------------------------------------------------
+
+// Pbkdf2Key
+
+// required bytes salt = 1;
+inline bool Pbkdf2Key::has_salt() const {
+  return _has_bit(0);
+}
+inline void Pbkdf2Key::clear_salt() {
+  if (salt_ != &_default_salt_) {
+    salt_->clear();
+  }
+  _clear_bit(0);
+}
+inline const ::std::string& Pbkdf2Key::salt() const {
+  return *salt_;
+}
+inline void Pbkdf2Key::set_salt(const ::std::string& value) {
+  _set_bit(0);
+  if (salt_ == &_default_salt_) {
+    salt_ = new ::std::string;
+  }
+  salt_->assign(value);
+}
+inline void Pbkdf2Key::set_salt(const char* value) {
+  _set_bit(0);
+  if (salt_ == &_default_salt_) {
+    salt_ = new ::std::string;
+  }
+  salt_->assign(value);
+}
+inline void Pbkdf2Key::set_salt(const void* value, size_t size) {
+  _set_bit(0);
+  if (salt_ == &_default_salt_) {
+    salt_ = new ::std::string;
+  }
+  salt_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Pbkdf2Key::mutable_salt() {
+  _set_bit(0);
+  if (salt_ == &_default_salt_) {
+    salt_ = new ::std::string;
+  }
+  return salt_;
+}
+
+// optional int32 iterations = 2 [default = 4096];
+inline bool Pbkdf2Key::has_iterations() const {
+  return _has_bit(1);
+}
+inline void Pbkdf2Key::clear_iterations() {
+  iterations_ = 4096;
+  _clear_bit(1);
+}
+inline ::google::protobuf::int32 Pbkdf2Key::iterations() const {
+  return iterations_;
+}
+inline void Pbkdf2Key::set_iterations(::google::protobuf::int32 value) {
+  _set_bit(1);
+  iterations_ = value;
+}
+
+// required bytes iv = 3;
+inline bool Pbkdf2Key::has_iv() const {
+  return _has_bit(2);
+}
+inline void Pbkdf2Key::clear_iv() {
+  if (iv_ != &_default_iv_) {
+    iv_->clear();
+  }
+  _clear_bit(2);
+}
+inline const ::std::string& Pbkdf2Key::iv() const {
+  return *iv_;
+}
+inline void Pbkdf2Key::set_iv(const ::std::string& value) {
+  _set_bit(2);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  iv_->assign(value);
+}
+inline void Pbkdf2Key::set_iv(const char* value) {
+  _set_bit(2);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  iv_->assign(value);
+}
+inline void Pbkdf2Key::set_iv(const void* value, size_t size) {
+  _set_bit(2);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  iv_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Pbkdf2Key::mutable_iv() {
+  _set_bit(2);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  return iv_;
+}
+
+// required bytes key = 4;
+inline bool Pbkdf2Key::has_key() const {
+  return _has_bit(3);
+}
+inline void Pbkdf2Key::clear_key() {
+  if (key_ != &_default_key_) {
+    key_->clear();
+  }
+  _clear_bit(3);
+}
+inline const ::std::string& Pbkdf2Key::key() const {
+  return *key_;
+}
+inline void Pbkdf2Key::set_key(const ::std::string& value) {
+  _set_bit(3);
+  if (key_ == &_default_key_) {
+    key_ = new ::std::string;
+  }
+  key_->assign(value);
+}
+inline void Pbkdf2Key::set_key(const char* value) {
+  _set_bit(3);
+  if (key_ == &_default_key_) {
+    key_ = new ::std::string;
+  }
+  key_->assign(value);
+}
+inline void Pbkdf2Key::set_key(const void* value, size_t size) {
+  _set_bit(3);
+  if (key_ == &_default_key_) {
+    key_ = new ::std::string;
+  }
+  key_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Pbkdf2Key::mutable_key() {
+  _set_bit(3);
+  if (key_ == &_default_key_) {
+    key_ = new ::std::string;
+  }
+  return key_;
+}
+
+// -------------------------------------------------------------------
+
+// PgpKey
+
+// optional string key_id = 1;
+inline bool PgpKey::has_key_id() const {
+  return _has_bit(0);
+}
+inline void PgpKey::clear_key_id() {
+  if (key_id_ != &_default_key_id_) {
+    key_id_->clear();
+  }
+  _clear_bit(0);
+}
+inline const ::std::string& PgpKey::key_id() const {
+  return *key_id_;
+}
+inline void PgpKey::set_key_id(const ::std::string& value) {
+  _set_bit(0);
+  if (key_id_ == &_default_key_id_) {
+    key_id_ = new ::std::string;
+  }
+  key_id_->assign(value);
+}
+inline void PgpKey::set_key_id(const char* value) {
+  _set_bit(0);
+  if (key_id_ == &_default_key_id_) {
+    key_id_ = new ::std::string;
+  }
+  key_id_->assign(value);
+}
+inline void PgpKey::set_key_id(const char* value, size_t size) {
+  _set_bit(0);
+  if (key_id_ == &_default_key_id_) {
+    key_id_ = new ::std::string;
+  }
+  key_id_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* PgpKey::mutable_key_id() {
+  _set_bit(0);
+  if (key_id_ == &_default_key_id_) {
+    key_id_ = new ::std::string;
+  }
+  return key_id_;
+}
+
+// required bytes encrypted_key = 2;
+inline bool PgpKey::has_encrypted_key() const {
+  return _has_bit(1);
+}
+inline void PgpKey::clear_encrypted_key() {
+  if (encrypted_key_ != &_default_encrypted_key_) {
+    encrypted_key_->clear();
+  }
+  _clear_bit(1);
+}
+inline const ::std::string& PgpKey::encrypted_key() const {
+  return *encrypted_key_;
+}
+inline void PgpKey::set_encrypted_key(const ::std::string& value) {
+  _set_bit(1);
+  if (encrypted_key_ == &_default_encrypted_key_) {
+    encrypted_key_ = new ::std::string;
+  }
+  encrypted_key_->assign(value);
+}
+inline void PgpKey::set_encrypted_key(const char* value) {
+  _set_bit(1);
+  if (encrypted_key_ == &_default_encrypted_key_) {
+    encrypted_key_ = new ::std::string;
+  }
+  encrypted_key_->assign(value);
+}
+inline void PgpKey::set_encrypted_key(const void* value, size_t size) {
+  _set_bit(1);
+  if (encrypted_key_ == &_default_encrypted_key_) {
+    encrypted_key_ = new ::std::string;
+  }
+  encrypted_key_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* PgpKey::mutable_encrypted_key() {
+  _set_bit(1);
+  if (encrypted_key_ == &_default_encrypted_key_) {
+    encrypted_key_ = new ::std::string;
+  }
+  return encrypted_key_;
+}
+
+// -------------------------------------------------------------------
+
+// EncryptedProperties
+
+// required bytes encrypted_data = 1;
+inline bool EncryptedProperties::has_encrypted_data() const {
+  return _has_bit(0);
+}
+inline void EncryptedProperties::clear_encrypted_data() {
+  if (encrypted_data_ != &_default_encrypted_data_) {
+    encrypted_data_->clear();
+  }
+  _clear_bit(0);
+}
+inline const ::std::string& EncryptedProperties::encrypted_data() const {
+  return *encrypted_data_;
+}
+inline void EncryptedProperties::set_encrypted_data(const ::std::string& value) {
+  _set_bit(0);
+  if (encrypted_data_ == &_default_encrypted_data_) {
+    encrypted_data_ = new ::std::string;
+  }
+  encrypted_data_->assign(value);
+}
+inline void EncryptedProperties::set_encrypted_data(const char* value) {
+  _set_bit(0);
+  if (encrypted_data_ == &_default_encrypted_data_) {
+    encrypted_data_ = new ::std::string;
+  }
+  encrypted_data_->assign(value);
+}
+inline void EncryptedProperties::set_encrypted_data(const void* value, size_t size) {
+  _set_bit(0);
+  if (encrypted_data_ == &_default_encrypted_data_) {
+    encrypted_data_ = new ::std::string;
+  }
+  encrypted_data_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* EncryptedProperties::mutable_encrypted_data() {
+  _set_bit(0);
+  if (encrypted_data_ == &_default_encrypted_data_) {
+    encrypted_data_ = new ::std::string;
+  }
+  return encrypted_data_;
+}
+
+// required bytes iv = 2;
+inline bool EncryptedProperties::has_iv() const {
+  return _has_bit(1);
+}
+inline void EncryptedProperties::clear_iv() {
+  if (iv_ != &_default_iv_) {
+    iv_->clear();
+  }
+  _clear_bit(1);
+}
+inline const ::std::string& EncryptedProperties::iv() const {
+  return *iv_;
+}
+inline void EncryptedProperties::set_iv(const ::std::string& value) {
+  _set_bit(1);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  iv_->assign(value);
+}
+inline void EncryptedProperties::set_iv(const char* value) {
+  _set_bit(1);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  iv_->assign(value);
+}
+inline void EncryptedProperties::set_iv(const void* value, size_t size) {
+  _set_bit(1);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  iv_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* EncryptedProperties::mutable_iv() {
+  _set_bit(1);
+  if (iv_ == &_default_iv_) {
+    iv_ = new ::std::string;
+  }
+  return iv_;
+}
+
+// optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
+inline bool EncryptedProperties::has_algorithm() const {
+  return _has_bit(2);
+}
+inline void EncryptedProperties::clear_algorithm() {
+  algorithm_ = 1;
+  _clear_bit(2);
+}
+inline Lyekka::pb::Encryption EncryptedProperties::algorithm() const {
+  return static_cast< Lyekka::pb::Encryption >(algorithm_);
+}
+inline void EncryptedProperties::set_algorithm(Lyekka::pb::Encryption value) {
+  GOOGLE_DCHECK(Lyekka::pb::Encryption_IsValid(value));
+  _set_bit(2);
+  algorithm_ = value;
+}
+
+// optional .Lyekka.pb.Pbkdf2Key password_key = 4;
+inline bool EncryptedProperties::has_password_key() const {
+  return _has_bit(3);
+}
+inline void EncryptedProperties::clear_password_key() {
+  if (password_key_ != NULL) password_key_->::Lyekka::pb::Pbkdf2Key::Clear();
+  _clear_bit(3);
+}
+inline const ::Lyekka::pb::Pbkdf2Key& EncryptedProperties::password_key() const {
+  return password_key_ != NULL ? *password_key_ : *default_instance_->password_key_;
+}
+inline ::Lyekka::pb::Pbkdf2Key* EncryptedProperties::mutable_password_key() {
+  _set_bit(3);
+  if (password_key_ == NULL) password_key_ = new ::Lyekka::pb::Pbkdf2Key;
+  return password_key_;
+}
+
+// optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
+inline bool EncryptedProperties::has_pgp_encrypted_key() const {
+  return _has_bit(4);
+}
+inline void EncryptedProperties::clear_pgp_encrypted_key() {
+  if (pgp_encrypted_key_ != NULL) pgp_encrypted_key_->::Lyekka::pb::PgpKey::Clear();
+  _clear_bit(4);
+}
+inline const ::Lyekka::pb::PgpKey& EncryptedProperties::pgp_encrypted_key() const {
+  return pgp_encrypted_key_ != NULL ? *pgp_encrypted_key_ : *default_instance_->pgp_encrypted_key_;
+}
+inline ::Lyekka::pb::PgpKey* EncryptedProperties::mutable_pgp_encrypted_key() {
+  _set_bit(4);
+  if (pgp_encrypted_key_ == NULL) pgp_encrypted_key_ = new ::Lyekka::pb::PgpKey;
+  return pgp_encrypted_key_;
+}
+
+// -------------------------------------------------------------------
+
+// Manifest
+
+// optional .Lyekka.pb.Properties properties = 1;
+inline bool Manifest::has_properties() const {
+  return _has_bit(0);
+}
+inline void Manifest::clear_properties() {
+  if (properties_ != NULL) properties_->::Lyekka::pb::Properties::Clear();
+  _clear_bit(0);
+}
+inline const ::Lyekka::pb::Properties& Manifest::properties() const {
+  return properties_ != NULL ? *properties_ : *default_instance_->properties_;
+}
+inline ::Lyekka::pb::Properties* Manifest::mutable_properties() {
+  _set_bit(0);
+  if (properties_ == NULL) properties_ = new ::Lyekka::pb::Properties;
+  return properties_;
+}
+
+// optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
+inline bool Manifest::has_secure_properties() const {
+  return _has_bit(1);
+}
+inline void Manifest::clear_secure_properties() {
+  if (secure_properties_ != NULL) secure_properties_->::Lyekka::pb::EncryptedProperties::Clear();
+  _clear_bit(1);
+}
+inline const ::Lyekka::pb::EncryptedProperties& Manifest::secure_properties() const {
+  return secure_properties_ != NULL ? *secure_properties_ : *default_instance_->secure_properties_;
+}
+inline ::Lyekka::pb::EncryptedProperties* Manifest::mutable_secure_properties() {
+  _set_bit(1);
+  if (secure_properties_ == NULL) secure_properties_ = new ::Lyekka::pb::EncryptedProperties;
+  return secure_properties_;
 }
 
 // -------------------------------------------------------------------
@@ -1798,171 +2548,6 @@ inline ::std::string* Signature::mutable_signature() {
   return signature_;
 }
 
-// -------------------------------------------------------------------
-
-// Manifest
-
-// optional bytes tree_sha = 1;
-inline bool Manifest::has_tree_sha() const {
-  return _has_bit(0);
-}
-inline void Manifest::clear_tree_sha() {
-  if (tree_sha_ != &_default_tree_sha_) {
-    tree_sha_->clear();
-  }
-  _clear_bit(0);
-}
-inline const ::std::string& Manifest::tree_sha() const {
-  return *tree_sha_;
-}
-inline void Manifest::set_tree_sha(const ::std::string& value) {
-  _set_bit(0);
-  if (tree_sha_ == &_default_tree_sha_) {
-    tree_sha_ = new ::std::string;
-  }
-  tree_sha_->assign(value);
-}
-inline void Manifest::set_tree_sha(const char* value) {
-  _set_bit(0);
-  if (tree_sha_ == &_default_tree_sha_) {
-    tree_sha_ = new ::std::string;
-  }
-  tree_sha_->assign(value);
-}
-inline void Manifest::set_tree_sha(const void* value, size_t size) {
-  _set_bit(0);
-  if (tree_sha_ == &_default_tree_sha_) {
-    tree_sha_ = new ::std::string;
-  }
-  tree_sha_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* Manifest::mutable_tree_sha() {
-  _set_bit(0);
-  if (tree_sha_ == &_default_tree_sha_) {
-    tree_sha_ = new ::std::string;
-  }
-  return tree_sha_;
-}
-
-// optional bool is_tree_encrypted = 2;
-inline bool Manifest::has_is_tree_encrypted() const {
-  return _has_bit(1);
-}
-inline void Manifest::clear_is_tree_encrypted() {
-  is_tree_encrypted_ = false;
-  _clear_bit(1);
-}
-inline bool Manifest::is_tree_encrypted() const {
-  return is_tree_encrypted_;
-}
-inline void Manifest::set_is_tree_encrypted(bool value) {
-  _set_bit(1);
-  is_tree_encrypted_ = value;
-}
-
-// optional .Lyekka.pb.Properties properties = 3;
-inline bool Manifest::has_properties() const {
-  return _has_bit(2);
-}
-inline void Manifest::clear_properties() {
-  if (properties_ != NULL) properties_->::Lyekka::pb::Properties::Clear();
-  _clear_bit(2);
-}
-inline const ::Lyekka::pb::Properties& Manifest::properties() const {
-  return properties_ != NULL ? *properties_ : *default_instance_->properties_;
-}
-inline ::Lyekka::pb::Properties* Manifest::mutable_properties() {
-  _set_bit(2);
-  if (properties_ == NULL) properties_ = new ::Lyekka::pb::Properties;
-  return properties_;
-}
-
-// optional bytes secure_properties = 4;
-inline bool Manifest::has_secure_properties() const {
-  return _has_bit(3);
-}
-inline void Manifest::clear_secure_properties() {
-  if (secure_properties_ != &_default_secure_properties_) {
-    secure_properties_->clear();
-  }
-  _clear_bit(3);
-}
-inline const ::std::string& Manifest::secure_properties() const {
-  return *secure_properties_;
-}
-inline void Manifest::set_secure_properties(const ::std::string& value) {
-  _set_bit(3);
-  if (secure_properties_ == &_default_secure_properties_) {
-    secure_properties_ = new ::std::string;
-  }
-  secure_properties_->assign(value);
-}
-inline void Manifest::set_secure_properties(const char* value) {
-  _set_bit(3);
-  if (secure_properties_ == &_default_secure_properties_) {
-    secure_properties_ = new ::std::string;
-  }
-  secure_properties_->assign(value);
-}
-inline void Manifest::set_secure_properties(const void* value, size_t size) {
-  _set_bit(3);
-  if (secure_properties_ == &_default_secure_properties_) {
-    secure_properties_ = new ::std::string;
-  }
-  secure_properties_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* Manifest::mutable_secure_properties() {
-  _set_bit(3);
-  if (secure_properties_ == &_default_secure_properties_) {
-    secure_properties_ = new ::std::string;
-  }
-  return secure_properties_;
-}
-
-// repeated bytes pgp_encrypted_key = 5;
-inline int Manifest::pgp_encrypted_key_size() const {
-  return pgp_encrypted_key_.size();
-}
-inline void Manifest::clear_pgp_encrypted_key() {
-  pgp_encrypted_key_.Clear();
-}
-inline const ::std::string& Manifest::pgp_encrypted_key(int index) const {
-  return pgp_encrypted_key_.Get(index);
-}
-inline ::std::string* Manifest::mutable_pgp_encrypted_key(int index) {
-  return pgp_encrypted_key_.Mutable(index);
-}
-inline void Manifest::set_pgp_encrypted_key(int index, const ::std::string& value) {
-  pgp_encrypted_key_.Mutable(index)->assign(value);
-}
-inline void Manifest::set_pgp_encrypted_key(int index, const char* value) {
-  pgp_encrypted_key_.Mutable(index)->assign(value);
-}
-inline void Manifest::set_pgp_encrypted_key(int index, const void* value, size_t size) {
-  pgp_encrypted_key_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* Manifest::add_pgp_encrypted_key() {
-  return pgp_encrypted_key_.Add();
-}
-inline void Manifest::add_pgp_encrypted_key(const ::std::string& value) {
-  pgp_encrypted_key_.Add()->assign(value);
-}
-inline void Manifest::add_pgp_encrypted_key(const char* value) {
-  pgp_encrypted_key_.Add()->assign(value);
-}
-inline void Manifest::add_pgp_encrypted_key(const void* value, size_t size) {
-  pgp_encrypted_key_.Add()->assign(reinterpret_cast<const char*>(value), size);
-}
-inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
-Manifest::pgp_encrypted_key() const {
-  return pgp_encrypted_key_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::std::string>*
-Manifest::mutable_pgp_encrypted_key() {
-  return &pgp_encrypted_key_;
-}
-
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -1973,6 +2558,10 @@ Manifest::mutable_pgp_encrypted_key() {
 namespace google {
 namespace protobuf {
 
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< Lyekka::pb::Encryption>() {
+  return Lyekka::pb::Encryption_descriptor();
+}
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< Lyekka::pb::Compression>() {
   return Lyekka::pb::Compression_descriptor();

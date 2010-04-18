@@ -14,18 +14,21 @@ message TreeRef {
   extensions 1000 to 1999;
 }
 
+enum Encryption { 
+  AES_128_CBC = 1;
+}
+
 enum Compression {
-  GZIP = 0;
+  ZLIB = 0;
   NONE = 1;
 }
 
 message Part {
   optional uint64 offset = 1;  
-  required uint32 size = 2;    // The size of the (possibly unencrypted) data 
-    
+  required uint32 size = 2;    // The size of the (possibly encrypted) data 
   required int32 sha_idx = 3;  // The index to the refs table
-  optional bytes key = 4;      // The encryption key, which is the SHA256 of the unencrypted contents.
-  optional Compression compression = 5 [default = GZIP];
+  optional bytes key = 4;      // The encryption key + iv
+  optional Compression compression = 5 [default = ZLIB];
   extensions 1000 to 1999;
 }
 
@@ -61,35 +64,57 @@ message Properties {
 
 message SecureProperties {
   repeated Property properties = 1;
-  optional bytes tree_key = 2;
+  /* The key used to decrypt the entry point */
+  optional bytes entry_point_key = 2;
+}
+
+message Pbkdf2Key {
+  /* Perform PBKDF2 on the provided passphrase and salt,
+   * for 'iterations' iterations.
+   * Truncate the result to 128 bits, and decrypt 'key'
+   * using AES-128-CBC with the provided IV. The result
+   * is the key which encrypted_data is encrypted with
+   */
+  required bytes salt = 1;
+  optional int32 iterations = 2 [default = 4096];
+  required bytes iv = 3;
+  required bytes key = 4;
+}
+
+message PgpKey {
+  optional string key_id = 1;
+  required bytes encrypted_key = 2;
+}
+
+message EncryptedProperties {
+  /* An encrypted 'SecureProperties' protocol buffer */
+  required bytes encrypted_data = 1;
+  required bytes iv = 2;
+  optional Encryption algorithm = 3 [default = AES_128_CBC];
+
+  /* Different ways to unlock the key used for encrypting 'encrypted_data',
+   * referred from here on as "the key"
+   */
+
+  /* Indicates that the key can be retrieved by applying the 
+   * PBKDF2 algorithm on a user-provided passphrase.
+   */
+  optional Pbkdf2Key password_key = 4;
+
+  /* The key is in turn encrypted using a public key, and can be unlocked
+   * by having the matching private key.
+   */
+  optional PgpKey pgp_encrypted_key = 5; 
+}
+
+message Manifest {
+  /* Publicly shown properties */
+  optional Properties properties = 1;
+
+  /* Secure properties */
+  optional EncryptedProperties secure_properties = 2;
 }
 
 message Signature {
   optional bytes signature = 1;
 }
-
-message Manifest {
-  optional bytes tree_sha = 1;
-  optional bool is_tree_encrypted = 2;
-  optional Properties properties = 3;
-  optional bytes secure_properties = 4; // An encrypted 'SecureProperties protocol buffer'
-  repeated bytes pgp_encrypted_key = 5; // The encrypted key needed to decrypt secure_properties
-}
-
-// ---------------
-
-//struct Index_V1 {
-//  uint32 entrypoint; [none = 0xFFFFFFFF];
-//  uint32 fanout[256];
-//  sha256 shas[count];
-//  uint32 offsets[count];
-//  uint64 largeoffset
-//}
-
-//struct Index_V2 {
-//  uint32 entrypoint; [none = 0xFFFFFFFF];
-//  uint32 fanout[256];
-//  sha256 shas[count];
-//  uint64 offsets[count];
-//}
-
