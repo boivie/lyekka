@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <fcntl.h>
 #include <iostream>
 #include "file.h"

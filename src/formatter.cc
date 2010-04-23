@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "formatter.h"
 
 using namespace Lyekka;
