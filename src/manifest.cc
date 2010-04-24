@@ -66,6 +66,7 @@ auto_ptr<Manifest> Manifest::deserialize(google::protobuf::io::ZeroCopyInputStre
 {
   auto_ptr<Manifest> manifest_p(new Manifest());
   int32_t pb_size = -1;
+  bool is_encrypted = false;
   {
     CodedInputStream cis(is_p);
     char header[4];
@@ -88,9 +89,11 @@ auto_ptr<Manifest> Manifest::deserialize(google::protobuf::io::ZeroCopyInputStre
       throw InvalidManifestException("Invalid pb size");
   }
   
-  GzipInputStream gzis(is_p, GzipInputStream::ZLIB);
-  if (!manifest_p->m_pb.ParseFromZeroCopyStream(&gzis))
-    throw InvalidManifestException("Invalid protocol buffer");
+  if (!is_encrypted) {
+    GzipInputStream gzis(is_p, GzipInputStream::ZLIB);
+    if (!manifest_p->m_pb.ParseFromZeroCopyStream(&gzis))
+      throw InvalidManifestException("Invalid protocol buffer");
+  }
 
   return auto_ptr<Manifest>(manifest_p.release());
 }

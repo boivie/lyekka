@@ -32,6 +32,7 @@
 #include <ostream>
 #include <vector>
 #include <sqlite3.h>
+#include <stdint.h>
 
 namespace sd
 {

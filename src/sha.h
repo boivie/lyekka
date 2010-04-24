@@ -3,6 +3,7 @@
 #define SHA_BITS 256
 
 #include <string>
+#include <cstring>
 #include <iostream>
 
 namespace Lyekka {

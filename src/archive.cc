@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <arpa/inet.h>
 
 using namespace std;
 using namespace Lyekka;

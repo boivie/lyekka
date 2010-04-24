@@ -25,6 +25,8 @@
 ///
 
 #include <cassert>
+#include <cstring>
+#include <cstdlib>
 #include "sdsqlite.h"
 
 namespace sd
@@ -250,7 +252,7 @@ sql&	sql::operator<<(const char* val)
 	if(!stmt_)			// first string added is the sql statement
 		prepare(val);
 	else
-		sqlite3_bind_text(stmt_, ++ipos_, val, std::strlen(val), SQLITE_TRANSIENT);
+		sqlite3_bind_text(stmt_, ++ipos_, val, strlen(val), SQLITE_TRANSIENT);
 	return *this;
 }
 
@@ -278,10 +280,10 @@ sql&	sql::operator<<(std::istream& val)
 {
 	std::streamsize bytes = val.seekg(0, std::ios::end).tellg();
 	val.seekg(0);
-	void* buf = (bytes > 0) ? std::malloc(bytes) : 0;
+	void* buf = (bytes > 0) ? malloc(bytes) : 0;
 	if(bytes > 0)
 		val.read(static_cast<char*>(buf), bytes);
-	sqlite3_bind_blob(stmt_, ++ipos_, buf, bytes, (bytes > 0) ? std::free : 0);
+	sqlite3_bind_blob(stmt_, ++ipos_, buf, bytes, (bytes > 0) ? free : 0);
 	return *this;
 }
 
