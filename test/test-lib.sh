@@ -64,6 +64,11 @@ test_failure_ () {
 	echo "$@" | sed -e 's/^/	/'
 }
 
+test_must_fail () {
+	"$@"
+	test $? -gt 0 
+}
+
 test_expect_success () {
     test_count=$(($test_count+1))
     say >&3 "expecting success: $2"

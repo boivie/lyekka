@@ -1,8 +1,8 @@
 Ix:~ victor$ lyekka version
 lyekka version 0.1
 
-Ix:~ victor$ lyekka create
-Created lyekka.db
+Ix:~ victor$ lyekka create home
+Created 'home' in lyekka.db
 
 Ix:~ victor$ lyekka path add /path/to/files
 Added /path/to/files
@@ -10,24 +10,29 @@ Added /path/to/files
 Ix:~ victor$ lyekka path list
 /path/to/files
 
-Ix:~ victor$ lyekka update-index
-Indexing .... Done.
-
-Ix:~ victor$ lyekka remote add work /Volumes/USBPINNE
+Ix:~ victor$ lyekka host add work
 Added work as a remote site.
+NOTE: This host is still considered untrusted until you
+      authenticate it using the "pair" command.
 
-Ix:~ victor$ lyekka remote list
-[work] /Volumes/USBPINNE
+Ix:~ victor$ lyekka host list
+work
 
 Ix:~ victor$ lyekka status
 [work] At most 15 MB needs to be copied.
 
-Ix:~ victor$ lyekka push work 
+Ix:~ victor$ lyekka push work /Volumes/USBPINNE
 Copying a maximum of 15.8 GB to /Volumes/USBPINNE
 Writing objects: 5% (1/105), 180KiB/s
 
+----
 
+Chimera:~ victor$ lyekka create work
+Created 'work' in lyekka.db
 
-Triggering new build
-.
-rebuild
+Chimera:~ victor$ lyekka pull /Volumes/USBDRIVE
+WARNING: This pack comes from the host 'home' which you have
+         never seen before. Use -f to continue.
+
+Chimera:~ victor$ lyekka pull -f home /Volumes/USBDRIVE
+Importing '2010-04-20 02:44' from 'home'...

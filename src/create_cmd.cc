@@ -6,15 +6,32 @@
 
 using namespace std;
 using namespace Lyekka;
+namespace bpo = boost::program_options;
 namespace fs = boost::filesystem;
 
 int create(CommandLineParser& c)
 {
+  string name = "";
+  c.po.add_options()
+    ("name,n", bpo::value<string>(&name), "host's name");
   c.parse_options();
+
   if (fs::exists(fs::path("lyekka.db")))
   {
     cerr << "Refuses to overwrite already existing 'lyekka.db'" << endl;
     return -2;
+  }
+
+  if (name == "") {
+    char buf[1024];
+    if (gethostname(buf, sizeof(buf)-1) == 0) {
+      name = string(buf);
+    }
+  }
+
+  if (name == "") {
+    cerr << "No name provided, and could not guess.";
+    return 1;
   }
 
   sd::sqlite db("lyekka.db");
@@ -62,9 +79,23 @@ int create(CommandLineParser& c)
 
   db << "CREATE INDEX remote_mapping_object_id ON remote_mapping(object_id)";
 
+  db << "CREATE TABLE config (name TEXT PRIMARY KEY, value TEXT)";
   db << "PRAGMA user_version = 1";
-  db << "COMMIT";
 
+  sd::sql insert_query(db);
+  insert_query << "INSERT INTO config (name, value) VALUES ('name', ?)";
+  try 
+  {
+    insert_query << name;
+    insert_query.step();
+  }
+  catch(sd::db_error& err)
+  { 
+    cerr << "Failed to set name (bad name?)" << endl;
+    return 1;
+  }    
+  db << "COMMIT";
+      
   cout << "Database 'lyekka.db' created." << endl;
   return 0;
 }
