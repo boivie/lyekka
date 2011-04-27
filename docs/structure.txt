@@ -1,0 +1,66 @@
+package Lyekka.pb;
+option optimize_for = SPEED;
+
+/*
+
+Pack Structure
+==============
+---
+Superblock
+---
+chunk
+---
+chunk
+---
+
+Superblock Structure
+====================
+--- START of superblock (64 bytes)
+00-15: 16 bytes magic [32 7d 25 2e 42 18 77 3a 5b 47 c8 58 4d f3 10 2d]
+16-19: UINT32: version.
+20-23: UINT32: total superblock size. Multiple of 512
+
+SHA1 of superblock
+--- END of superblock
+
+
+Chunk Structure
+===============
+--- START chunk
+--- START chunk header v1 (64 bytes)
+00-15: 16 bytes magic [6f 66 ac 53 1e b1 46 ef e2 ec 95 86 04 32 cb 85]
+16-35: 20 bytes chunk ID
+36-39: UINT32: Payload Size
+40-43: UINT32: Header size (including padding)
+44-47: flags: |000.. SNAPPY ZLIB DELETED|
+48-53: 6 bytes padding
+--- END chunk header
+--- START payload
+DATA
+padding to even 32 bytes
+--- END payload
+--- START footer (32 bytes)
+00-19: SHA1 of chunk header + metadata + payload
+20-23: 4 bytes CRC32
+23-31: 8 bytes magic = [TBD] 
+--- END footer
+--- END chunk
+
+
+Index File Structure
+====================
+---
+superblock
+---
+index record
+---
+index record
+---
+
+
+Index Record
+============
+00-19: 20 bytes chunk ID
+20-23: UINT32 chunk offset
+24-27: UINT32 chunk size
+ */
