@@ -18,9 +18,9 @@ Superblock Structure
 --- START of superblock (64 bytes)
 00-15: 16 bytes magic [32 7d 25 2e 42 18 77 3a 5b 47 c8 58 4d f3 10 2d]
 16-19: UINT32: version.
-20-23: UINT32: total superblock size. Multiple of 512
-
-SHA1 of superblock
+20-23: UINT32: total superblock size.
+24-43: 20 bytes padding
+44-63: SHA1 of superblock
 --- END of superblock
 
 
@@ -33,7 +33,7 @@ Chunk Structure
 36-39: UINT32: Payload Size
 40-43: UINT32: Header size (including padding)
 44-47: flags: |000.. SNAPPY ZLIB DELETED|
-48-53: 6 bytes padding
+48-63: 16 bytes padding
 --- END chunk header
 --- START payload
 DATA
@@ -42,7 +42,7 @@ padding to even 32 bytes
 --- START footer (32 bytes)
 00-19: SHA1 of chunk header + metadata + payload
 20-23: 4 bytes CRC32
-23-31: 8 bytes magic = [TBD] 
+23-31: 8 bytes magic = [5d 6d cc 7d fe 63 1e 4f]
 --- END footer
 --- END chunk
 
@@ -63,4 +63,5 @@ Index Record
 00-19: 20 bytes chunk ID
 20-23: UINT32 chunk offset
 24-27: UINT32 chunk size
+28-31: UINT32 flags
  */
