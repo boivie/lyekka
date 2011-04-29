@@ -8,8 +8,17 @@ class ChunkId {
 public:
   static ChunkId from_b16(const char* data);
   static ChunkId from_bin(const char* data);
-  friend bool operator < (const ChunkId& n2, const ChunkId& n1) { return memcmp(n1.cid, n2.cid, 20) > 0; }
+  friend bool operator < (const ChunkId& n2, const ChunkId& n1) {
+    return memcmp(n1.cid, n2.cid, 20) > 0;
+  }
   friend std::ostream& operator << (std::ostream& os, const ChunkId& C);
+  inline size_t hash() const { return *(size_t*)cid; };
+
+  friend bool operator==(const ChunkId& left, const ChunkId& right) {
+    return memcmp(left.cid, right.cid, 20) == 0;
+  }
+
+
 private:
   uint8_t cid[20];
 

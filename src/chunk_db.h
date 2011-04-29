@@ -1,12 +1,20 @@
 #pragma once
 
 #include <map>
+#include <google/sparse_hash_map>
 #include <string>
 #include "chunk_id.h"
 #include "pack.h"
 
+class hash_fun2 {
+public:
+  size_t operator()(const ChunkId& key_value) const {
+     return key_value.hash();
+   }
+};
+
 typedef std::map<long long, Pack> PackT;
-typedef std::map<ChunkId, ChunkLocation> ChunkT;
+typedef google::sparse_hash_map< ChunkId, ChunkLocation, hash_fun2 > ChunkT;
 
 class ChunkFindResult;
 

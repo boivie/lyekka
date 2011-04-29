@@ -40,6 +40,6 @@ ostream& operator << (ostream& os, const ChunkId& C)
     sprintf((hex + i * 2), "%02x", C.cid[i]);
   hex[40] = 0;
 
-  os << "<chunk " << hex << ">";
+  os << "<chunk " << hex << ", h = " << C.hash() << ">";
   return os;
 }

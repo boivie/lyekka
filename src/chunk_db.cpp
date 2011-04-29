@@ -6,6 +6,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <iostream>
+#include <google/sparse_hash_map>
 #include "chunk_db.h"
 
 using namespace std;
