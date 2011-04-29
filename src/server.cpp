@@ -25,12 +25,16 @@ static inline int begins_with(const char* haystack, const char* needle) {
   return strncmp(haystack, needle, strlen(needle)) == 0;
 }
 
+static void free_buf(const void *data, size_t datalen, void *extra) {
+  free(extra);
+}
+
 static void handle_chunk(struct evhttp_request *req, const char *path) {
   struct evbuffer *evb = NULL;
   ChunkT::const_iterator it;
   ChunkId cid;
   char *buf;
-  
+
   // Syntax: /7a6fcd13fc74e995faa1885ca6be37a5dcb7bc60
   if (strlen(path) != 41) {
     evhttp_send_error(req, 404, 0);
@@ -50,7 +54,7 @@ static void handle_chunk(struct evhttp_request *req, const char *path) {
   read(result.pack().fd(), buf, result.size());
   const char* payload = buf + ntohl(*(uint32_t*)(buf + 40));
   uint32_t payload_size = ntohl(*(uint32_t*)(buf + 36));
-  evbuffer_add(evb, payload, payload_size);
+  evbuffer_add_reference(evb, payload, payload_size, free_buf, buf);
   
   evhttp_send_reply(req, 200, "OK", evb);
   if (evb)
@@ -77,7 +81,7 @@ static void handle_request(struct evhttp_request *req, void *arg)
 
   path = evhttp_uri_get_path(decoded);
   if (!path) path = "/";
-  
+
   if (begins_with(path, "/chunks/")) {
     handle_chunk(req, path + 7);
   } else {
