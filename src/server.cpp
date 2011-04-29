@@ -92,7 +92,7 @@ static void handle_request(struct evhttp_request *req, void *arg)
 }
 
 
-int main(int argc, char **argv)
+int main(int argc, char* argv[])
 {
   struct event_base *base;
   struct evhttp *http;
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
   unsigned short port = 8080;
 
   if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-    return (1);
+    return 1;
 
   string pack_path(argv[1]);
   db.load(pack_path);
