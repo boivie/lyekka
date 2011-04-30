@@ -82,8 +82,8 @@ static void handle_request(struct evhttp_request *req, void *arg)
   path = evhttp_uri_get_path(decoded);
   if (!path) path = "/";
 
-  if (begins_with(path, "/chunks/")) {
-    handle_chunk(req, path + 7);
+  if (begins_with(path, "/chunk/")) {
+    handle_chunk(req, path + 6);
   } else {
     evhttp_send_error(req, 400, "Not Found");
   }
