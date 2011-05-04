@@ -54,7 +54,7 @@ static void free_buf(const void *data, size_t datalen, void *extra) {
   free(extra);
 }
 
-static void handle_post_chunk(struct evhttp_request *req, const char *path) {
+static void handle_put_chunk(struct evhttp_request *req, const char *path) {
   BodyReader* br = (BodyReader*)(req->body_opaque);
   if (br == NULL) {
     evhttp_send_error(req, 500, "No body data");
@@ -85,7 +85,7 @@ static void handle_get_chunk(struct evhttp_request *req, const char *path) {
     return;
   }
 
-  cid = ChunkId::from_b16(path + 1);
+  cid = ChunkId::from_hex(path + 1);
 
   ChunkFindResult result = db.find(cid);
 
@@ -112,7 +112,6 @@ static inline int is_get(struct evhttp_request *req) {
 static inline int is_put(struct evhttp_request *req) {
   return evhttp_request_get_command(req) == EVHTTP_REQ_PUT;
 }
-
 
 static void* body_create(struct evhttp_request *req, void *arg) {
   struct evkeyvalq *headers = evhttp_request_get_input_headers(req);
@@ -150,7 +149,7 @@ static void handle_request(struct evhttp_request *req, void *arg)
   if (is_get(req) && begins_with(path, "/chunk/")) {
     handle_get_chunk(req, path + 6);
   } else if (is_put(req) && begins_with(path, "/chunk/")) {
-    handle_post_chunk(req, path + 6);
+    handle_put_chunk(req, path + 6);
   } else {
     evhttp_send_error(req, 400, "Not Found");
   }

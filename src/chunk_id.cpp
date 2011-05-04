@@ -18,14 +18,14 @@ static int base16_decode(int c) {
 
 const std::string ChunkId::hex() const {
   char buf[41];
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 20; i++)
     sprintf(&buf[i * 2], "%02x", cid[i]);
-  }
+
   buf[40] = 0;
   return string(buf);
 }
 
-ChunkId ChunkId::from_b16(const char* data) {
+ChunkId ChunkId::from_hex(const char* data) {
   ChunkId cid;
 
   for (int i = 0; i < 20; i++) {
@@ -53,12 +53,6 @@ ChunkId ChunkId::calculate(const void* data, size_t len) {
 
 ostream& operator << (ostream& os, const ChunkId& C)
 {
-  char hex[41];
-
-  for (int i = 0; i < 20; i++)
-    sprintf((hex + i * 2), "%02x", C.cid[i]);
-  hex[40] = 0;
-
-  os << "<chunk " << hex << ", h = " << C.hash() << ">";
+  os << "<chunk " << C.hex() << ", h = " << C.hash() << ">";
   return os;
 }

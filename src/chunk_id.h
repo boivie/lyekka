@@ -6,7 +6,7 @@
 
 class ChunkId {
 public:
-  static ChunkId from_b16(const char* data);
+  static ChunkId from_hex(const char* data);
   static ChunkId from_bin(const char* data);
   static ChunkId calculate(const void* data, size_t len);
 
