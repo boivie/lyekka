@@ -40,8 +40,8 @@ DATA
 padding to even 32 bytes
 --- END payload
 --- START footer (32 bytes)
-00-19: SHA1 of chunk header + metadata + payload
-20-23: 4 bytes CRC32
+00-19: SHA1 of chunk header + metadata + payload (May be 0000)
+20-23: 4 bytes CRC32 (May be 0000)
 23-31: 8 bytes magic = [5d 6d cc 7d fe 63 1e 4f]
 --- END footer
 --- END chunk

@@ -2,9 +2,12 @@
 
 #include <map>
 #include <google/sparse_hash_map>
+#include <boost/filesystem.hpp>
 #include <string>
+#include <stdint.h>
 #include "chunk_id.h"
 #include "pack.h"
+#include "sha1.h"
 
 class hash_fun2 {
 public:
@@ -20,25 +23,34 @@ class ChunkFindResult;
 
 class ChunkDatabase {
 public:
-  ChunkDatabase() : m_chunks(), m_packs() {}
+  ChunkDatabase() : m_chunks(), m_packs() { SHA1_Init(&sha1_ctx); }
 
   ChunkFindResult find(const ChunkId& cid);
 
-  void load(const std::string& path) {
-    find_indexes(path);
-    load_indexes(path);
-  }
-
+  void set_path(boost::filesystem::path& path);
+  bool load();
+  bool repair();
   void dump_all(void);
-
-  size_t pack_count() const { return m_packs.size(); };
-  size_t chunk_count() const { return m_chunks.size(); };
+  void create_partial();
+  void close_partial();
+  void write_chunk(const ChunkId& cid, const void* data, size_t len);
 
 private:
-  void load_indexes(const std::string& path);
-  void find_indexes(const std::string& path);
+  const boost::filesystem::path& partial() const { return m_partial; }
+  void load_indexes();
+  void find_indexes();
+  bool has_partial();
+  void preallocate(int fd);
+  size_t write_data(const void* data_p, size_t len);
+  boost::filesystem::path m_path;
+  boost::filesystem::path m_partial;
   ChunkT m_chunks;
   PackT m_packs;
+  int m_pack_fd;
+  int m_index_fd;
+  SHA1_CTX sha1_ctx;
+  uint64_t m_latest_pack;
+  uint32_t m_pack_offset;
 };
 
 class ChunkFindResult {

@@ -5,6 +5,7 @@ set(lyekka_SOURCES
 server.cpp
 chunk_db.cpp
 chunk_id.cpp
+sha1.c
 )
 
 ADD_EXECUTABLE(lyekka ${lyekka_SOURCES})
@@ -16,8 +17,7 @@ LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/CMake/")
 
 find_package(Boost REQUIRED)
-find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
-find_package(Protobuf REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options thread REQUIRED)
 find_package(Event REQUIRED)
 
 MESSAGE("Boost information:") 
@@ -30,6 +30,7 @@ target_link_libraries(lyekka
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
   ${EVENT_LIBRARIES}
 )
 

@@ -8,6 +8,8 @@ class ChunkId {
 public:
   static ChunkId from_b16(const char* data);
   static ChunkId from_bin(const char* data);
+  static ChunkId calculate(const void* data, size_t len);
+
   friend bool operator < (const ChunkId& n2, const ChunkId& n1) {
     return memcmp(n1.cid, n2.cid, 20) > 0;
   }
@@ -17,11 +19,10 @@ public:
   friend bool operator==(const ChunkId& left, const ChunkId& right) {
     return memcmp(left.cid, right.cid, 20) == 0;
   }
-
-
+  const uint8_t* binary() const { return cid; }
+  const std::string hex() const;
 private:
   uint8_t cid[20];
-
 };
 
 class ChunkLocation {
