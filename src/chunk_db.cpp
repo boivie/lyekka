@@ -117,9 +117,9 @@ void ChunkDatabase::write_chunk(const ChunkId& cid, const void* data, size_t len
   } header;
   memcpy(header.magic, chunk_magic, 16);
   memcpy(header.chunk_id, cid.binary(), 20);
-  header.payload_size = len;
-  header.header_size = 64;
-  header.flags = 0;
+  header.payload_size = htonl(len);
+  header.header_size = htonl(64);
+  header.flags = htonl(0);
   memset(header.padding, 0, sizeof(header.padding));
   written += write_data(&header, sizeof(header));
   written += write_data(data, len);
@@ -140,9 +140,9 @@ void ChunkDatabase::write_chunk(const ChunkId& cid, const void* data, size_t len
     uint32_t flags;
   } index_entry;
   memcpy(index_entry.chunk_id, cid.binary(), 20);
-  index_entry.offset = m_pack_offset;
-  index_entry.size = written;
-  index_entry.flags = 0;
+  index_entry.offset = htonl(m_pack_offset);
+  index_entry.size = htonl(written);
+  index_entry.flags = htonl(0);
   write(m_index_fd, &index_entry, sizeof(index_entry));
   m_pack_offset += written;
 }
