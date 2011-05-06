@@ -223,8 +223,7 @@ void ChunkDatabase::load_indexes() {
       uint32_t flags = ntohl(*(uint32_t*)(entry + 28));
       const ChunkLocation loc(i->first, offset, size);
       const ChunkId cid = ChunkId::from_bin(entry);
-      /* TODO: m_chunks[cid] = loc; */
-      m_chunks.insert(std::make_pair(cid, loc));
+      m_chunks[cid] = loc;
     }
   }
 }
@@ -258,7 +257,7 @@ void ChunkDatabase::find_indexes() {
 void ChunkDatabase::dump_all(void) {
   cout << "[[dump begin]]" << endl;
   for (ChunkT::const_iterator it = m_chunks.begin(); it != m_chunks.end(); ++it) {
-    cout << it->first << endl;
+    cout << it->first << " " << it->second << endl;
   }
   cout << "[[dump end]]" << endl;
 }

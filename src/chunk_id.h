@@ -27,12 +27,23 @@ private:
 
 class ChunkLocation {
 public:
+  ChunkLocation(const ChunkLocation& copy) : m_location(copy.m_location),
+					     m_size(copy.m_size) {};
   ChunkLocation(uint64_t pack, uint32_t offset, uint32_t size)
     : m_location(pack << (32 - 5) | offset >> 5), m_size(size) {};
   uint64_t pack() const { return m_location >> (32 - 5); };
   uint32_t offset() const { return (uint32_t)m_location << 5; };
   uint32_t size() const { return m_size; }
+  ChunkLocation() : m_location(0), m_size(0) {};
+  ChunkLocation& operator=(const ChunkLocation& other) {
+    if (this != &other) {
+      m_location = other.m_location;
+      m_size = other.m_size;
+    }
+    return *this;
+  }
+  friend std::ostream& operator << (std::ostream& os, const ChunkLocation& C);
 private:
-  const uint64_t m_location;
-  const uint32_t m_size;
+  uint64_t m_location;
+  uint32_t m_size;
 };

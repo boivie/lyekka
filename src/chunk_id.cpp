@@ -56,3 +56,10 @@ ostream& operator << (ostream& os, const ChunkId& C)
   os << "<chunk " << C.hex() << ", h = " << C.hash() << ">";
   return os;
 }
+
+
+ostream& operator << (ostream& os, const ChunkLocation& C)
+{
+  os << "loc = " << C.pack() << ":" << C.offset() << ", s = " << C.size();
+  return os;
+}
