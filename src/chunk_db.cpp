@@ -19,7 +19,7 @@ namespace fs = boost::filesystem;
 ChunkFindResult ChunkDatabase::find(const ChunkId& cid) {
   ChunkT::const_iterator it = m_chunks.find(cid);
   if (it == m_chunks.end()) {
-    assert(0);
+    throw ChunkNotFound();
   }
   PackT::const_iterator pit = m_packs.find(it->second.pack());
   assert(pit != m_packs.end());
@@ -221,8 +221,9 @@ void ChunkDatabase::load_indexes() {
       uint32_t offset = ntohl(*(uint32_t*)(entry + 20));
       uint32_t size = ntohl(*(uint32_t*)(entry + 24));
       uint32_t flags = ntohl(*(uint32_t*)(entry + 28));
-      ChunkLocation loc(i->first, offset, size);
-      ChunkId cid = ChunkId::from_bin(entry);
+      const ChunkLocation loc(i->first, offset, size);
+      const ChunkId cid = ChunkId::from_bin(entry);
+      /* TODO: m_chunks[cid] = loc; */
       m_chunks.insert(std::make_pair(cid, loc));
     }
   }

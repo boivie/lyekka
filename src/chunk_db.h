@@ -64,3 +64,7 @@ private:
   const Pack& m_pack;
   const ChunkLocation& m_location;
 };
+
+class ChunkNotFound : public std::exception {
+
+};

@@ -64,7 +64,7 @@ static void handle_put_chunk(struct evhttp_request *req, const char *path) {
   struct evbuffer *evb = evbuffer_new();
   evbuffer_add_printf(evb, "%s", cid.hex().c_str());
   
-  cout << "write_chunk " << cid.hex() << endl;
+  cout << "write_chunk " << cid.hex() << " " << br->len() << " bytes" << endl;
     
   db.write_chunk(cid, br->data(), br->len());
   
@@ -87,22 +87,28 @@ static void handle_get_chunk(struct evhttp_request *req, const char *path) {
 
   cid = ChunkId::from_hex(path + 1);
 
-  ChunkFindResult result = db.find(cid);
+  try {
+    ChunkFindResult result = db.find(cid);
+    evhttp_add_header(evhttp_request_get_output_headers(req),
+		      "Content-Type", "text/plain");
+  
+    evb = evbuffer_new();
+    buf = (char*)malloc(result.size());
+    lseek(result.pack().fd(), result.offset(), SEEK_SET);
+    read(result.pack().fd(), buf, result.size());
+    const char* payload = buf + ntohl(*(uint32_t*)(buf + 40));
+    uint32_t payload_size = ntohl(*(uint32_t*)(buf + 36));
+    evbuffer_add_reference(evb, payload, payload_size, free_buf, buf);
+  
+    cout << "200 get " << path << " " << payload_size << " bytes" << endl;
+    evhttp_send_reply(req, 200, "OK", evb);
+    if (evb)
+      evbuffer_free(evb);
+  } catch (ChunkNotFound& cnf) {
+    cout << "404 get " << path << endl;
+    evhttp_send_error(req, 404, "Chunk not found");
+  }
 
-  evhttp_add_header(evhttp_request_get_output_headers(req),
-		    "Content-Type", "text/plain");
-  
-  evb = evbuffer_new();
-  buf = (char*)malloc(result.size());
-  lseek(result.pack().fd(), result.offset(), SEEK_SET);
-  read(result.pack().fd(), buf, result.size());
-  const char* payload = buf + ntohl(*(uint32_t*)(buf + 40));
-  uint32_t payload_size = ntohl(*(uint32_t*)(buf + 36));
-  evbuffer_add_reference(evb, payload, payload_size, free_buf, buf);
-  
-  evhttp_send_reply(req, 200, "OK", evb);
-  if (evb)
-    evbuffer_free(evb);
 }
 
 static inline int is_get(struct evhttp_request *req) {
