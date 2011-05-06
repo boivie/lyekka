@@ -7,10 +7,15 @@
 #include <dirent.h>
 #include "pack.h"
 
+#ifndef O_NOATIME
+# define O_NOATIME 0
+#endif
+
 Pack::Pack(uint64_t num, boost::filesystem::path& fname)
   : m_fname(fname), m_num(num)
 {
-  m_fd = open(fname.string().c_str(), O_RDONLY);
+  int flags = O_RDONLY | O_NOATIME;
+  m_fd = open(fname.string().c_str(), flags);
 }
 
 extern void die();

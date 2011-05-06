@@ -16,22 +16,37 @@ namespace fs = boost::filesystem;
 
 #define PACK_MAX_SIZE ((uint64_t)(500*1024)*1024)
 
+#ifndef O_NOATIME
+# define O_NOATIME 0
+#endif
+
 fs::path ChunkDatabase::get_idx(const fs::path& pack_fname) const
 {
   const std::string index_fname = pack_fname.string() + ".idx";
   return fs::path(index_fname);
 }
 
-
-ChunkFindResult ChunkDatabase::find(const ChunkId& cid) {
+StoredChunk ChunkDatabase::find(const ChunkId& cid) {
   ChunkT::const_iterator it = m_chunks.find(cid);
   if (it == m_chunks.end()) {
     throw ChunkNotFound();
   }
-  PackT::const_iterator pit = m_packs.find(it->second.pack());
+
+  ChunkLocation loc = it->second;
+  PackT::const_iterator pit = m_packs.find(loc.pack());
   assert(pit != m_packs.end());
-  assert(pit->second->num() == it->second.pack());
-  return ChunkFindResult(*this, pit->second, it->second);
+  assert(pit->second->num() == loc.pack());
+
+  PackPtr pack = pit->second;
+  BufferPtr buf(new vector<uint8_t>(loc.size()));
+  uint8_t* raw_p = &(*buf)[0];
+
+  lseek(pack->fd(), loc.offset(), SEEK_SET);
+  read(pack->fd(), raw_p, loc.size());
+
+  size_t payload_offset = ntohl(*(uint32_t*)(raw_p + 40));
+  size_t payload_size = ntohl(*(uint32_t*)(raw_p + 36));
+  return StoredChunk(cid, buf, payload_offset, payload_size);
 }
 
 bool ChunkDatabase::load() {
@@ -64,52 +79,54 @@ bool ChunkDatabase::repair() {
   return false;
 }
 
-void ChunkDatabase::create_partial() {
-  int flags = O_WRONLY | O_CREAT | O_EXCL
-#ifdef O_NOATIME
-		      | O_NOATIME
-#endif
-    ;
+bool ChunkDatabase::create_partial() {
+  const fs::path index = get_idx(m_partial);
+  int flags = O_WRONLY | O_CREAT | O_EXCL | O_NOATIME;
   int mode = S_IRUSR | S_IWUSR;
 
-  m_pack_fd = open(partial().string().c_str(),
-		   flags, mode);
-  const fs::path index = get_idx(m_partial);
-  m_index_fd = open(index.string().c_str(), flags, mode);
+  m_partial_w_fd = open(partial().string().c_str(), flags, mode);
+  m_partial_idx_fd = open(index.string().c_str(), flags, mode);
 		    
-  if (m_pack_fd == -1 || m_index_fd == -1) {
+  if (m_partial_w_fd == -1 || m_partial_idx_fd == -1) {
     cerr << "Failed to create partial or index file" << endl;
-  } else {
-    preallocate(m_pack_fd);
-    // Write pack header.
-    const uint8_t pack_superblock[64] = 
-      {0x32, 0x7d, 0x25, 0x2e, 0x42, 0x18, 0x77, 0x3a,
-       0x5b, 0x47, 0xc8, 0x58, 0x4d, 0xf3, 0x10, 0x2d,
-       0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x40,
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       0x00, 0x00, 0x00, 0x00, 0x06, 0x2e, 0x13, 0xca,
-       0x4a, 0xe3, 0x11, 0xbb, 0x3a, 0x2e, 0xcd, 0xa9,
-       0x98, 0xb7, 0x7f, 0x08, 0xbf, 0x37, 0x8f, 0xee};
-    const uint8_t index_superblock[32] = 
-      {0xca, 0xf7, 0xe7, 0xbf, 0x96, 0xa7, 0x99, 0xf0,
-       0x54, 0x74, 0x69, 0xcb, 0x69, 0x8b, 0xfb, 0x68,
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-    write_data(pack_superblock, sizeof(pack_superblock));
-    write(m_index_fd, index_superblock, sizeof(index_superblock));
-    m_pack_offset = 64;
+    return false;
   }
+
+  preallocate(m_partial_w_fd);
+  // Write pack header.
+  const uint8_t pack_superblock[64] =
+    {0x32, 0x7d, 0x25, 0x2e, 0x42, 0x18, 0x77, 0x3a,
+     0x5b, 0x47, 0xc8, 0x58, 0x4d, 0xf3, 0x10, 0x2d,
+     0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x40,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x06, 0x2e, 0x13, 0xca,
+     0x4a, 0xe3, 0x11, 0xbb, 0x3a, 0x2e, 0xcd, 0xa9,
+     0x98, 0xb7, 0x7f, 0x08, 0xbf, 0x37, 0x8f, 0xee};
+  const uint8_t index_superblock[32] =
+    {0xca, 0xf7, 0xe7, 0xbf, 0x96, 0xa7, 0x99, 0xf0,
+     0x54, 0x74, 0x69, 0xcb, 0x69, 0x8b, 0xfb, 0x68,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  write_data(pack_superblock, sizeof(pack_superblock));
+  write(m_partial_idx_fd, index_superblock, sizeof(index_superblock));
+  m_pack_offset = 64;
+
+  PackPtr p(new Pack(0, m_partial));
+  m_packs.insert(std::make_pair(0, p));
+
+  return true;
 }
 
 size_t ChunkDatabase::write_data(const void* data_p, size_t len) {
   SHA1_Update(&sha1_ctx, (const uint8_t*)data_p, len);
-  write(m_pack_fd, data_p, len);
+  write(m_partial_w_fd, data_p, len);
   return len;
 }
 
-void ChunkDatabase::write_chunk(const ChunkId& cid, const void* data, size_t len)
+void ChunkDatabase::write_chunk(StoredChunk& sc)
 {
+  BufferPtr buf = sc.raw_buffer();
   size_t written = 0;
   const uint8_t chunk_magic[16] = 
     {0x6f, 0x66, 0xac, 0x53, 0x1e, 0xb1, 0x46, 0xef, 
@@ -123,17 +140,17 @@ void ChunkDatabase::write_chunk(const ChunkId& cid, const void* data, size_t len
     uint8_t padding[16];
   } header;
   memcpy(header.magic, chunk_magic, 16);
-  memcpy(header.chunk_id, cid.binary(), 20);
-  header.payload_size = htonl(len);
+  memcpy(header.chunk_id, sc.cid().binary(), 20);
+  header.payload_size = htonl(buf->size());
   header.header_size = htonl(64);
   header.flags = htonl(0);
   memset(header.padding, 0, sizeof(header.padding));
   written += write_data(&header, sizeof(header));
-  written += write_data(data, len);
-  const uint8_t padding_array[32] = 
+  written += write_data(&(*buf)[0], buf->size());
+  const uint8_t padding_array[32] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  size_t padding = (32 - len) % 32;
+  size_t padding = (32 - buf->size()) % 32;
   if (padding) written += write_data(padding_array, padding);
   written += write_data(padding_array, 20);
   written += write_data(padding_array, 4);
@@ -146,11 +163,16 @@ void ChunkDatabase::write_chunk(const ChunkId& cid, const void* data, size_t len
     uint32_t size;
     uint32_t flags;
   } index_entry;
-  memcpy(index_entry.chunk_id, cid.binary(), 20);
+  memcpy(index_entry.chunk_id, sc.cid().binary(), 20);
   index_entry.offset = htonl(m_pack_offset);
   index_entry.size = htonl(written);
   index_entry.flags = htonl(0);
-  write(m_index_fd, &index_entry, sizeof(index_entry));
+  write(m_partial_idx_fd, &index_entry, sizeof(index_entry));
+
+  // Written to disk - now serve it to clients
+  const ChunkLocation loc(0, m_pack_offset, written);
+  m_chunks[sc.cid()] = loc;
+
   m_pack_offset += written;
 }
 
@@ -178,8 +200,8 @@ void ChunkDatabase::close_partial()
     fs::path pack_name = m_path / string(basename);
     fs::path idx_name = get_idx(pack_name);
     cout << "Renaming partial to " << pack_name << endl;
-    close(m_pack_fd);
-    close(m_index_fd);
+    close(m_partial_w_fd);
+    close(m_partial_idx_fd);
     fs::rename(m_partial, pack_name);
     fs::rename(partial_idx, idx_name);
   }

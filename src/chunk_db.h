@@ -21,21 +21,21 @@ typedef boost::shared_ptr<Pack> PackPtr;
 typedef std::map<long long, PackPtr > PackT;
 typedef google::sparse_hash_map< ChunkId, ChunkLocation, hash_fun2 > ChunkT;
 
-class ChunkFindResult;
+class StoredChunk;
 
 class ChunkDatabase {
 public:
   ChunkDatabase() : m_chunks(), m_packs() { SHA1_Init(&sha1_ctx); }
 
-  ChunkFindResult find(const ChunkId& cid);
+  StoredChunk find(const ChunkId& cid);
 
   void set_path(boost::filesystem::path& path);
   bool load();
   bool repair();
   void dump_all(void);
-  void create_partial();
+  bool create_partial();
   void close_partial();
-  void write_chunk(const ChunkId& cid, const void* data, size_t len);
+  void write_chunk(StoredChunk& sc);
 
 private:
   const boost::filesystem::path& partial() const { return m_partial; }
@@ -49,23 +49,33 @@ private:
   boost::filesystem::path m_partial;
   ChunkT m_chunks;
   PackT m_packs;
-  int m_pack_fd;
-  int m_index_fd;
+
+  int m_partial_idx_fd;
+  int m_partial_r_fd;
+  int m_partial_w_fd;
+
   SHA1_CTX sha1_ctx;
   uint64_t m_latest_pack;
   uint32_t m_pack_offset;
 };
 
-class ChunkFindResult {
+typedef boost::shared_ptr< std::vector<uint8_t> > BufferPtr;
+
+class StoredChunk {
 public:
-  ChunkFindResult(ChunkDatabase db, PackPtr pack, const ChunkLocation& location) : m_db(db), m_pack(pack), m_location(location) {};
-  PackPtr pack(void) const { return m_pack; }
-  uint32_t offset(void) const { return m_location.offset(); }
-  uint32_t size(void) const { return m_location.size(); }
+  StoredChunk(const ChunkId& cid, BufferPtr buffer,
+	      size_t payload_offset, size_t payload_size)
+    : m_cid(cid), m_buffer(buffer),
+      m_payload_offset(payload_offset), m_payload_size(payload_size) {}
+  const ChunkId& cid() const { return m_cid; }
+  BufferPtr raw_buffer() const { return m_buffer; }
+  const size_t payload_offset() const { return m_payload_offset; }
+  const size_t payload_size() const { return m_payload_size; }
 private:
-  const ChunkDatabase& m_db;
-  PackPtr m_pack;
-  const ChunkLocation& m_location;
+  const ChunkId m_cid;
+  BufferPtr m_buffer;
+  size_t m_payload_offset;
+  size_t m_payload_size;
 };
 
 class ChunkNotFound : public std::exception {
