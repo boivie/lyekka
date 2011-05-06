@@ -126,6 +126,12 @@ size_t ChunkDatabase::write_data(const void* data_p, size_t len) {
 
 void ChunkDatabase::write_chunk(StoredChunk& sc)
 {
+  ChunkT::const_iterator it = m_chunks.find(sc.cid());
+  if (it != m_chunks.end()) {
+    cout << "Chunk " << sc.cid().hex() << " already exists." << endl;
+    return;
+  }
+
   BufferPtr buf = sc.raw_buffer();
   size_t written = 0;
   const uint8_t chunk_magic[16] = 
