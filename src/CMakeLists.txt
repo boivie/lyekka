@@ -9,6 +9,8 @@ sha1.c
 pack.cpp
 )
 
+add_definitions(-Wall -Wextra)
+
 ADD_EXECUTABLE(lyekka ${lyekka_SOURCES})
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})

@@ -26,8 +26,7 @@ using namespace std;
 namespace po = boost::program_options;
 
 
-ChunkDatabase db;
-long long num_requests;
+static ChunkDatabase db;
 
 class BodyReader {
 public:
@@ -50,6 +49,7 @@ static inline int begins_with(const char* haystack, const char* needle) {
 }
 
 static void handle_put_chunk(struct evhttp_request *req, const char *path) {
+  (void)(path);
   BodyReader* br = (BodyReader*)(req->body_opaque);
   if (br == NULL) {
     evhttp_send_error(req, 500, "No body data");
@@ -78,6 +78,8 @@ private:
 };
 
 static void free_deferred(const void *data, size_t datalen, void *extra) {
+  (void)data;
+  (void)datalen;
   DeferredBuffer *buf = (DeferredBuffer *)extra;
   delete buf;
 }
@@ -116,26 +118,33 @@ static void handle_get_chunk(struct evhttp_request *req, const char *path) {
   }
 }
 
-static inline int is_get(struct evhttp_request *req) {
+static inline int is_get(struct evhttp_request *req)
+{
   return evhttp_request_get_command(req) == EVHTTP_REQ_GET;
 }
 
-static inline int is_put(struct evhttp_request *req) {
+static inline int is_put(struct evhttp_request *req)
+{
   return evhttp_request_get_command(req) == EVHTTP_REQ_PUT;
 }
 
-static void* body_create(struct evhttp_request *req, void *arg) {
-  struct evkeyvalq *headers = evhttp_request_get_input_headers(req);
+static void* body_create(struct evhttp_request *req, void *arg)
+{
   BodyReader* br = new BodyReader();
+  (void)arg;
+  (void)req;
   return br;
 }
 
-static void body_destroy(struct evhttp_request *req, void *opaque) {
+static void body_destroy(struct evhttp_request *req, void *opaque)
+{
   BodyReader* br = (BodyReader*)opaque;
+  (void)req;
   delete br;
 }
 
-static void body_read(struct evhttp_request *req, void *opaque) {
+static void body_read(struct evhttp_request *req, void *opaque)
+{
   char buf[4097];
   BodyReader* br = (BodyReader*)opaque;
   int bytes = evbuffer_remove(req->input_buffer, buf, 4096);
@@ -147,6 +156,9 @@ static void handle_request(struct evhttp_request *req, void *arg)
   const char *uri = evhttp_request_get_uri(req);
   struct evhttp_uri *decoded;
   const char *path;
+
+  (void)req;
+  (void)arg;
 
   decoded = evhttp_uri_parse(uri);
   if (!decoded) {

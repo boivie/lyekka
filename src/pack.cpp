@@ -12,7 +12,7 @@
 #endif
 
 Pack::Pack(uint64_t num, const boost::filesystem::path& fname)
-  : m_fname(fname), m_num(num)
+  : m_num(num), m_fname(fname)
 {
   int flags = O_RDONLY | O_NOATIME;
   m_fd = open(fname.string().c_str(), flags);

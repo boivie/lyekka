@@ -214,6 +214,7 @@ void ChunkDatabase::close_partial()
 }
 
 void ChunkDatabase::preallocate(int fd) {
+  (void)fd;
 #if defined(__linux__)
   int err = posix_fallocate(fd, PACK_MAX_SIZE);
   if (err == 0)
@@ -272,6 +273,7 @@ void ChunkDatabase::load_indexes() {
       uint32_t offset = ntohl(*(uint32_t*)(entry + 20));
       uint32_t size = ntohl(*(uint32_t*)(entry + 24));
       uint32_t flags = ntohl(*(uint32_t*)(entry + 28));
+      (void)flags;
       const ChunkLocation loc(i->first, offset, size);
       const ChunkId cid = ChunkId::from_bin(entry);
       m_chunks[cid] = loc;
