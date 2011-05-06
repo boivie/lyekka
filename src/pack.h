@@ -5,7 +5,7 @@
 
 class Pack {
 public:
-  Pack(uint64_t num, boost::filesystem::path& fname);
+  Pack(uint64_t num, const boost::filesystem::path& fname);
   Pack(const Pack& copy);
   ~Pack();
   int fd() const { return m_fd; };

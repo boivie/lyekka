@@ -56,8 +56,9 @@ static void handle_put_chunk(struct evhttp_request *req, const char *path) {
     return;
   }
 
-  ChunkId cid = ChunkId::calculate(&(*br->buffer())[0], br->buffer()->size());
-  StoredChunk sc(cid, br->buffer(), 0, br->buffer()->size());
+  const ChunkId cid = ChunkId::calculate(&(*br->buffer())[0],
+					 br->buffer()->size());
+  const StoredChunk sc(cid, br->buffer(), 0, br->buffer()->size());
   db.write_chunk(sc);
 
   cout << "write_chunk " << cid.hex() << " " << br->buffer()->size()
@@ -90,8 +91,8 @@ static void handle_get_chunk(struct evhttp_request *req, const char *path) {
 
   try {
     struct evbuffer *evb = NULL;
-    ChunkId cid = ChunkId::from_hex(path + 1);
-    StoredChunk sc = db.find(cid);
+    const ChunkId cid = ChunkId::from_hex(path + 1);
+    const StoredChunk sc = db.find(cid);
 
     evhttp_add_header(evhttp_request_get_output_headers(req),
 		      "Content-Type", "text/plain");

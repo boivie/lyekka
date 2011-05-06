@@ -27,15 +27,15 @@ class ChunkDatabase {
 public:
   ChunkDatabase() : m_chunks(), m_packs() { SHA1_Init(&sha1_ctx); }
 
-  StoredChunk find(const ChunkId& cid);
+  const StoredChunk find(const ChunkId& cid);
 
-  void set_path(boost::filesystem::path& path);
+  void set_path(const boost::filesystem::path& path);
   bool load();
   bool repair();
   void dump_all(void);
   bool create_partial();
   void close_partial();
-  void write_chunk(StoredChunk& sc);
+  void write_chunk(const StoredChunk& sc);
 
 private:
   const boost::filesystem::path& partial() const { return m_partial; }
@@ -68,14 +68,14 @@ public:
     : m_cid(cid), m_buffer(buffer),
       m_payload_offset(payload_offset), m_payload_size(payload_size) {}
   const ChunkId& cid() const { return m_cid; }
-  BufferPtr raw_buffer() const { return m_buffer; }
+  const BufferPtr raw_buffer() const { return m_buffer; }
   const size_t payload_offset() const { return m_payload_offset; }
   const size_t payload_size() const { return m_payload_size; }
 private:
   const ChunkId m_cid;
-  BufferPtr m_buffer;
-  size_t m_payload_offset;
-  size_t m_payload_size;
+  const BufferPtr m_buffer;
+  const size_t m_payload_offset;
+  const size_t m_payload_size;
 };
 
 class ChunkNotFound : public std::exception {

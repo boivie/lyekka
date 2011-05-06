@@ -11,7 +11,7 @@
 # define O_NOATIME 0
 #endif
 
-Pack::Pack(uint64_t num, boost::filesystem::path& fname)
+Pack::Pack(uint64_t num, const boost::filesystem::path& fname)
   : m_fname(fname), m_num(num)
 {
   int flags = O_RDONLY | O_NOATIME;

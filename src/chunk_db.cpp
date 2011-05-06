@@ -26,13 +26,13 @@ fs::path ChunkDatabase::get_idx(const fs::path& pack_fname) const
   return fs::path(index_fname);
 }
 
-StoredChunk ChunkDatabase::find(const ChunkId& cid) {
+const StoredChunk ChunkDatabase::find(const ChunkId& cid) {
   ChunkT::const_iterator it = m_chunks.find(cid);
   if (it == m_chunks.end()) {
     throw ChunkNotFound();
   }
 
-  ChunkLocation loc = it->second;
+  const ChunkLocation loc = it->second;
   PackT::const_iterator pit = m_packs.find(loc.pack());
   assert(pit != m_packs.end());
   assert(pit->second->num() == loc.pack());
@@ -66,7 +66,7 @@ bool ChunkDatabase::load() {
   return true;
 }
 
-void ChunkDatabase::set_path(boost::filesystem::path& path) {
+void ChunkDatabase::set_path(const boost::filesystem::path& path) {
   m_path = path;
   m_partial = path / fs::path("partial.db");
 }
@@ -124,7 +124,7 @@ size_t ChunkDatabase::write_data(const void* data_p, size_t len) {
   return len;
 }
 
-void ChunkDatabase::write_chunk(StoredChunk& sc)
+void ChunkDatabase::write_chunk(const StoredChunk& sc)
 {
   ChunkT::const_iterator it = m_chunks.find(sc.cid());
   if (it != m_chunks.end()) {
@@ -184,7 +184,7 @@ void ChunkDatabase::write_chunk(StoredChunk& sc)
 
 void ChunkDatabase::close_partial()
 {
-  fs::path partial_idx = get_idx(m_partial);
+  const fs::path partial_idx = get_idx(m_partial);
 
   if (m_pack_offset == 64) {
     // We haven't written any chunks. Just remove the partial file instead.
@@ -203,8 +203,8 @@ void ChunkDatabase::close_partial()
 
     sprintf(basename, "pack-%012llu-%s", m_latest_pack + 1, sha1_hex);
 
-    fs::path pack_name = m_path / string(basename);
-    fs::path idx_name = get_idx(pack_name);
+    const fs::path pack_name = m_path / string(basename);
+    const fs::path idx_name = get_idx(pack_name);
     cout << "Renaming partial to " << pack_name << endl;
     close(m_partial_w_fd);
     close(m_partial_idx_fd);
