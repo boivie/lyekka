@@ -6,6 +6,7 @@ server.cpp
 chunk_db.cpp
 chunk_id.cpp
 sha1.c
+pack.cpp
 )
 
 ADD_EXECUTABLE(lyekka ${lyekka_SOURCES})

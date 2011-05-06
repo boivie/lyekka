@@ -94,8 +94,8 @@ static void handle_get_chunk(struct evhttp_request *req, const char *path) {
   
     evb = evbuffer_new();
     buf = (char*)malloc(result.size());
-    lseek(result.pack().fd(), result.offset(), SEEK_SET);
-    read(result.pack().fd(), buf, result.size());
+    lseek(result.pack()->fd(), result.offset(), SEEK_SET);
+    read(result.pack()->fd(), buf, result.size());
     const char* payload = buf + ntohl(*(uint32_t*)(buf + 40));
     uint32_t payload_size = ntohl(*(uint32_t*)(buf + 36));
     evbuffer_add_reference(evb, payload, payload_size, free_buf, buf);
@@ -285,4 +285,9 @@ int main(int argc, char* argv[])
   cout << "Listening for incoming connections." << endl;
   event_base_dispatch(base);
   return 0;
+}
+
+void die() {
+  printStackTrace();
+  assert(0);
 }

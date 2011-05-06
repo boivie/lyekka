@@ -16,6 +16,13 @@ namespace fs = boost::filesystem;
 
 #define PACK_MAX_SIZE ((uint64_t)(500*1024)*1024)
 
+fs::path ChunkDatabase::get_idx(const fs::path& pack_fname) const
+{
+  const std::string index_fname = pack_fname.string() + ".idx";
+  return fs::path(index_fname);
+}
+
+
 ChunkFindResult ChunkDatabase::find(const ChunkId& cid) {
   ChunkT::const_iterator it = m_chunks.find(cid);
   if (it == m_chunks.end()) {
@@ -23,7 +30,7 @@ ChunkFindResult ChunkDatabase::find(const ChunkId& cid) {
   }
   PackT::const_iterator pit = m_packs.find(it->second.pack());
   assert(pit != m_packs.end());
-  assert(pit->second.num() == it->second.pack());
+  assert(pit->second->num() == it->second.pack());
   return ChunkFindResult(*this, pit->second, it->second);
 }
 
@@ -67,8 +74,8 @@ void ChunkDatabase::create_partial() {
 
   m_pack_fd = open(partial().string().c_str(),
 		   flags, mode);
-  const std::string index_fname = partial().string() + ".idx";
-  m_index_fd = open(index_fname.c_str(), flags, mode);
+  const fs::path index = get_idx(m_partial);
+  m_index_fd = open(index.string().c_str(), flags, mode);
 		    
   if (m_pack_fd == -1 || m_index_fd == -1) {
     cerr << "Failed to create partial or index file" << endl;
@@ -149,15 +156,33 @@ void ChunkDatabase::write_chunk(const ChunkId& cid, const void* data, size_t len
 
 void ChunkDatabase::close_partial()
 {
-  char basename[100];
-  sprintf(basename, "pack-%012llu", m_latest_pack + 1);
-  fs::path fname = m_path / string(basename);
-  string partial_index = m_partial.string() + ".idx";
-  string pack_index = fname.string() + ".idx";
-  close(m_pack_fd);
-  cout << "Renaming partial to " << fname << endl;
-  rename(m_partial.string().c_str(), fname.string().c_str());
-  rename(partial_index.c_str(), pack_index.c_str());
+  fs::path partial_idx = get_idx(m_partial);
+
+  if (m_pack_offset == 64) {
+    // We haven't written any chunks. Just remove the partial file instead.
+    cout << "No entries written, removing partial file" << endl;
+    fs::remove(m_partial);
+    fs::remove(partial_idx);
+  } else {
+    char basename[100];
+    uint8_t sha1_bin[20];
+    char sha1_hex[41];
+
+    SHA1_Final(&sha1_ctx, sha1_bin);
+
+    for (int i = 0; i < 20; i++) sprintf(&sha1_hex[i * 2], "%02x", sha1_bin[i]);
+    sha1_hex[40] = 0;
+
+    sprintf(basename, "pack-%012llu-%s", m_latest_pack + 1, sha1_hex);
+
+    fs::path pack_name = m_path / string(basename);
+    fs::path idx_name = get_idx(pack_name);
+    cout << "Renaming partial to " << pack_name << endl;
+    close(m_pack_fd);
+    close(m_index_fd);
+    fs::rename(m_partial, pack_name);
+    fs::rename(partial_idx, idx_name);
+  }
 }
 
 void ChunkDatabase::preallocate(int fd) {
@@ -201,11 +226,9 @@ void ChunkDatabase::preallocate(int fd) {
 void ChunkDatabase::load_indexes() {
   for (PackT::const_iterator i = m_packs.begin(); i != m_packs.end(); ++i) {
     char sb[32];
-    char fname[PATH_MAX + 1];
     char entry[32];
-    sprintf(fname, "%spack-%012lld.idx", m_path.string().c_str(), i->first);
-    
-    FILE* fp = fopen(fname, "rb");
+    boost::filesystem::path fname = get_idx(i->second->fname().string());
+    FILE* fp = fopen(fname.string().c_str(), "rb");
     if (!fp) {
       cerr << "Failed to open file" << endl;
       continue;
@@ -230,7 +253,6 @@ void ChunkDatabase::load_indexes() {
 
 void ChunkDatabase::find_indexes() {
   DIR *dirp = opendir(m_path.string().c_str());
-  char fname[PATH_MAX + 1];
   struct dirent *dent;
 
   if (!dirp) {
@@ -239,16 +261,16 @@ void ChunkDatabase::find_indexes() {
   }
 
   while ((dent = readdir(dirp)) != NULL) {
-    // format: pack-123456789012.idx = 21 characters
-    if (strlen(dent->d_name) != 21) continue;
-    if (strncmp(dent->d_name, "pack-", 5) ||
-	strncmp(dent->d_name + 17, ".idx", 4)) continue;
+    // format: pack-123456789012-{40-sha1} = 62 characters
+    if (strlen(dent->d_name) != 58) continue;
+    if (!(!strncmp(dent->d_name, "pack-", 5) &&
+	  dent->d_name[17] == '-')) continue;
     uint64_t num = (uint64_t)strtoull(dent->d_name + 5, NULL, 10);
     if (num == 0 && errno == EINVAL) continue;
-    sprintf(fname, "%spack-%012lld", m_path.string().c_str(), num);
 
-    Pack p(num, open(fname, O_RDONLY));
-    m_packs.insert(std::make_pair(p.num(), p));
+    fs::path fname = m_path / string(dent->d_name);
+    PackPtr p(new Pack(num, fname));
+    m_packs.insert(std::make_pair(num, p));
   }
  
   closedir(dirp);

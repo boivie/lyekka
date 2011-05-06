@@ -3,6 +3,7 @@
 #include <map>
 #include <google/sparse_hash_map>
 #include <boost/filesystem.hpp>
+#include <boost/smart_ptr.hpp>
 #include <string>
 #include <stdint.h>
 #include "chunk_id.h"
@@ -16,7 +17,8 @@ public:
    }
 };
 
-typedef std::map<long long, Pack> PackT;
+typedef boost::shared_ptr<Pack> PackPtr;
+typedef std::map<long long, PackPtr > PackT;
 typedef google::sparse_hash_map< ChunkId, ChunkLocation, hash_fun2 > ChunkT;
 
 class ChunkFindResult;
@@ -42,6 +44,7 @@ private:
   bool has_partial();
   void preallocate(int fd);
   size_t write_data(const void* data_p, size_t len);
+  boost::filesystem::path get_idx(const boost::filesystem::path& pack_fname) const;
   boost::filesystem::path m_path;
   boost::filesystem::path m_partial;
   ChunkT m_chunks;
@@ -55,13 +58,13 @@ private:
 
 class ChunkFindResult {
 public:
-  ChunkFindResult(ChunkDatabase db, const Pack& pack, const ChunkLocation& location) : m_db(db), m_pack(pack), m_location(location) {};
-  const Pack& pack(void) const { return m_pack; }
+  ChunkFindResult(ChunkDatabase db, PackPtr pack, const ChunkLocation& location) : m_db(db), m_pack(pack), m_location(location) {};
+  PackPtr pack(void) const { return m_pack; }
   uint32_t offset(void) const { return m_location.offset(); }
   uint32_t size(void) const { return m_location.size(); }
 private:
   const ChunkDatabase& m_db;
-  const Pack& m_pack;
+  PackPtr m_pack;
   const ChunkLocation& m_location;
 };
 
