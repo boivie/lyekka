@@ -2,6 +2,9 @@
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
 #include "lyekka.pb.h"
+
+#include <algorithm>
+
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/wire_format_lite_inl.h>
@@ -441,8 +444,6 @@ bool Compression_IsValid(int value) {
 
 // ===================================================================
 
-const ::std::string TreeRef::_default_name_;
-const ::std::string TreeRef::_default_key_;
 #ifndef _MSC_VER
 const int TreeRef::kNameFieldNumber;
 const int TreeRef::kModeFieldNumber;
@@ -468,12 +469,12 @@ TreeRef::TreeRef(const TreeRef& from)
 
 void TreeRef::SharedCtor() {
   _cached_size_ = 0;
-  name_ = const_cast< ::std::string*>(&_default_name_);
+  name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   mode_ = 0;
   mtime_ = GOOGLE_LONGLONG(0);
   mtime_ns_ = 0;
   sha_idx_ = 0;
-  key_ = const_cast< ::std::string*>(&_default_key_);
+  key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -482,10 +483,10 @@ TreeRef::~TreeRef() {
 }
 
 void TreeRef::SharedDtor() {
-  if (name_ != &_default_name_) {
+  if (name_ != &::google::protobuf::internal::kEmptyString) {
     delete name_;
   }
-  if (key_ != &_default_key_) {
+  if (key_ != &::google::protobuf::internal::kEmptyString) {
     delete key_;
   }
   if (this != default_instance_) {
@@ -515,8 +516,8 @@ TreeRef* TreeRef::New() const {
 void TreeRef::Clear() {
   _extensions_.Clear();
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (name_ != &_default_name_) {
+    if (has_name()) {
+      if (name_ != &::google::protobuf::internal::kEmptyString) {
         name_->clear();
       }
     }
@@ -524,8 +525,8 @@ void TreeRef::Clear() {
     mtime_ = GOOGLE_LONGLONG(0);
     mtime_ns_ = 0;
     sha_idx_ = 0;
-    if (_has_bit(5)) {
-      if (key_ != &_default_key_) {
+    if (has_key()) {
+      if (key_ != &::google::protobuf::internal::kEmptyString) {
         key_->clear();
       }
     }
@@ -564,7 +565,7 @@ bool TreeRef::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &mode_)));
-          _set_bit(1);
+          set_has_mode();
         } else {
           goto handle_uninterpreted;
         }
@@ -580,7 +581,7 @@ bool TreeRef::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
                  input, &mtime_)));
-          _set_bit(2);
+          set_has_mtime();
         } else {
           goto handle_uninterpreted;
         }
@@ -596,7 +597,7 @@ bool TreeRef::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &mtime_ns_)));
-          _set_bit(3);
+          set_has_mtime_ns();
         } else {
           goto handle_uninterpreted;
         }
@@ -612,7 +613,7 @@ bool TreeRef::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &sha_idx_)));
-          _set_bit(4);
+          set_has_sha_idx();
         } else {
           goto handle_uninterpreted;
         }
@@ -658,7 +659,7 @@ bool TreeRef::MergePartialFromCodedStream(
 void TreeRef::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required string name = 1;
-  if (_has_bit(0)) {
+  if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -667,27 +668,27 @@ void TreeRef::SerializeWithCachedSizes(
   }
   
   // required int32 mode = 2;
-  if (_has_bit(1)) {
+  if (has_mode()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->mode(), output);
   }
   
   // required int64 mtime = 3;
-  if (_has_bit(2)) {
+  if (has_mtime()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->mtime(), output);
   }
   
   // optional int32 mtime_ns = 4;
-  if (_has_bit(3)) {
+  if (has_mtime_ns()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->mtime_ns(), output);
   }
   
   // required int32 sha_idx = 5;
-  if (_has_bit(4)) {
+  if (has_sha_idx()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->sha_idx(), output);
   }
   
   // optional bytes key = 6;
-  if (_has_bit(5)) {
+  if (has_key()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       6, this->key(), output);
   }
@@ -705,7 +706,7 @@ void TreeRef::SerializeWithCachedSizes(
 ::google::protobuf::uint8* TreeRef::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required string name = 1;
-  if (_has_bit(0)) {
+  if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -715,27 +716,27 @@ void TreeRef::SerializeWithCachedSizes(
   }
   
   // required int32 mode = 2;
-  if (_has_bit(1)) {
+  if (has_mode()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->mode(), target);
   }
   
   // required int64 mtime = 3;
-  if (_has_bit(2)) {
+  if (has_mtime()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->mtime(), target);
   }
   
   // optional int32 mtime_ns = 4;
-  if (_has_bit(3)) {
+  if (has_mtime_ns()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->mtime_ns(), target);
   }
   
   // required int32 sha_idx = 5;
-  if (_has_bit(4)) {
+  if (has_sha_idx()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->sha_idx(), target);
   }
   
   // optional bytes key = 6;
-  if (_has_bit(5)) {
+  if (has_key()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         6, this->key(), target);
@@ -827,22 +828,22 @@ void TreeRef::MergeFrom(const ::google::protobuf::Message& from) {
 void TreeRef::MergeFrom(const TreeRef& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_name()) {
       set_name(from.name());
     }
-    if (from._has_bit(1)) {
+    if (from.has_mode()) {
       set_mode(from.mode());
     }
-    if (from._has_bit(2)) {
+    if (from.has_mtime()) {
       set_mtime(from.mtime());
     }
-    if (from._has_bit(3)) {
+    if (from.has_mtime_ns()) {
       set_mtime_ns(from.mtime_ns());
     }
-    if (from._has_bit(4)) {
+    if (from.has_sha_idx()) {
       set_sha_idx(from.sha_idx());
     }
-    if (from._has_bit(5)) {
+    if (from.has_key()) {
       set_key(from.key());
     }
   }
@@ -895,7 +896,6 @@ void TreeRef::Swap(TreeRef* other) {
 
 // ===================================================================
 
-const ::std::string Part::_default_key_;
 #ifndef _MSC_VER
 const int Part::kOffsetFieldNumber;
 const int Part::kSizeFieldNumber;
@@ -923,7 +923,7 @@ void Part::SharedCtor() {
   offset_ = GOOGLE_ULONGLONG(0);
   size_ = 0u;
   sha_idx_ = 0;
-  key_ = const_cast< ::std::string*>(&_default_key_);
+  key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   compression_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -933,7 +933,7 @@ Part::~Part() {
 }
 
 void Part::SharedDtor() {
-  if (key_ != &_default_key_) {
+  if (key_ != &::google::protobuf::internal::kEmptyString) {
     delete key_;
   }
   if (this != default_instance_) {
@@ -966,8 +966,8 @@ void Part::Clear() {
     offset_ = GOOGLE_ULONGLONG(0);
     size_ = 0u;
     sha_idx_ = 0;
-    if (_has_bit(3)) {
-      if (key_ != &_default_key_) {
+    if (has_key()) {
+      if (key_ != &::google::protobuf::internal::kEmptyString) {
         key_->clear();
       }
     }
@@ -990,7 +990,7 @@ bool Part::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
                  input, &offset_)));
-          _set_bit(0);
+          set_has_offset();
         } else {
           goto handle_uninterpreted;
         }
@@ -1006,7 +1006,7 @@ bool Part::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, &size_)));
-          _set_bit(1);
+          set_has_size();
         } else {
           goto handle_uninterpreted;
         }
@@ -1022,7 +1022,7 @@ bool Part::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &sha_idx_)));
-          _set_bit(2);
+          set_has_sha_idx();
         } else {
           goto handle_uninterpreted;
         }
@@ -1089,28 +1089,28 @@ bool Part::MergePartialFromCodedStream(
 void Part::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional uint64 offset = 1;
-  if (_has_bit(0)) {
+  if (has_offset()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(1, this->offset(), output);
   }
   
   // required uint32 size = 2;
-  if (_has_bit(1)) {
+  if (has_size()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->size(), output);
   }
   
   // required int32 sha_idx = 3;
-  if (_has_bit(2)) {
+  if (has_sha_idx()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->sha_idx(), output);
   }
   
   // optional bytes key = 4;
-  if (_has_bit(3)) {
+  if (has_key()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       4, this->key(), output);
   }
   
   // optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
-  if (_has_bit(4)) {
+  if (has_compression()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       5, this->compression(), output);
   }
@@ -1128,29 +1128,29 @@ void Part::SerializeWithCachedSizes(
 ::google::protobuf::uint8* Part::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional uint64 offset = 1;
-  if (_has_bit(0)) {
+  if (has_offset()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(1, this->offset(), target);
   }
   
   // required uint32 size = 2;
-  if (_has_bit(1)) {
+  if (has_size()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->size(), target);
   }
   
   // required int32 sha_idx = 3;
-  if (_has_bit(2)) {
+  if (has_sha_idx()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->sha_idx(), target);
   }
   
   // optional bytes key = 4;
-  if (_has_bit(3)) {
+  if (has_key()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         4, this->key(), target);
   }
   
   // optional .Lyekka.pb.Compression compression = 5 [default = ZLIB];
-  if (_has_bit(4)) {
+  if (has_compression()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       5, this->compression(), target);
   }
@@ -1233,19 +1233,19 @@ void Part::MergeFrom(const ::google::protobuf::Message& from) {
 void Part::MergeFrom(const Part& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_offset()) {
       set_offset(from.offset());
     }
-    if (from._has_bit(1)) {
+    if (from.has_size()) {
       set_size(from.size());
     }
-    if (from._has_bit(2)) {
+    if (from.has_sha_idx()) {
       set_sha_idx(from.sha_idx());
     }
-    if (from._has_bit(3)) {
+    if (from.has_key()) {
       set_key(from.key());
     }
-    if (from._has_bit(4)) {
+    if (from.has_compression()) {
       set_compression(from.compression());
     }
   }
@@ -1297,7 +1297,6 @@ void Part::Swap(Part* other) {
 
 // ===================================================================
 
-const ::std::string FileEntry::_default_name_;
 #ifndef _MSC_VER
 const int FileEntry::kNameFieldNumber;
 const int FileEntry::kModeFieldNumber;
@@ -1323,7 +1322,7 @@ FileEntry::FileEntry(const FileEntry& from)
 
 void FileEntry::SharedCtor() {
   _cached_size_ = 0;
-  name_ = const_cast< ::std::string*>(&_default_name_);
+  name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   mode_ = 0;
   size_ = GOOGLE_ULONGLONG(0);
   mtime_ = GOOGLE_LONGLONG(0);
@@ -1336,7 +1335,7 @@ FileEntry::~FileEntry() {
 }
 
 void FileEntry::SharedDtor() {
-  if (name_ != &_default_name_) {
+  if (name_ != &::google::protobuf::internal::kEmptyString) {
     delete name_;
   }
   if (this != default_instance_) {
@@ -1365,8 +1364,8 @@ FileEntry* FileEntry::New() const {
 
 void FileEntry::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (name_ != &_default_name_) {
+    if (has_name()) {
+      if (name_ != &::google::protobuf::internal::kEmptyString) {
         name_->clear();
       }
     }
@@ -1410,7 +1409,7 @@ bool FileEntry::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &mode_)));
-          _set_bit(1);
+          set_has_mode();
         } else {
           goto handle_uninterpreted;
         }
@@ -1426,7 +1425,7 @@ bool FileEntry::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
                  input, &size_)));
-          _set_bit(2);
+          set_has_size();
         } else {
           goto handle_uninterpreted;
         }
@@ -1442,7 +1441,7 @@ bool FileEntry::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
                  input, &mtime_)));
-          _set_bit(3);
+          set_has_mtime();
         } else {
           goto handle_uninterpreted;
         }
@@ -1458,7 +1457,7 @@ bool FileEntry::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &mtime_ns_)));
-          _set_bit(4);
+          set_has_mtime_ns();
         } else {
           goto handle_uninterpreted;
         }
@@ -1500,7 +1499,7 @@ bool FileEntry::MergePartialFromCodedStream(
 void FileEntry::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required string name = 1;
-  if (_has_bit(0)) {
+  if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -1509,22 +1508,22 @@ void FileEntry::SerializeWithCachedSizes(
   }
   
   // required int32 mode = 2;
-  if (_has_bit(1)) {
+  if (has_mode()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->mode(), output);
   }
   
   // required uint64 size = 3;
-  if (_has_bit(2)) {
+  if (has_size()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->size(), output);
   }
   
   // required int64 mtime = 4;
-  if (_has_bit(3)) {
+  if (has_mtime()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt64(4, this->mtime(), output);
   }
   
   // optional int32 mtime_ns = 5;
-  if (_has_bit(4)) {
+  if (has_mtime_ns()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->mtime_ns(), output);
   }
   
@@ -1543,7 +1542,7 @@ void FileEntry::SerializeWithCachedSizes(
 ::google::protobuf::uint8* FileEntry::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required string name = 1;
-  if (_has_bit(0)) {
+  if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -1553,22 +1552,22 @@ void FileEntry::SerializeWithCachedSizes(
   }
   
   // required int32 mode = 2;
-  if (_has_bit(1)) {
+  if (has_mode()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->mode(), target);
   }
   
   // required uint64 size = 3;
-  if (_has_bit(2)) {
+  if (has_size()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(3, this->size(), target);
   }
   
   // required int64 mtime = 4;
-  if (_has_bit(3)) {
+  if (has_mtime()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(4, this->mtime(), target);
   }
   
   // optional int32 mtime_ns = 5;
-  if (_has_bit(4)) {
+  if (has_mtime_ns()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->mtime_ns(), target);
   }
   
@@ -1661,19 +1660,19 @@ void FileEntry::MergeFrom(const FileEntry& from) {
   GOOGLE_CHECK_NE(&from, this);
   parts_.MergeFrom(from.parts_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_name()) {
       set_name(from.name());
     }
-    if (from._has_bit(1)) {
+    if (from.has_mode()) {
       set_mode(from.mode());
     }
-    if (from._has_bit(2)) {
+    if (from.has_size()) {
       set_size(from.size());
     }
-    if (from._has_bit(3)) {
+    if (from.has_mtime()) {
       set_mtime(from.mtime());
     }
-    if (from._has_bit(4)) {
+    if (from.has_mtime_ns()) {
       set_mtime_ns(from.mtime_ns());
     }
   }
@@ -1974,8 +1973,6 @@ void Tree::Swap(Tree* other) {
 
 // ===================================================================
 
-const ::std::string Property::_default_key_;
-const ::std::string Property::_default_str_val_;
 #ifndef _MSC_VER
 const int Property::kKeyFieldNumber;
 const int Property::kStrValFieldNumber;
@@ -1997,8 +1994,8 @@ Property::Property(const Property& from)
 
 void Property::SharedCtor() {
   _cached_size_ = 0;
-  key_ = const_cast< ::std::string*>(&_default_key_);
-  str_val_ = const_cast< ::std::string*>(&_default_str_val_);
+  key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  str_val_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2007,10 +2004,10 @@ Property::~Property() {
 }
 
 void Property::SharedDtor() {
-  if (key_ != &_default_key_) {
+  if (key_ != &::google::protobuf::internal::kEmptyString) {
     delete key_;
   }
-  if (str_val_ != &_default_str_val_) {
+  if (str_val_ != &::google::protobuf::internal::kEmptyString) {
     delete str_val_;
   }
   if (this != default_instance_) {
@@ -2039,13 +2036,13 @@ Property* Property::New() const {
 
 void Property::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (key_ != &_default_key_) {
+    if (has_key()) {
+      if (key_ != &::google::protobuf::internal::kEmptyString) {
         key_->clear();
       }
     }
-    if (_has_bit(1)) {
-      if (str_val_ != &_default_str_val_) {
+    if (has_str_val()) {
+      if (str_val_ != &::google::protobuf::internal::kEmptyString) {
         str_val_->clear();
       }
     }
@@ -2112,7 +2109,7 @@ bool Property::MergePartialFromCodedStream(
 void Property::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required string key = 1;
-  if (_has_bit(0)) {
+  if (has_key()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->key().data(), this->key().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -2121,7 +2118,7 @@ void Property::SerializeWithCachedSizes(
   }
   
   // optional string str_val = 2;
-  if (_has_bit(1)) {
+  if (has_str_val()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->str_val().data(), this->str_val().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -2138,7 +2135,7 @@ void Property::SerializeWithCachedSizes(
 ::google::protobuf::uint8* Property::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required string key = 1;
-  if (_has_bit(0)) {
+  if (has_key()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->key().data(), this->key().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -2148,7 +2145,7 @@ void Property::SerializeWithCachedSizes(
   }
   
   // optional string str_val = 2;
-  if (_has_bit(1)) {
+  if (has_str_val()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->str_val().data(), this->str_val().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -2209,10 +2206,10 @@ void Property::MergeFrom(const ::google::protobuf::Message& from) {
 void Property::MergeFrom(const Property& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_key()) {
       set_key(from.key());
     }
-    if (from._has_bit(1)) {
+    if (from.has_str_val()) {
       set_str_val(from.str_val());
     }
   }
@@ -2463,7 +2460,6 @@ void Properties::Swap(Properties* other) {
 
 // ===================================================================
 
-const ::std::string SecureProperties::_default_entry_point_key_;
 #ifndef _MSC_VER
 const int SecureProperties::kPropertiesFieldNumber;
 const int SecureProperties::kEntryPointKeyFieldNumber;
@@ -2485,7 +2481,7 @@ SecureProperties::SecureProperties(const SecureProperties& from)
 
 void SecureProperties::SharedCtor() {
   _cached_size_ = 0;
-  entry_point_key_ = const_cast< ::std::string*>(&_default_entry_point_key_);
+  entry_point_key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2494,7 +2490,7 @@ SecureProperties::~SecureProperties() {
 }
 
 void SecureProperties::SharedDtor() {
-  if (entry_point_key_ != &_default_entry_point_key_) {
+  if (entry_point_key_ != &::google::protobuf::internal::kEmptyString) {
     delete entry_point_key_;
   }
   if (this != default_instance_) {
@@ -2523,8 +2519,8 @@ SecureProperties* SecureProperties::New() const {
 
 void SecureProperties::Clear() {
   if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
-    if (_has_bit(1)) {
-      if (entry_point_key_ != &_default_entry_point_key_) {
+    if (has_entry_point_key()) {
+      if (entry_point_key_ != &::google::protobuf::internal::kEmptyString) {
         entry_point_key_->clear();
       }
     }
@@ -2594,7 +2590,7 @@ void SecureProperties::SerializeWithCachedSizes(
   }
   
   // optional bytes entry_point_key = 2;
-  if (_has_bit(1)) {
+  if (has_entry_point_key()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       2, this->entry_point_key(), output);
   }
@@ -2615,7 +2611,7 @@ void SecureProperties::SerializeWithCachedSizes(
   }
   
   // optional bytes entry_point_key = 2;
-  if (_has_bit(1)) {
+  if (has_entry_point_key()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         2, this->entry_point_key(), target);
@@ -2675,7 +2671,7 @@ void SecureProperties::MergeFrom(const SecureProperties& from) {
   GOOGLE_CHECK_NE(&from, this);
   properties_.MergeFrom(from.properties_);
   if (from._has_bits_[1 / 32] & (0xffu << (1 % 32))) {
-    if (from._has_bit(1)) {
+    if (from.has_entry_point_key()) {
       set_entry_point_key(from.entry_point_key());
     }
   }
@@ -2723,9 +2719,6 @@ void SecureProperties::Swap(SecureProperties* other) {
 
 // ===================================================================
 
-const ::std::string Pbkdf2Key::_default_salt_;
-const ::std::string Pbkdf2Key::_default_iv_;
-const ::std::string Pbkdf2Key::_default_key_;
 #ifndef _MSC_VER
 const int Pbkdf2Key::kSaltFieldNumber;
 const int Pbkdf2Key::kIterationsFieldNumber;
@@ -2749,10 +2742,10 @@ Pbkdf2Key::Pbkdf2Key(const Pbkdf2Key& from)
 
 void Pbkdf2Key::SharedCtor() {
   _cached_size_ = 0;
-  salt_ = const_cast< ::std::string*>(&_default_salt_);
+  salt_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   iterations_ = 4096;
-  iv_ = const_cast< ::std::string*>(&_default_iv_);
-  key_ = const_cast< ::std::string*>(&_default_key_);
+  iv_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2761,13 +2754,13 @@ Pbkdf2Key::~Pbkdf2Key() {
 }
 
 void Pbkdf2Key::SharedDtor() {
-  if (salt_ != &_default_salt_) {
+  if (salt_ != &::google::protobuf::internal::kEmptyString) {
     delete salt_;
   }
-  if (iv_ != &_default_iv_) {
+  if (iv_ != &::google::protobuf::internal::kEmptyString) {
     delete iv_;
   }
-  if (key_ != &_default_key_) {
+  if (key_ != &::google::protobuf::internal::kEmptyString) {
     delete key_;
   }
   if (this != default_instance_) {
@@ -2796,19 +2789,19 @@ Pbkdf2Key* Pbkdf2Key::New() const {
 
 void Pbkdf2Key::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (salt_ != &_default_salt_) {
+    if (has_salt()) {
+      if (salt_ != &::google::protobuf::internal::kEmptyString) {
         salt_->clear();
       }
     }
     iterations_ = 4096;
-    if (_has_bit(2)) {
-      if (iv_ != &_default_iv_) {
+    if (has_iv()) {
+      if (iv_ != &::google::protobuf::internal::kEmptyString) {
         iv_->clear();
       }
     }
-    if (_has_bit(3)) {
-      if (key_ != &_default_key_) {
+    if (has_key()) {
+      if (key_ != &::google::protobuf::internal::kEmptyString) {
         key_->clear();
       }
     }
@@ -2844,7 +2837,7 @@ bool Pbkdf2Key::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &iterations_)));
-          _set_bit(1);
+          set_has_iterations();
         } else {
           goto handle_uninterpreted;
         }
@@ -2899,24 +2892,24 @@ bool Pbkdf2Key::MergePartialFromCodedStream(
 void Pbkdf2Key::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required bytes salt = 1;
-  if (_has_bit(0)) {
+  if (has_salt()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       1, this->salt(), output);
   }
   
   // optional int32 iterations = 2 [default = 4096];
-  if (_has_bit(1)) {
+  if (has_iterations()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->iterations(), output);
   }
   
   // required bytes iv = 3;
-  if (_has_bit(2)) {
+  if (has_iv()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       3, this->iv(), output);
   }
   
   // required bytes key = 4;
-  if (_has_bit(3)) {
+  if (has_key()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       4, this->key(), output);
   }
@@ -2930,26 +2923,26 @@ void Pbkdf2Key::SerializeWithCachedSizes(
 ::google::protobuf::uint8* Pbkdf2Key::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required bytes salt = 1;
-  if (_has_bit(0)) {
+  if (has_salt()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         1, this->salt(), target);
   }
   
   // optional int32 iterations = 2 [default = 4096];
-  if (_has_bit(1)) {
+  if (has_iterations()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->iterations(), target);
   }
   
   // required bytes iv = 3;
-  if (_has_bit(2)) {
+  if (has_iv()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         3, this->iv(), target);
   }
   
   // required bytes key = 4;
-  if (_has_bit(3)) {
+  if (has_key()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         4, this->key(), target);
@@ -3021,16 +3014,16 @@ void Pbkdf2Key::MergeFrom(const ::google::protobuf::Message& from) {
 void Pbkdf2Key::MergeFrom(const Pbkdf2Key& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_salt()) {
       set_salt(from.salt());
     }
-    if (from._has_bit(1)) {
+    if (from.has_iterations()) {
       set_iterations(from.iterations());
     }
-    if (from._has_bit(2)) {
+    if (from.has_iv()) {
       set_iv(from.iv());
     }
-    if (from._has_bit(3)) {
+    if (from.has_key()) {
       set_key(from.key());
     }
   }
@@ -3078,8 +3071,6 @@ void Pbkdf2Key::Swap(Pbkdf2Key* other) {
 
 // ===================================================================
 
-const ::std::string PgpKey::_default_key_id_;
-const ::std::string PgpKey::_default_encrypted_key_;
 #ifndef _MSC_VER
 const int PgpKey::kKeyIdFieldNumber;
 const int PgpKey::kEncryptedKeyFieldNumber;
@@ -3101,8 +3092,8 @@ PgpKey::PgpKey(const PgpKey& from)
 
 void PgpKey::SharedCtor() {
   _cached_size_ = 0;
-  key_id_ = const_cast< ::std::string*>(&_default_key_id_);
-  encrypted_key_ = const_cast< ::std::string*>(&_default_encrypted_key_);
+  key_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  encrypted_key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -3111,10 +3102,10 @@ PgpKey::~PgpKey() {
 }
 
 void PgpKey::SharedDtor() {
-  if (key_id_ != &_default_key_id_) {
+  if (key_id_ != &::google::protobuf::internal::kEmptyString) {
     delete key_id_;
   }
-  if (encrypted_key_ != &_default_encrypted_key_) {
+  if (encrypted_key_ != &::google::protobuf::internal::kEmptyString) {
     delete encrypted_key_;
   }
   if (this != default_instance_) {
@@ -3143,13 +3134,13 @@ PgpKey* PgpKey::New() const {
 
 void PgpKey::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (key_id_ != &_default_key_id_) {
+    if (has_key_id()) {
+      if (key_id_ != &::google::protobuf::internal::kEmptyString) {
         key_id_->clear();
       }
     }
-    if (_has_bit(1)) {
-      if (encrypted_key_ != &_default_encrypted_key_) {
+    if (has_encrypted_key()) {
+      if (encrypted_key_ != &::google::protobuf::internal::kEmptyString) {
         encrypted_key_->clear();
       }
     }
@@ -3213,7 +3204,7 @@ bool PgpKey::MergePartialFromCodedStream(
 void PgpKey::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional string key_id = 1;
-  if (_has_bit(0)) {
+  if (has_key_id()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->key_id().data(), this->key_id().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -3222,7 +3213,7 @@ void PgpKey::SerializeWithCachedSizes(
   }
   
   // required bytes encrypted_key = 2;
-  if (_has_bit(1)) {
+  if (has_encrypted_key()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       2, this->encrypted_key(), output);
   }
@@ -3236,7 +3227,7 @@ void PgpKey::SerializeWithCachedSizes(
 ::google::protobuf::uint8* PgpKey::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional string key_id = 1;
-  if (_has_bit(0)) {
+  if (has_key_id()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->key_id().data(), this->key_id().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -3246,7 +3237,7 @@ void PgpKey::SerializeWithCachedSizes(
   }
   
   // required bytes encrypted_key = 2;
-  if (_has_bit(1)) {
+  if (has_encrypted_key()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         2, this->encrypted_key(), target);
@@ -3304,10 +3295,10 @@ void PgpKey::MergeFrom(const ::google::protobuf::Message& from) {
 void PgpKey::MergeFrom(const PgpKey& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_key_id()) {
       set_key_id(from.key_id());
     }
-    if (from._has_bit(1)) {
+    if (from.has_encrypted_key()) {
       set_encrypted_key(from.encrypted_key());
     }
   }
@@ -3353,8 +3344,6 @@ void PgpKey::Swap(PgpKey* other) {
 
 // ===================================================================
 
-const ::std::string EncryptedProperties::_default_encrypted_data_;
-const ::std::string EncryptedProperties::_default_iv_;
 #ifndef _MSC_VER
 const int EncryptedProperties::kEncryptedDataFieldNumber;
 const int EncryptedProperties::kIvFieldNumber;
@@ -3381,8 +3370,8 @@ EncryptedProperties::EncryptedProperties(const EncryptedProperties& from)
 
 void EncryptedProperties::SharedCtor() {
   _cached_size_ = 0;
-  encrypted_data_ = const_cast< ::std::string*>(&_default_encrypted_data_);
-  iv_ = const_cast< ::std::string*>(&_default_iv_);
+  encrypted_data_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  iv_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   algorithm_ = 1;
   password_key_ = NULL;
   pgp_encrypted_key_ = NULL;
@@ -3394,10 +3383,10 @@ EncryptedProperties::~EncryptedProperties() {
 }
 
 void EncryptedProperties::SharedDtor() {
-  if (encrypted_data_ != &_default_encrypted_data_) {
+  if (encrypted_data_ != &::google::protobuf::internal::kEmptyString) {
     delete encrypted_data_;
   }
-  if (iv_ != &_default_iv_) {
+  if (iv_ != &::google::protobuf::internal::kEmptyString) {
     delete iv_;
   }
   if (this != default_instance_) {
@@ -3428,21 +3417,21 @@ EncryptedProperties* EncryptedProperties::New() const {
 
 void EncryptedProperties::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (encrypted_data_ != &_default_encrypted_data_) {
+    if (has_encrypted_data()) {
+      if (encrypted_data_ != &::google::protobuf::internal::kEmptyString) {
         encrypted_data_->clear();
       }
     }
-    if (_has_bit(1)) {
-      if (iv_ != &_default_iv_) {
+    if (has_iv()) {
+      if (iv_ != &::google::protobuf::internal::kEmptyString) {
         iv_->clear();
       }
     }
     algorithm_ = 1;
-    if (_has_bit(3)) {
+    if (has_password_key()) {
       if (password_key_ != NULL) password_key_->::Lyekka::pb::Pbkdf2Key::Clear();
     }
-    if (_has_bit(4)) {
+    if (has_pgp_encrypted_key()) {
       if (pgp_encrypted_key_ != NULL) pgp_encrypted_key_->::Lyekka::pb::PgpKey::Clear();
     }
   }
@@ -3551,31 +3540,31 @@ bool EncryptedProperties::MergePartialFromCodedStream(
 void EncryptedProperties::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required bytes encrypted_data = 1;
-  if (_has_bit(0)) {
+  if (has_encrypted_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       1, this->encrypted_data(), output);
   }
   
   // required bytes iv = 2;
-  if (_has_bit(1)) {
+  if (has_iv()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       2, this->iv(), output);
   }
   
   // optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
-  if (_has_bit(2)) {
+  if (has_algorithm()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       3, this->algorithm(), output);
   }
   
   // optional .Lyekka.pb.Pbkdf2Key password_key = 4;
-  if (_has_bit(3)) {
+  if (has_password_key()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       4, this->password_key(), output);
   }
   
   // optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
-  if (_has_bit(4)) {
+  if (has_pgp_encrypted_key()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       5, this->pgp_encrypted_key(), output);
   }
@@ -3589,34 +3578,34 @@ void EncryptedProperties::SerializeWithCachedSizes(
 ::google::protobuf::uint8* EncryptedProperties::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required bytes encrypted_data = 1;
-  if (_has_bit(0)) {
+  if (has_encrypted_data()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         1, this->encrypted_data(), target);
   }
   
   // required bytes iv = 2;
-  if (_has_bit(1)) {
+  if (has_iv()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         2, this->iv(), target);
   }
   
   // optional .Lyekka.pb.Encryption algorithm = 3 [default = AES_128_CBC];
-  if (_has_bit(2)) {
+  if (has_algorithm()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       3, this->algorithm(), target);
   }
   
   // optional .Lyekka.pb.Pbkdf2Key password_key = 4;
-  if (_has_bit(3)) {
+  if (has_password_key()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         4, this->password_key(), target);
   }
   
   // optional .Lyekka.pb.PgpKey pgp_encrypted_key = 5;
-  if (_has_bit(4)) {
+  if (has_pgp_encrypted_key()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         5, this->pgp_encrypted_key(), target);
@@ -3694,19 +3683,19 @@ void EncryptedProperties::MergeFrom(const ::google::protobuf::Message& from) {
 void EncryptedProperties::MergeFrom(const EncryptedProperties& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_encrypted_data()) {
       set_encrypted_data(from.encrypted_data());
     }
-    if (from._has_bit(1)) {
+    if (from.has_iv()) {
       set_iv(from.iv());
     }
-    if (from._has_bit(2)) {
+    if (from.has_algorithm()) {
       set_algorithm(from.algorithm());
     }
-    if (from._has_bit(3)) {
+    if (from.has_password_key()) {
       mutable_password_key()->::Lyekka::pb::Pbkdf2Key::MergeFrom(from.password_key());
     }
-    if (from._has_bit(4)) {
+    if (from.has_pgp_encrypted_key()) {
       mutable_pgp_encrypted_key()->::Lyekka::pb::PgpKey::MergeFrom(from.pgp_encrypted_key());
     }
   }
@@ -3822,10 +3811,10 @@ Manifest* Manifest::New() const {
 
 void Manifest::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
+    if (has_properties()) {
       if (properties_ != NULL) properties_->::Lyekka::pb::Properties::Clear();
     }
-    if (_has_bit(1)) {
+    if (has_secure_properties()) {
       if (secure_properties_ != NULL) secure_properties_->::Lyekka::pb::EncryptedProperties::Clear();
     }
   }
@@ -3885,13 +3874,13 @@ bool Manifest::MergePartialFromCodedStream(
 void Manifest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional .Lyekka.pb.Properties properties = 1;
-  if (_has_bit(0)) {
+  if (has_properties()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1, this->properties(), output);
   }
   
   // optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
-  if (_has_bit(1)) {
+  if (has_secure_properties()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       2, this->secure_properties(), output);
   }
@@ -3905,14 +3894,14 @@ void Manifest::SerializeWithCachedSizes(
 ::google::protobuf::uint8* Manifest::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional .Lyekka.pb.Properties properties = 1;
-  if (_has_bit(0)) {
+  if (has_properties()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         1, this->properties(), target);
   }
   
   // optional .Lyekka.pb.EncryptedProperties secure_properties = 2;
-  if (_has_bit(1)) {
+  if (has_secure_properties()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         2, this->secure_properties(), target);
@@ -3970,10 +3959,10 @@ void Manifest::MergeFrom(const ::google::protobuf::Message& from) {
 void Manifest::MergeFrom(const Manifest& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_properties()) {
       mutable_properties()->::Lyekka::pb::Properties::MergeFrom(from.properties());
     }
-    if (from._has_bit(1)) {
+    if (from.has_secure_properties()) {
       mutable_secure_properties()->::Lyekka::pb::EncryptedProperties::MergeFrom(from.secure_properties());
     }
   }
@@ -4024,7 +4013,6 @@ void Manifest::Swap(Manifest* other) {
 
 // ===================================================================
 
-const ::std::string Signature::_default_signature_;
 #ifndef _MSC_VER
 const int Signature::kSignatureFieldNumber;
 #endif  // !_MSC_VER
@@ -4045,7 +4033,7 @@ Signature::Signature(const Signature& from)
 
 void Signature::SharedCtor() {
   _cached_size_ = 0;
-  signature_ = const_cast< ::std::string*>(&_default_signature_);
+  signature_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -4054,7 +4042,7 @@ Signature::~Signature() {
 }
 
 void Signature::SharedDtor() {
-  if (signature_ != &_default_signature_) {
+  if (signature_ != &::google::protobuf::internal::kEmptyString) {
     delete signature_;
   }
   if (this != default_instance_) {
@@ -4083,8 +4071,8 @@ Signature* Signature::New() const {
 
 void Signature::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (signature_ != &_default_signature_) {
+    if (has_signature()) {
+      if (signature_ != &::google::protobuf::internal::kEmptyString) {
         signature_->clear();
       }
     }
@@ -4131,7 +4119,7 @@ bool Signature::MergePartialFromCodedStream(
 void Signature::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional bytes signature = 1;
-  if (_has_bit(0)) {
+  if (has_signature()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
       1, this->signature(), output);
   }
@@ -4145,7 +4133,7 @@ void Signature::SerializeWithCachedSizes(
 ::google::protobuf::uint8* Signature::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional bytes signature = 1;
-  if (_has_bit(0)) {
+  if (has_signature()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         1, this->signature(), target);
@@ -4196,7 +4184,7 @@ void Signature::MergeFrom(const ::google::protobuf::Message& from) {
 void Signature::MergeFrom(const Signature& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_signature()) {
       set_signature(from.signature());
     }
   }
