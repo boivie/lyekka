@@ -36,7 +36,7 @@ static bool already_in_db(sd::sqlite& db, string name)
 
 int Paths::add(std::string& path)
 {
-  fs::path p(path, fs::native);
+  fs::path p(path);
   
   if (!fs::exists(p) || 
     !fs::is_directory(p))

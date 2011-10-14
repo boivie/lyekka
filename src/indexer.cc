@@ -138,7 +138,7 @@ void Indexer::index_path(fs::path& path, int dir_db_id)
        dir_itr != end_iter;
        ++dir_itr )
   {
-    FileList::iterator known_i = known.find(dir_itr->path().leaf());
+    FileList::iterator known_i = known.find(dir_itr->path().leaf().string());
     auto_ptr<IndexedBase> item_p;
     if (known_i != known.end()) 
     {
@@ -213,7 +213,7 @@ void Indexer::delete_files(FileList& deletemap)
 
 std::auto_ptr<IndexedFile> Indexer::create_file_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  string filename = itr->path().leaf();
+  string filename = itr->path().leaf().string();
   sd::sql query(m_db);
   query << "INSERT INTO files (parent,name,mtime,size) VALUES (?, ?, 0, 0)";
   query << parent_id << filename;
@@ -224,7 +224,7 @@ std::auto_ptr<IndexedFile> Indexer::create_file_obj(boost::filesystem::directory
 
 std::auto_ptr<IndexedDir> Indexer::create_dir_obj(boost::filesystem::directory_iterator& itr, int parent_id)
 {
-  string filename = itr->path().leaf();
+  string filename = itr->path().leaf().string();
   sd::sql query(m_db);
   query << "INSERT INTO paths (parent,name,mtime) VALUES (?, ?, 0)";
   query << parent_id << filename;
